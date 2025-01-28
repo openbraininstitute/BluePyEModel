@@ -81,7 +81,7 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/BlueBrain/BluePyEModel"
+Homepage = "https://github.com/openbraininstitute/BluePyEModel"
 
 [tool.setuptools]
 include-package-data = true

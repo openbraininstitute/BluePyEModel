@@ -21,7 +21,7 @@ BluePyEModel: Blue Brain Python Electrical Modeling Pipeline
 Introduction
 ------------
 
-The Blue Brain Python Electrical Modeling Pipeline (BluePyEModel) is a Python package facilitating the configuration and execution of electrical neuron model (e-model) building tasks. It covers tasks such as extraction of electrical features from electrophysiology data, e-model parameters optimisation and model validation. As such, it builds on top of `eFEL <https://github.com/BlueBrain/eFEL>`_, `BluePyEfe <https://github.com/BlueBrain/BluePyEfe>`_ and `BluePyOpt <https://github.com/BlueBrain/BluePyOpt>`_.
+The Blue Brain Python Electrical Modeling Pipeline (BluePyEModel) is a Python package facilitating the configuration and execution of electrical neuron model (e-model) building tasks. It covers tasks such as extraction of electrical features from electrophysiology data, e-model parameters optimisation and model validation. As such, it builds on top of `eFEL <https://github.com/openbraininstitute/eFEL>`_, `BluePyEfe <https://github.com/openbraininstitute/BluePyEfe>`_ and `BluePyOpt <https://github.com/openbraininstitute/BluePyOpt>`_.
 
 For a general overview and example of electrical model building, please refer to the paper: `A universal workflow for creation, validation and generalization of detailed neuronal models <https://doi.org/10.1016/j.patter.2023.100855>`_.
 
@@ -44,7 +44,7 @@ Additionally, to cite software used for different steps of the pipeline, please 
    - ``eFEL``: `Zenodo DOI: 10.5281/zenodo.593869 <https://doi.org/10.5281/zenodo.593869>`_
    - ``BluePyEfe``: `Zenodo DOI: 10.5281/zenodo.3728191 <https://doi.org/10.5281/zenodo.3728191>`_
 
-- Ion Channel Selector: `Me-Features-to-Mo-ID Mapping <https://github.com/BlueBrain/me-features-to-mo-ID-mapping>`_: paper: `Roussel et al., 2023 <https://doi.org/10.1371/journal.pcbi.1010058>`_
+- Ion Channel Selector: `Me-Features-to-Mo-ID Mapping <https://github.com/openbraininstitute/me-features-to-mo-ID-mapping>`_: paper: `Roussel et al., 2023 <https://doi.org/10.1371/journal.pcbi.1010058>`_
 
 Installation
 ------------
@@ -65,10 +65,10 @@ If you do not wish to install all dependencies, specific dependencies can be sel
 To get started with the E-Model building pipeline
 -------------------------------------------------
 
-.. image:: https://raw.githubusercontent.com/BlueBrain/BluePyEModel/main/doc/images/pipeline.png
+.. image:: https://raw.githubusercontent.com/openbraininstitute/BluePyEModel/main/doc/images/pipeline.png
    :alt: E-Model building pipeline
 
-This section presents a general picture of the pipeline. For a detailed picture and how to use it, please refer to the `L5PC example <https://github.com/BlueBrain/BluePyEModel/tree/main/examples/L5PC/>`_ and its `README <https://github.com/BlueBrain/BluePyEModel/tree/main/examples/L5PC/README.rst>`_.
+This section presents a general picture of the pipeline. For a detailed picture and how to use it, please refer to the `L5PC example <https://github.com/openbraininstitute/BluePyEModel/tree/main/examples/L5PC/>`_ and its `README <https://github.com/openbraininstitute/BluePyEModel/tree/main/examples/L5PC/README.rst>`_.
 
 The pipeline is divided in 6 steps:
 
@@ -81,12 +81,12 @@ The pipeline is divided in 6 steps:
 
 These six steps are to be run in order as for example validation cannot be run if no models have been stored. Steps ``validation``, ``plotting`` and ``exporting`` are optional. Step ``extraction`` can also be optional in the case where the file containing the protocols and optimisation targets is created by hand or if it is obtained from an older project.
 
-For an example of how to run the pipeline with the Nexus access point, see the `Nexus example <https://github.com/BlueBrain/BluePyEModel/tree/main/examples/nexus/>`_
+For an example of how to run the pipeline with the Nexus access point, see the `Nexus example <https://github.com/openbraininstitute/BluePyEModel/tree/main/examples/nexus/>`_
 
 Schematics of BluePyEModel classes
 -----------------------------------
 
-.. image:: https://raw.githubusercontent.com/BlueBrain/BluePyEModel/main/doc/images/classes_schema.png
+.. image:: https://raw.githubusercontent.com/openbraininstitute/BluePyEModel/main/doc/images/classes_schema.png
    :alt: Schematics of BluePyEModel classes
 
 
@@ -101,14 +101,16 @@ Copyright
 
 Copyright (c) 2023-2024 Blue Brain Project/EPFL
 
+Copyright (c) 2025 Open Brain Institute
+
 This work is licensed under `Apache 2.0 <https://www.apache.org/licenses/LICENSE-2.0.html>`_
 
 
 .. |license| image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
-                :target: https://github.com/BlueBrain/BluePyEModel/blob/main/LICENSE.txt
+                :target: https://github.com/openbraininstitute/BluePyEModel/blob/main/LICENSE.txt
 
-.. |tests| image:: https://github.com/BlueBrain/BluepyEModel/actions/workflows/test.yml/badge.svg
-   :target: https://github.com/BlueBrain/BluepyEModel/actions/workflows/test.yml
+.. |tests| image:: https://github.com/openbraininstitute/BluepyEModel/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/openbraininstitute/BluepyEModel/actions/workflows/test.yml
    :alt: CI
 
 .. |pypi| image:: https://img.shields.io/pypi/v/bluepyemodel.svg
@@ -119,8 +121,8 @@ This work is licensed under `Apache 2.0 <https://www.apache.org/licenses/LICENSE
                :target: https://bluepyemodel.readthedocs.io/
                :alt: latest documentation
 
-.. |coverage| image:: https://codecov.io/github/BlueBrain/BluePyEModel/coverage.svg?branch=main
-                   :target: https://codecov.io/gh/BlueBrain/bluepyemodel
+.. |coverage| image:: https://codecov.io/github/openbraininstitute/BluePyEModel/coverage.svg?branch=main
+                   :target: https://codecov.io/gh/openbraininstitute/bluepyemodel
                    :alt: coverage
 
 .. |zenodo| image:: https://zenodo.org/badge/651152332.svg
@@ -134,4 +136,4 @@ This work is licensed under `Apache 2.0 <https://www.apache.org/licenses/LICENSE
     to skip content after the marker 'substitutions'.
 
 .. substitutions
-.. |banner| image:: https://raw.githubusercontent.com/BlueBrain/BluePyEModel/main/doc/source/logo/BluePyEModelBanner.jpg
+.. |banner| image:: https://raw.githubusercontent.com/openbraininstitute/BluePyEModel/main/doc/source/logo/BluePyEModelBanner.jpg
