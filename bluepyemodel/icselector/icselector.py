@@ -1,4 +1,4 @@
-""" ICSELECTOR
+"""ICSELECTOR
 Select a set of NEURON mechanisms, parameters and bounds from corresponding
 genes. Gene names can be selected from a file mapping genes to different
 ME-T types. Corresponding channels are selected from a file mapping channels

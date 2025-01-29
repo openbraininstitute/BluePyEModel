@@ -17,7 +17,7 @@ jobs:
     needs: call-test-workflow
     environment:  # needed for pypi publication
       name: pypi
-      url: https://pypi.org/p/bluepyopt
+      url: https://pypi.org/p/bluepyemodel
     permissions:
       contents: write
       id-token: write  # needed for pypi publication
