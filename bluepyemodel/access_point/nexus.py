@@ -1486,3 +1486,39 @@ class NexusAccessPoint(DataAccessPoint):
             return True
         except AccessPointException:
             return False
+
+    def store_simulatable_neuron(
+        self, simulatable_neuron, is_analysis_suitable=False
+    ):
+        """Store a BPEM object on Nexus
+        
+        Args:
+            simulatable_neuron (SimulatableNeuron)
+            is_analysis_suitable (bool): Should be True only when managing metatada for resources
+                of type EModel, for which all data are complete (has FCC, ETC, EMC, etc.).
+        """
+
+        metadata_dict = self.emodel_metadata_ontology.for_resource(
+            is_analysis_suitable=is_analysis_suitable
+        )
+
+        type_ = "SimulatableNeuron"
+
+        base_payload = simulatable_neuron.as_dict()
+        base_payload["type"] = ["Entity", type_]
+        if "subject" in metadata_dict:
+            base_payload["subject"] = metadata_dict["subject"]
+        if "brainLocation" in metadata_dict:
+            base_payload["brainLocation"] = metadata_dict["brainLocation"]
+        if "annotation" in metadata_dict:
+            base_payload["annotation"] = metadata_dict["annotation"]
+
+        self.forge.register(
+            base_payload,
+            filters_existence=None,
+            legacy_filters_existence=None,
+            replace=False,
+            distributions=None,
+            images=None,
+            type_=type_,
+        )
