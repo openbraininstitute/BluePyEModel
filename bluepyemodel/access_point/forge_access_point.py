@@ -37,7 +37,7 @@ from bluepyemodel.emodel_pipeline.emodel_script import EModelScript
 from bluepyemodel.emodel_pipeline.emodel_settings import EModelPipelineSettings
 from bluepyemodel.emodel_pipeline.emodel_workflow import EModelWorkflow
 from bluepyemodel.emodel_pipeline.memodel import MEModel
-from bluepyemodel.emodel_pipeline.simulatableneuron import SimulatableNeuron
+from bluepyemodel.emodel_pipeline.simulatable_neuron import SimulatableNeuron
 from bluepyemodel.evaluation.fitness_calculator_configuration import FitnessCalculatorConfiguration
 from bluepyemodel.model.distribution_configuration import DistributionConfiguration
 from bluepyemodel.model.neuron_model_configuration import NeuronModelConfiguration
@@ -71,7 +71,7 @@ CLASS_TO_RESOURCE_NAME = {
     "EModelWorkflow": "EMW",
     "EModelScript": "EMS",
     "MEModel": "MEM",
-    "SimulatableNeuron": "SN"
+    "SimulatableNeuron": "SN",
 }
 
 NEXUS_TYPE_TO_CLASS = {
@@ -84,7 +84,7 @@ NEXUS_TYPE_TO_CLASS = {
     "EModelWorkflow": EModelWorkflow,
     "EModelScript": EModelScript,
     "MEModel": MEModel,
-    "SimulatableNeuron": SimulatableNeuron
+    "SimulatableNeuron": SimulatableNeuron,
 }
 
 NEXUS_ENTRIES = [
@@ -441,9 +441,8 @@ class NexusForgeAccessPoint:
         # when EModelWorkflow resource is complete
         if type_ == "EModelWorkflow":
             type_ = "Entity"
-        if type_ == "SimulatableNeuron":
-            schema_id = None
-        else:
+        schema_id = None
+        if type_ != "SimulatableNeuron":
             schema_id = self.forge._model.schema_id(type_)
 
         self.forge.register(resource, schema_id=schema_id)

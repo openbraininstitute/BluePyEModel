@@ -1,3 +1,5 @@
+"""SimulatableNeuron class"""
+
 """
 Copyright 2025 Open Brain Institute
 
@@ -19,22 +21,24 @@ class SimulatableNeuron:
     """Whole neuron model, including links to morphology, ion channels models and hoc."""
 
     def __init__(
-            self,
-            description,
-            emodel_script_id,
-            mechanism_ids,
-            morphology_id,
-            holding_current=None,
-            threshold_current=None,
-            validated=False,
-        ):
+        self,
+        name,
+        description,
+        emodel_script_id,
+        mechanism_ids,
+        morphology_id,
+        holding_current=None,
+        threshold_current=None,
+        validated=False,
+    ):
         """Init
 
         from_circuit and synaptomes, that might be present in the database,
         are not implemented here.
-        name, eModel, eType, subject, brainRegion are automatically filled in by forge_access_point for now using emodel_metadata
-        
+        subject, brainRegion are coming emodel_metadata
+
         Args:
+            name (str): name
             description (str): description of the model
             emodel_script_id (str): ID of the hoc model in the database
             mechanism_ids (list of str): IDs of the ion channel models in the database
@@ -44,6 +48,7 @@ class SimulatableNeuron:
             validated (bool): whether the model has been validated by user
         """
         # check if brain region and subject are automatically added
+        self.name = name
         self.description = description
         self.emodel_script_id = emodel_script_id
         self.mechanism_ids = mechanism_ids

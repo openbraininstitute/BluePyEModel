@@ -1487,11 +1487,9 @@ class NexusAccessPoint(DataAccessPoint):
         except AccessPointException:
             return False
 
-    def store_simulatable_neuron(
-        self, simulatable_neuron, is_analysis_suitable=False
-    ):
+    def store_simulatable_neuron(self, simulatable_neuron, is_analysis_suitable=False):
         """Store a BPEM object on Nexus
-        
+
         Args:
             simulatable_neuron (SimulatableNeuron)
             is_analysis_suitable (bool): Should be True only when managing metatada for resources
@@ -1513,7 +1511,7 @@ class NexusAccessPoint(DataAccessPoint):
         if "annotation" in metadata_dict:
             base_payload["annotation"] = metadata_dict["annotation"]
 
-        self.forge.register(
+        self.access_point.register(
             base_payload,
             filters_existence=None,
             legacy_filters_existence=None,
