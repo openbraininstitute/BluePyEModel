@@ -1520,3 +1520,20 @@ class NexusAccessPoint(DataAccessPoint):
             images=None,
             type_=type_,
         )
+
+        # update EMW if any
+        workflow, workflow_id = self.get_emodel_workflow()
+
+        # wait for the object to be uploaded and fetchable
+        if workflow is not None and workflow_id is not None:
+            time.sleep(self.sleep_time)
+
+            # fetch just uploaded simulatable neuron resource to get its id
+            type_ = "SimulatableNeuron"
+            filters = {"type": type_, **simulatable_neuron.as_dict()}
+            resource = self.access_point.fetch_one(filters, strict=True)
+            simulatable_neuron_id = resource.id
+            workflow.add_simulatable_neuron_id(simulatable_neuron_id)
+
+            time.sleep(self.sleep_time)
+            self.store_or_update_emodel_workflow(workflow)
