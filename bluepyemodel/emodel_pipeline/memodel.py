@@ -53,12 +53,12 @@ class MEModel(EModelMixin):
         self.status = status
 
     def get_related_nexus_ids(self):
-        uses = []
+        hasPart = []
         if self.emodel_id:
-            uses.append({"id": self.emodel_id, "type": "EModel"})
+            hasPart.append({"id": self.emodel_id, "type": "EModel"})
         if self.morphology_id:
-            uses.append({"id": self.morphology_id, "type": "NeuronMorphology"})
-        return {"uses": uses}
+            hasPart.append({"id": self.morphology_id, "type": "NeuronMorphology"})
+        return {"hasPart": hasPart}
 
     def as_dict(self):
         pdf_dependencies = self.build_pdf_dependencies(self.seed)
