@@ -47,6 +47,8 @@ logger = logging.getLogger("__main__")
 
 # pylint: disable=bare-except,consider-iterating-dictionary
 
+DEFAULT_NEXUS_ENDPOINT = "https://openbluebrain.com/api/nexus/v1"
+
 CLASS_TO_NEXUS_TYPE = {
     "TargetsConfiguration": "ExtractionTargetsConfiguration",
     "EModelPipelineSettings": "EModelPipelineSettings",
@@ -114,7 +116,7 @@ class NexusForgeAccessPoint:
         self,
         project="emodel_pipeline",
         organisation="demo",
-        endpoint="https://openbluebrain.com/api/nexus/v1",
+        endpoint=DEFAULT_NEXUS_ENDPOINT,
         forge_path=None,
         limit=5000,
         debug=False,
@@ -922,7 +924,7 @@ class NexusForgeAccessPoint:
 
 
 def ontology_forge_access_point(
-    access_token=None, forge_path=None, endpoint="https://openbluebrain.com/api/nexus/v1"
+    access_token=None, forge_path=None, endpoint=DEFAULT_NEXUS_ENDPOINT
 ):
     """Returns an access point targeting the project containing the ontology for the
     species and brain regions"""
@@ -944,7 +946,7 @@ def atlas_forge_access_point(access_token=None, forge_path=None):
     access_point = NexusForgeAccessPoint(
         project="atlas",
         organisation="bbp",
-        endpoint="https://openbluebrain.com/api/nexus/v1",
+        endpoint=DEFAULT_NEXUS_ENDPOINT,
         forge_path=forge_path,
         access_token=access_token,
     )
@@ -989,7 +991,7 @@ def check_resource(
     access_point=None,
     access_token=None,
     forge_path=None,
-    endpoint="https://openbluebrain.com/api/nexus/v1",
+    endpoint=DEFAULT_NEXUS_ENDPOINT,
 ):
     """Checks that resource is present on nexus and is part of the provided category
 
@@ -1041,7 +1043,7 @@ def get_available_traces(species=None, brain_region=None, access_token=None, for
         access_point = NexusForgeAccessPoint(
             project=proj_traces["project"],
             organisation=proj_traces["organisation"],
-            endpoint="https://openbluebrain.com/api/nexus/v1",
+            endpoint=DEFAULT_NEXUS_ENDPOINT,
             forge_path=forge_path,
             access_token=access_token,
             cross_bucket=True,
@@ -1054,7 +1056,7 @@ def get_available_traces(species=None, brain_region=None, access_token=None, for
 
 
 def get_brain_region(
-    brain_region, access_token=None, forge_path=None, endpoint="https://openbluebrain.com/api/nexus/v1"
+    brain_region, access_token=None, forge_path=None, endpoint=DEFAULT_NEXUS_ENDPOINT
 ):
     """Returns the resource corresponding to the brain region
 
@@ -1102,7 +1104,7 @@ def get_brain_region(
 
 
 def get_brain_region_dict(
-    brain_region, access_token=None, forge_path=None, endpoint="https://openbluebrain.com/api/nexus/v1"
+    brain_region, access_token=None, forge_path=None, endpoint=DEFAULT_NEXUS_ENDPOINT
 ):
     """Returns a dict with id and label of the resource corresponding to the brain region
 
@@ -1128,7 +1130,7 @@ def get_brain_region_dict(
 
 
 def get_brain_region_notation(
-    brain_region, access_token=None, forge_path=None, endpoint="https://openbluebrain.com/api/nexus/v1"
+    brain_region, access_token=None, forge_path=None, endpoint=DEFAULT_NEXUS_ENDPOINT
 ):
     """Get the ontology of the brain location."""
     if brain_region is None:
@@ -1142,7 +1144,7 @@ def get_brain_region_notation(
 
 
 def get_nexus_brain_region(
-    brain_region, access_token=None, forge_path=None, endpoint="https://openbluebrain.com/api/nexus/v1"
+    brain_region, access_token=None, forge_path=None, endpoint=DEFAULT_NEXUS_ENDPOINT
 ):
     """Get the ontology of the brain location."""
     if brain_region is None:
@@ -1158,7 +1160,7 @@ def get_nexus_brain_region(
     }
 
 
-def get_all_species(access_token=None, forge_path=None, endpoint="https://openbluebrain.com/api/nexus/v1"):
+def get_all_species(access_token=None, forge_path=None, endpoint=DEFAULT_NEXUS_ENDPOINT):
     access_point = ontology_forge_access_point(access_token, forge_path, endpoint)
 
     resources = access_point.forge.search({"subClassOf": "nsg:Species"}, limit=100)

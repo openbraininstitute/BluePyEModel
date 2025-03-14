@@ -28,6 +28,7 @@ import pandas
 from kgforge.core import Resource
 
 from bluepyemodel.access_point.access_point import DataAccessPoint
+from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
 from bluepyemodel.access_point.forge_access_point import NEXUS_PROJECTS_TRACES
 from bluepyemodel.access_point.forge_access_point import AccessPointException
 from bluepyemodel.access_point.forge_access_point import NexusForgeAccessPoint
@@ -70,7 +71,7 @@ class NexusAccessPoint(DataAccessPoint):
         synapse_class=None,
         project="emodel_pipeline",
         organisation="demo",
-        endpoint="https://openbluebrain.com/api/nexus/v1",
+        endpoint=DEFAULT_NEXUS_ENDPOINT,
         forge_path=None,
         forge_ontology_path=None,
         access_token=None,
@@ -1080,7 +1081,7 @@ class NexusAccessPoint(DataAccessPoint):
             access_point = NexusForgeAccessPoint(
                 project=proj_traces["project"],
                 organisation=proj_traces["organisation"],
-                endpoint="https://openbluebrain.com/api/nexus/v1",
+                endpoint=DEFAULT_NEXUS_ENDPOINT,
                 forge_path=self.access_point.forge_path,
                 access_token=self.access_point.access_token,
                 cross_bucket=True,

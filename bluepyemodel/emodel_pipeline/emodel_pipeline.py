@@ -22,6 +22,7 @@ import pathlib
 import warnings
 
 from bluepyemodel.access_point import get_access_point
+from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
 from bluepyemodel.efeatures_extraction.efeatures_extraction import extract_save_features_protocols
 from bluepyemodel.emodel_pipeline import plotting
 from bluepyemodel.export_emodel.export_emodel import export_emodels_sonata
@@ -139,7 +140,7 @@ class EModel_pipeline:
             self.mapper = map
 
         if nexus_endpoint == "prod":
-            endpoint = "https://openbluebrain.com/api/nexus/v1"
+            endpoint = DEFAULT_NEXUS_ENDPOINT
         elif nexus_endpoint == "staging":
             endpoint = "https://staging.nexus.ocp.bbp.epfl.ch/v1"
         else:

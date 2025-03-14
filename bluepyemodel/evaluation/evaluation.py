@@ -1,4 +1,4 @@
-""" Emodels evaluation functions """
+"""Emodels evaluation functions"""
 
 """
 Copyright 2023-2024 Blue Brain Project / EPFL

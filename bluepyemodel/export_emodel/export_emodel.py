@@ -24,6 +24,7 @@ import time
 
 import h5py
 
+from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
 from bluepyemodel.evaluation.evaluation import compute_responses
 from bluepyemodel.evaluation.evaluation import get_evaluator_from_access_point
 from bluepyemodel.export_emodel.utils import get_hoc_file_path
@@ -251,7 +252,7 @@ def export_emodels_nexus(
     local_access_point,
     nexus_organisation,
     nexus_project,
-    nexus_endpoint="https://openbluebrain.com/api/nexus/v1",
+    nexus_endpoint=DEFAULT_NEXUS_ENDPOINT,
     forge_path=None,
     forge_ontology_path=None,
     access_token=None,
@@ -269,7 +270,7 @@ def export_emodels_nexus(
         nexus_organisation (str): The Nexus organisation to which the e-models will be transferred.
         nexus_project (str): The Nexus project to which the e-models will be transferred.
         nexus_endpoint (str, optional): The Nexus endpoint.
-            Defaults to "https://openbluebrain.com/api/nexus/v1".
+            Defaults to DEFAULT_NEXUS_ENDPOINT.
         forge_path (str, optional): The path to the forge.
         forge_ontology_path (str, optional): The path to the forge ontology.
         access_token (str, optional): The access token for Nexus.

@@ -1,4 +1,4 @@
-""" Package version """
+"""Package version"""
 
 """
 Copyright 2023-2024, EPFL/Blue Brain Project

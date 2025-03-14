@@ -18,6 +18,8 @@ limitations under the License.
 
 import luigi
 
+from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
+
 
 class EmodelAPIConfig(luigi.Config):
     """Configuration of emodel api database."""
@@ -35,7 +37,7 @@ class EmodelAPIConfig(luigi.Config):
     forge_ontology_path = luigi.OptionalParameter(default=None)
     nexus_project = luigi.OptionalParameter(default="emodel_pipeline")
     nexus_organisation = luigi.OptionalParameter(default="demo")
-    nexus_endpoint = luigi.OptionalParameter(default="https://openbluebrain.com/api/nexus/v1")
+    nexus_endpoint = luigi.OptionalParameter(default=DEFAULT_NEXUS_ENDPOINT)
 
     def __init__(self, *args, **kwargs):
         """Init."""
