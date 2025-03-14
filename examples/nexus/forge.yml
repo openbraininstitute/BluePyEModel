@@ -8,7 +8,7 @@ Model:
 
 Store:
   name: BlueBrainNexus
-  endpoint: https://bbp.epfl.ch/nexus/v1
+  endpoint: https://openbluebrain.com/api/nexus/v1
   model:
     name: RdfModel
   searchendpoints:

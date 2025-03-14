@@ -8,12 +8,12 @@ Model:
 
 Store:
   name: BlueBrainNexus
-  endpoint: https://bbp.epfl.ch/nexus/v1
+  endpoint: https://openbluebrain.com/api/nexus/v1
   model:
     name: RdfModel
   searchendpoints:
     sparql:
-      endpoint: "https://bluebrain.github.io/nexus/vocabulary/defaultSparqlIndex"
+      endpoint: "https://bbp.epfl.ch/neurosciencegraph/data/62529364-b584-4cc9-82ce-36efd690b111"
     elastic:
       endpoint: "https://bbp.epfl.ch/neurosciencegraph/data/views/aggreg-es/dataset"
       mapping: "https://bbp.epfl.ch/neurosciencegraph/data/views/es/dataset"
