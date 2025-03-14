@@ -251,7 +251,7 @@ def export_emodels_nexus(
     local_access_point,
     nexus_organisation,
     nexus_project,
-    nexus_endpoint="https://bbp.epfl.ch/nexus/v1",
+    nexus_endpoint="https://openbluebrain.com/api/nexus/v1",
     forge_path=None,
     forge_ontology_path=None,
     access_token=None,
@@ -269,7 +269,7 @@ def export_emodels_nexus(
         nexus_organisation (str): The Nexus organisation to which the e-models will be transferred.
         nexus_project (str): The Nexus project to which the e-models will be transferred.
         nexus_endpoint (str, optional): The Nexus endpoint.
-            Defaults to "https://bbp.epfl.ch/nexus/v1".
+            Defaults to "https://openbluebrain.com/api/nexus/v1".
         forge_path (str, optional): The path to the forge.
         forge_ontology_path (str, optional): The path to the forge ontology.
         access_token (str, optional): The access token for Nexus.

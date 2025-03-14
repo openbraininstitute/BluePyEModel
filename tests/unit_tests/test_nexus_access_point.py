@@ -65,7 +65,7 @@ def mock_nexus_access_point():
         mock_nexus_forge_access_point = NexusForgeAccessPoint(
             project="test",
             organisation="demo",
-            endpoint="https://bbp.epfl.ch/nexus/v1",
+            endpoint="https://openbluebrain.com/api/nexus/v1",
             forge_path=None,
             access_token="test_token",
         )
@@ -84,7 +84,7 @@ def mock_nexus_access_point():
                 iteration_tag="v0",
                 project="test",
                 organisation="demo",
-                endpoint="https://bbp.epfl.ch/nexus/v1",
+                endpoint="https://openbluebrain.com/api/nexus/v1",
                 forge_path=None,
                 forge_ontology_path=None,
                 access_token="test_token",

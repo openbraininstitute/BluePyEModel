@@ -70,7 +70,7 @@ class NexusAccessPoint(DataAccessPoint):
         synapse_class=None,
         project="emodel_pipeline",
         organisation="demo",
-        endpoint="https://bbp.epfl.ch/nexus/v1",
+        endpoint="https://openbluebrain.com/api/nexus/v1",
         forge_path=None,
         forge_ontology_path=None,
         access_token=None,
@@ -1080,7 +1080,7 @@ class NexusAccessPoint(DataAccessPoint):
             access_point = NexusForgeAccessPoint(
                 project=proj_traces["project"],
                 organisation=proj_traces["organisation"],
-                endpoint="https://bbp.epfl.ch/nexus/v1",
+                endpoint="https://openbluebrain.com/api/nexus/v1",
                 forge_path=self.access_point.forge_path,
                 access_token=self.access_point.access_token,
                 cross_bucket=True,

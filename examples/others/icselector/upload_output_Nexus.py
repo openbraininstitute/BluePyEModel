@@ -31,7 +31,7 @@ from kgforge.specializations.resources import Dataset
 
 TOKEN = getpass.getpass()
 
-nexus_endpoint = "https://bbp.epfl.ch/nexus/v1" # production environment
+nexus_endpoint = "https://openbluebrain.com/api/nexus/v1" # production environment
 
 ORG = "bbp"
 PROJECT = "ncmv3"

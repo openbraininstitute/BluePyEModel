@@ -48,7 +48,7 @@ def mock_forge_access_point():
                 return NexusForgeAccessPoint(
                     project="test",
                     organisation="demo",
-                    endpoint="https://bbp.epfl.ch/nexus/v1",
+                    endpoint="https://openbluebrain.com/api/nexus/v1",
                     forge_path=None,
                     access_token="test_token",
                 )
@@ -59,7 +59,7 @@ def test_nexus_forge_access_point_init(mock_forge_access_point):
     Test the initialization of NexusForgeAccessPoint.
     """
     assert mock_forge_access_point.bucket == "demo/test"
-    assert mock_forge_access_point.endpoint == "https://bbp.epfl.ch/nexus/v1"
+    assert mock_forge_access_point.endpoint == "https://openbluebrain.com/api/nexus/v1"
     assert mock_forge_access_point.access_token == "test_token"
     assert (
         mock_forge_access_point.agent.id

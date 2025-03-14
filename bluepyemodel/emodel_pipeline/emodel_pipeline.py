@@ -139,7 +139,7 @@ class EModel_pipeline:
             self.mapper = map
 
         if nexus_endpoint == "prod":
-            endpoint = "https://bbp.epfl.ch/nexus/v1"
+            endpoint = "https://openbluebrain.com/api/nexus/v1"
         elif nexus_endpoint == "staging":
             endpoint = "https://staging.nexus.ocp.bbp.epfl.ch/v1"
         else:

@@ -35,7 +35,7 @@ class EmodelAPIConfig(luigi.Config):
     forge_ontology_path = luigi.OptionalParameter(default=None)
     nexus_project = luigi.OptionalParameter(default="emodel_pipeline")
     nexus_organisation = luigi.OptionalParameter(default="demo")
-    nexus_endpoint = luigi.OptionalParameter(default="https://bbp.epfl.ch/nexus/v1")
+    nexus_endpoint = luigi.OptionalParameter(default="https://openbluebrain.com/api/nexus/v1")
 
     def __init__(self, *args, **kwargs):
         """Init."""

@@ -31,7 +31,7 @@ TOKEN = getpass.getpass()
 # TOKEN = ""
 print("password taken")
 
-nexus_endpoint = "https://bbp.epfl.ch/nexus/v1" # production environment
+nexus_endpoint = "https://openbluebrain.com/api/nexus/v1" # production environment
 
 ORG = "bbp"
 PROJECT = "ncmv3"
