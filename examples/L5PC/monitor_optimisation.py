@@ -24,7 +24,7 @@ from bluepyemodel.access_point.local import LocalAccessPoint
 def monitor_optimisation():
 
     # IMPORTANT: Please populate the following parameters with the relevant values utilized:
-    githash = "YOUR_GITHASH_HERE"
+    githash = None
     emodel = "L5PC"
     species = "rat"
     brain_region = "SSCX"
