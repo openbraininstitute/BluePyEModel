@@ -142,7 +142,7 @@ class EModel_pipeline:
         if nexus_endpoint == "prod":
             endpoint = DEFAULT_NEXUS_ENDPOINT
         elif nexus_endpoint == "staging":
-            endpoint = "https://staging.nexus.ocp.bbp.epfl.ch/v1"
+            endpoint = "https://staging.openbluebrain.com/api/nexus/v1"
         else:
             endpoint = nexus_endpoint
 
