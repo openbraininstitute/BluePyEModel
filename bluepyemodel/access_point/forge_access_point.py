@@ -227,7 +227,7 @@ class NexusForgeAccessPoint:
         if self._atlas_release is None:
             self.refresh_token()
             atlas_access_point = atlas_forge_access_point(
-                access_token=self.access_token, forge_path=self.forge_path
+                access_token=self.access_token, forge_path=self.forge_path, endpoint=self.endpoint
             )
             atlas_resource = atlas_access_point.retrieve(atlas_def["id"])
             atlas_def["_rev"] = atlas_resource._store_metadata["_rev"]
@@ -940,13 +940,13 @@ def ontology_forge_access_point(
     return access_point
 
 
-def atlas_forge_access_point(access_token=None, forge_path=None):
+def atlas_forge_access_point(access_token=None, forge_path=None, endpoint=DEFAULT_NEXUS_ENDPOINT):
     """Returns an access point targeting the project containing the atlas"""
 
     access_point = NexusForgeAccessPoint(
         project="atlas",
         organisation="bbp",
-        endpoint=DEFAULT_NEXUS_ENDPOINT,
+        endpoint=endpoint,
         forge_path=forge_path,
         access_token=access_token,
     )
