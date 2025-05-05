@@ -351,7 +351,6 @@ class NexusForgeAccessPoint:
                 can be used to search for existence of resource on nexus.
                 Used to get image type if cannot be extracted from image path.
         """
-        resource = Dataset.from_resource(self.forge, resource, store_metadata=True)
         if filters_existence is None:
             filters_existence = {}
         for path in images:
@@ -426,8 +425,12 @@ class NexusForgeAccessPoint:
         resource = self.forge.from_json(resource_description, na="None")
         resource = self.add_contribution(resource)
 
-        if distributions:
+        if distributions or images:
+            # do this before adding lazy actions.
+            # if we do it after, it turns the lazy actions into a str
             resource = Dataset.from_resource(self.forge, resource)
+
+        if distributions:
             for path in distributions:
                 resource.add_distribution(path, content_type=f"application/{path.split('.')[-1]}")
 

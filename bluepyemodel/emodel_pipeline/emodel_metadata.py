@@ -126,7 +126,7 @@ class EModelMetadata:
             "name": "T-type annotation",
         }
 
-    def annotation_list(self, is_analysis_suitable=False):
+    def annotation_list(self, is_analysis_suitable=False, is_curated=False):
         """Returns an annotation list containing mtype, etype and ttype annotations.
 
         Args:
@@ -146,6 +146,19 @@ class EModelMetadata:
                     "motivatedBy": {"id": "quality:Assessment", "type": "Motivation"},
                     "name": "Data usage scope annotation",
                     "note": "Analysis can be run on this model.",
+                }
+            )
+        if is_curated:
+            annotation_list.append(
+                {
+                    "@type": ["QualityAnnotation", "Annotation"],
+                    "hasBody": {
+                        "@id": "https://neuroshapes.org/Curated",
+                        "@type": ["AnnotationBody", "DataMaturity"],
+                        "label": "Curated"
+                    },
+                    "motivatedBy": {"@id": "quality:Assessment", "@type": "Motivation"},
+                    "name": "Data maturity annotation"
                 }
             )
         if self.etype:
@@ -201,7 +214,7 @@ class EModelMetadata:
         """Legacy metadata used for filtering, without the annotation list"""
         return self.as_dict_for_resource_legacy()
 
-    def for_resource(self, is_analysis_suitable=False):
+    def for_resource(self, is_analysis_suitable=False, is_curated=False):
         """Metadata to add to a resource to register.
 
         DO NOT use for filtering. For filtering, use self.filters_for_resource() instead.
@@ -213,7 +226,9 @@ class EModelMetadata:
 
         metadata = self.as_dict_for_resource()
 
-        metadata["annotation"] = self.annotation_list(is_analysis_suitable=is_analysis_suitable)
+        metadata["annotation"] = self.annotation_list(
+            is_analysis_suitable=is_analysis_suitable, is_curated=is_curated
+        )
 
         return metadata
 
