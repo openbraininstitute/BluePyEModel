@@ -155,10 +155,10 @@ class EModelMetadata:
                     "hasBody": {
                         "@id": "https://neuroshapes.org/Curated",
                         "@type": ["AnnotationBody", "DataMaturity"],
-                        "label": "Curated"
+                        "label": "Curated",
                     },
                     "motivatedBy": {"@id": "quality:Assessment", "@type": "Motivation"},
-                    "name": "Data maturity annotation"
+                    "name": "Data maturity annotation",
                 }
             )
         if self.etype:
