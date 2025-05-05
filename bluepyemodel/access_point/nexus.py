@@ -286,12 +286,19 @@ class NexusAccessPoint(DataAccessPoint):
         return subject
 
     def store_object(
-        self, object_, seed=None, description=None, currents=None, is_analysis_suitable=False
+        self,
+        object_,
+        seed=None,
+        description=None,
+        currents=None,
+        is_analysis_suitable=False,
+        is_curated=False,
     ):
         """Store a BPEM object on Nexus"""
 
         metadata_dict = self.emodel_metadata_ontology.for_resource(
-            is_analysis_suitable=is_analysis_suitable
+            is_analysis_suitable=is_analysis_suitable,
+            is_curated=is_curated,
         )
         if seed is not None:
             metadata_dict["seed"] = seed
@@ -622,11 +629,15 @@ class NexusAccessPoint(DataAccessPoint):
         except AccessPointException:
             targets_configuration_id = None
 
-        pipeline_settings_id = self.access_point.get_nexus_id(
-            type_="EModelPipelineSettings",
-            metadata=self.emodel_metadata_ontology.filters_for_resource(),
-            legacy_metadata=self.emodel_metadata_ontology.filters_for_resource_legacy(),
-        )
+        try:
+            pipeline_settings_id = self.access_point.get_nexus_id(
+                type_="EModelPipelineSettings",
+                metadata=self.emodel_metadata_ontology.filters_for_resource(),
+                legacy_metadata=self.emodel_metadata_ontology.filters_for_resource_legacy(),
+            )
+        except AccessPointException:
+            pipeline_settings_id = None
+
         emodel_configuration_id = self.access_point.get_nexus_id(
             type_="EModelConfiguration",
             metadata=self.emodel_metadata_ontology.filters_for_resource(),
@@ -803,6 +814,7 @@ class NexusAccessPoint(DataAccessPoint):
             )
 
         emodel.workflow_id = nexus_id
+        # make it analysis suitable AND curated if this is True
         is_analysis_suitable = (
             self.has_fitness_calculator_configuration
             and self.has_model_configuration
@@ -814,6 +826,7 @@ class NexusAccessPoint(DataAccessPoint):
             seed=emodel.seed,
             description=description,
             is_analysis_suitable=is_analysis_suitable,
+            is_curated=is_analysis_suitable,
         )
         # wait for the object to be uploaded and fetchable
         time.sleep(self.sleep_time)
