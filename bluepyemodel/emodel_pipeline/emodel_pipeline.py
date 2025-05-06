@@ -64,6 +64,7 @@ class EModel_pipeline:
         forge_ontology_path=None,
         nexus_organisation=None,
         nexus_project=None,
+        access_token=None,
     ):
         """Initializes the EModel_pipeline.
 
@@ -122,7 +123,7 @@ class EModel_pipeline:
                 of the e-model building pipeline be based on multiprocessing.
             data_access_point (str): name of the access_point used to access the data,
                 can be "nexus" or "local".
-
+            access_token (str): access token used to connect to Nexus.
         """
 
         # pylint: disable=too-many-arguments
@@ -165,6 +166,7 @@ class EModel_pipeline:
             access_point=data_access_point,
             forge_path=forge_path,
             forge_ontology_path=forge_ontology_path,
+            access_token=access_token,
         )
 
     def configure_model(
