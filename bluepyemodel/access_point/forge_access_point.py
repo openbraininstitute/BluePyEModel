@@ -1034,7 +1034,7 @@ def check_resource(
 def get_available_traces(species=None, brain_region=None, access_token=None, forge_path=None):
     """Returns a list of Resources of type Traces from the bbp/lnmce Nexus project"""
 
-    filters = {"type": "Trace", "distribution": {"encodingFormat": "application/nwb"}}
+    filters = {"type": "ExperimentalTrace", "distribution": {"encodingFormat": "application/nwb"}}
 
     if species:
         filters["subject"] = species

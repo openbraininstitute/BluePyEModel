@@ -46,6 +46,29 @@ Additionally, to cite software used for different steps of the pipeline, please 
 
 - Ion Channel Selector: `Me-Features-to-Mo-ID Mapping <https://github.com/openbraininstitute/me-features-to-mo-ID-mapping>`_: paper: `Roussel et al., 2023 <https://doi.org/10.1371/journal.pcbi.1010058>`_
 
+Requirements
+------------
+
+* `Python 3.11+ <https://www.python.org/downloads/release/python-311/>`_
+* numpy
+* scipy >= 1.16.1
+* pandas
+* ipyparallel >= 6.3
+* tqdm
+* pyyaml
+* gitpython
+* bluepyopt >= 1.14.10
+* bluepyefe >= 2.3.48
+* neurom >= 3.0
+* efel >= 5.5.5
+* configparser
+* neuron >= 8.0
+* morph_tool >= 2.8
+* morphio
+* fasteners >= 0.16
+* jinja2 >= 3.0.3
+* currentscape >= 0.0.11
+
 Installation
 ------------
 
