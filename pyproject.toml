@@ -10,18 +10,18 @@ authors = [
 description="Blue Brain Python Electrical Modeling Pipeline"
 readme = "README.rst"
 license = {file = "LICENSE.txt"}
-requires-python = ">= 3.9"
+requires-python = ">= 3.11"
 dynamic = ["version"]
 dependencies = [
     "numpy",
-    "scipy",
+    "scipy>=1.16.1",
     "pandas",
     "ipyparallel>=6.3",
     "tqdm",
     "pyyaml",
     "gitpython",
     "bluepyopt>=1.14.10",
-    "bluepyefe>=2.2.0",
+    "bluepyefe>=2.3.48",
     "neurom>=3.0",
     "efel>=5.5.5",
     "configparser",
