@@ -314,7 +314,7 @@ def get_evaluator_from_access_point(
     start_from_emodel = access_point.pipeline_settings.start_from_emodel
 
     if start_from_emodel is not None:
-        access_point_type = "local" if isinstance(access_point, LocalAccessPoint) else "nexus"
+        access_point_type = "local" if isinstance(access_point, LocalAccessPoint) else None
 
         seed = start_from_emodel.pop("seed", None)
 
@@ -325,7 +325,7 @@ def get_evaluator_from_access_point(
                 "recipes_path": access_point.recipes_path,
             }
         else:
-            raise NotImplementedError("start_from_emodel not implemented for Nexus access point")
+            raise NotImplementedError("start_from_emodel only implemented for nexus access point")
 
         starting_access_point = get_access_point(
             access_point=access_point_type, **start_from_emodel, **kwargs

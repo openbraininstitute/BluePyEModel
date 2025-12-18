@@ -24,7 +24,6 @@ from pathlib import Path
 import luigi
 
 from bluepyemodel.access_point.access_point import OptimisationState
-from bluepyemodel.access_point.nexus import NexusAccessPoint
 from bluepyemodel.efeatures_extraction.efeatures_extraction import extract_save_features_protocols
 from bluepyemodel.efeatures_extraction.targets_configurator import TargetsConfigurator
 from bluepyemodel.emodel_pipeline.plotting import optimisation
@@ -840,13 +839,6 @@ class ExportHoc(WorkflowTaskRequiringMechanisms, IPyParallelTask):
             seeds=list(range(args.seed, args.seed + args.batch_size)),
             map_function=mapper,
         )
-        if args.api_from_config == "nexus":
-            access_pt.store_emodels_sonata(
-                only_validated=False,
-                only_best=False,
-                seeds=list(range(args.seed, args.seed + args.batch_size)),
-                map_function=mapper,
-            )
 
     def output(self):
         """ """
@@ -931,8 +923,6 @@ class EModelCreation(WorkflowTask):
 
         def inner(self):
             """Inner decorator function"""
-            if EmodelAPIConfig().api == "nexus":
-                self.access_point.check_mettypes()
             # do this instead of just func(self) because of the yield in EModelCreation
             yield from func(self)
 
@@ -1285,10 +1275,6 @@ class PlotModels(WorkflowTaskRequiringMechanisms):
             sinespec_settings=sinespec_settings,
         )
 
-        if isinstance(self.access_point, NexusAccessPoint):
-            for seed in range(self.seed, self.seed + batch_size):
-                self.access_point.update_emodel_images(seed=seed, keep_old_images=False)
-
     def output(self):
         """ """
 
@@ -1382,11 +1368,6 @@ class PlotValidatedDistributions(WorkflowTaskRequiringMechanisms):
             plot_bAP_EPSP=False,
             only_validated=True,
         )
-
-        if isinstance(self.access_point, NexusAccessPoint):
-            seeds = [emodel.seed for emodel in self.access_point.get_emodels()]
-            for seed in seeds:
-                self.access_point.update_emodel_images(seed=seed, keep_old_images=False)
 
     def output(self):
         """ """

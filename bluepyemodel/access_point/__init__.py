@@ -69,29 +69,6 @@ def get_access_point(access_point, emodel, **kwargs):
     brain_region = kwargs.get("brain_region", None)
     brain_region = brain_region.replace("__", " ") if brain_region else None
 
-    if access_point == "nexus":
-        from bluepyemodel.access_point.nexus import NexusAccessPoint
-
-        if not kwargs.get("project"):
-            raise ValueError("Nexus project name is required for Nexus access point.")
-
-        return NexusAccessPoint(
-            emodel=emodel,
-            etype=etype,
-            ttype=ttype,
-            mtype=mtype,
-            species=kwargs.get("species", None),
-            brain_region=brain_region,
-            iteration_tag=kwargs.get("iteration_tag", None),
-            synapse_class=kwargs.get("synapse_class", None),
-            project=kwargs.get("project", None),
-            organisation=kwargs.get("organisation", "bbp"),
-            endpoint=kwargs.get("endpoint", "https://staging.openbluebrain.com/api/nexus/v1"),
-            forge_path=kwargs.get("forge_path", None),
-            forge_ontology_path=kwargs.get("forge_ontology_path", None),
-            access_token=kwargs.get("access_token", None),
-        )
-
     if access_point == "local":
         from bluepyemodel.access_point.local import LocalAccessPoint
 
@@ -111,4 +88,4 @@ def get_access_point(access_point, emodel, **kwargs):
             with_seeds=kwargs.get("with_seeds", False),
         )
 
-    raise ValueError(f"Unknown access point: {access_point}. Should be 'nexus' or 'local'.")
+    raise ValueError(f"Unknown access point: {access_point}. Should be 'local'.")

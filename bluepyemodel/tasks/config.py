@@ -18,8 +18,6 @@ limitations under the License.
 
 import luigi
 
-from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
-
 
 class EmodelAPIConfig(luigi.Config):
     """Configuration of emodel api database."""
@@ -31,13 +29,6 @@ class EmodelAPIConfig(luigi.Config):
     recipes_path = luigi.OptionalParameter(default=None)
     final_path = luigi.OptionalParameter(default="./final.json")
     legacy_dir_structure = luigi.BoolParameter(default=False)
-
-    # nexus parameters
-    forge_path = luigi.OptionalParameter(default=None)
-    forge_ontology_path = luigi.OptionalParameter(default=None)
-    nexus_project = luigi.OptionalParameter(default="emodel_pipeline")
-    nexus_organisation = luigi.OptionalParameter(default="demo")
-    nexus_endpoint = luigi.OptionalParameter(default=DEFAULT_NEXUS_ENDPOINT)
 
     def __init__(self, *args, **kwargs):
         """Init."""
@@ -52,18 +43,4 @@ class EmodelAPIConfig(luigi.Config):
                 "recipes_path": self.recipes_path,
                 "final_path": self.final_path,
                 "legacy_dir_structure": self.legacy_dir_structure,
-            }
-
-        if self.api == "nexus":
-            if self.forge_path is None:
-                raise ValueError("forge_path cannot be None when api is set to 'nexus'")
-            if self.forge_ontology_path is None:
-                raise ValueError("forge_ontology_path cannot be None when api is set to 'nexus'")
-
-            self.api_args = {
-                "forge_path": self.forge_path,
-                "forge_ontology_path": self.forge_ontology_path,
-                "project": self.nexus_project,
-                "organisation": self.nexus_organisation,
-                "endpoint": self.nexus_endpoint,
             }

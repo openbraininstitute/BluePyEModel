@@ -104,7 +104,7 @@ def select_emodels(
     iteration=None,
 ):
     if not emodels:
-        logger.warning("In export_emodels_nexus, no emodel for %s", emodel_name)
+        logger.warning("In select_emodels, no emodel for %s", emodel_name)
         return []
 
     if iteration:
@@ -117,7 +117,7 @@ def select_emodels(
         emodels = [e for e in emodels if e.seed in seeds]
         if not emodels:
             logger.warning(
-                "In export_emodels_nexus, no emodel for %s and seeds %s",
+                "In select_emodels, no emodel for %s and seeds %s",
                 emodel_name,
                 seeds,
             )
@@ -127,7 +127,7 @@ def select_emodels(
         emodels = [e for e in emodels if e.passed_validation]
         if not emodels:
             logger.warning(
-                "In export_emodels_nexus, no emodel for %s that passed validation",
+                "In select_emodels, no emodel for %s that passed validation",
                 emodel_name,
             )
             return []
