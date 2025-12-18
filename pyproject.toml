@@ -56,7 +56,7 @@ luigi = [
 ]
 docs = [
     "graphviz",
-    "sphinx",
+    "sphinx<9",
     "sphinx-bluebrain-theme",
     "luigi>=3.0",
     "luigi-tools>=0.0.12",
