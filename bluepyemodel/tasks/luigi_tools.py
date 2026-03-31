@@ -186,13 +186,13 @@ class BoolParameterCustom(luigi.BoolParameter):
             return _no_default_value
         return self.normalize(value)
 
-    def parse(self, val):
+    def parse(self, x):
         """
         Parses a ``bool`` from the string, matching 'true' or 'false' ignoring case.
         """
-        if val == _no_default_value:
+        if x == _no_default_value:
             return _no_default_value
-        return super().parse(val)
+        return super().parse(x)
 
 
 class ListParameterCustom(luigi.ListParameter):
