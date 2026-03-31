@@ -137,9 +137,7 @@ proc replace_axon(){ local count, i1, i2, L_target, strenght, taper_scale, termi
     }
     connect myelin(0), axon[1](1)
 }
-    """ % tuple(
-        params
-    )
+    """ % tuple(params)
 
 
 def replace_axon_with_taper(sim=None, icell=None):
