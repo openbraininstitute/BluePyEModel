@@ -51,14 +51,14 @@ classifiers=[
 
 [project.optional-dependencies]
 luigi = [
-    "luigi>=3.0",
+    "luigi>=3.7.2",
     "luigi-tools>=0.0.12",
 ]
 docs = [
     "graphviz",
     "sphinx<9",
     "sphinx-bluebrain-theme",
-    "luigi>=3.0",
+    "luigi>=3.7.2",
     "luigi-tools>=0.0.12",
 ]
 test = [
@@ -71,7 +71,7 @@ nexus = [
     "pyJWT>=2.1.0",
 ]
 all = [
-    "luigi>=3.0",
+    "luigi>=3.7.2",
     "luigi-tools>=0.0.12",
     "nexusforge>=0.8.2",
     "entity_management>=1.2",
