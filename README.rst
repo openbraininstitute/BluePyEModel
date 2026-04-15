@@ -132,8 +132,8 @@ This work is licensed under `Apache 2.0 <https://www.apache.org/licenses/LICENSE
 .. |license| image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
                 :target: https://github.com/openbraininstitute/BluePyEModel/blob/main/LICENSE.txt
 
-.. |tests| image:: https://github.com/openbraininstitute/BluepyEModel/actions/workflows/test.yml/badge.svg
-   :target: https://github.com/openbraininstitute/BluepyEModel/actions/workflows/test.yml
+.. |tests| image:: https://github.com/openbraininstitute/BluePyEModel/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/openbraininstitute/BluePyEModel/actions/workflows/test.yml
    :alt: CI
 
 .. |pypi| image:: https://img.shields.io/pypi/v/bluepyemodel.svg
