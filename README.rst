@@ -41,8 +41,8 @@ Additionally, to cite software used for different steps of the pipeline, please 
    - ``NEURON``:  The NEURON Book: Carnevale and Hines 2006 : https://doi.org/10.1017/CBO9780511541612
 
 - Feature Extraction:
-   - ``eFEL``: `Zenodo DOI: 10.5281/zenodo.593869 <https://doi.org/10.5281/zenodo.593869>`_
-   - ``BluePyEfe``: `Zenodo DOI: 10.5281/zenodo.3728191 <https://doi.org/10.5281/zenodo.3728191>`_
+   - ``eFEL``: `Zenodo DOI: 10.5281/zenodo.19604220 <https://doi.org/10.5281/zenodo.19604220>`_
+   - ``BluePyEfe``: `Zenodo DOI: 10.5281/zenodo.19591682 <https://doi.org/10.5281/zenodo.19591682>`_
 
 - Ion Channel Selector: `Me-Features-to-Mo-ID Mapping <https://github.com/openbraininstitute/me-features-to-mo-ID-mapping>`_: paper: `Roussel et al., 2023 <https://doi.org/10.1371/journal.pcbi.1010058>`_
 
@@ -148,8 +148,8 @@ This work is licensed under `Apache 2.0 <https://www.apache.org/licenses/LICENSE
                    :target: https://codecov.io/gh/openbraininstitute/bluepyemodel
                    :alt: coverage
 
-.. |zenodo| image:: https://zenodo.org/badge/651152332.svg
-                 :target: https://zenodo.org/badge/latestdoi/651152332
+.. |zenodo| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.19593077.svg
+                 :target: https://doi.org/10.5281/zenodo.19593077
 
 ..
     The following image is also defined in the index.rst file, as the relative path is
