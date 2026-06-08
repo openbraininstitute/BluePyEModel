@@ -65,6 +65,9 @@ test = [
     "pytest>=6.2",
     "dictdiffer>=0.8",
 ]
+mpi = [
+    "mpi4py>=3.0",
+]
 nexus = [
     "nexusforge>=0.8.2",
     "entity_management>=1.2",
@@ -78,6 +81,7 @@ all = [
     "pyJWT>=2.1.0",
     "pytest>=6.2",
     "dictdiffer>=0.8",
+    "mpi4py>=3.0",
 ]
 
 [project.urls]

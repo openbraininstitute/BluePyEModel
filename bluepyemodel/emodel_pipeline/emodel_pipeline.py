@@ -58,6 +58,7 @@ class EModel_pipeline:
         recipes_path=None,
         use_ipyparallel=None,
         use_multiprocessing=None,
+        use_mpi=None,
         data_access_point="local",
         nexus_endpoint="staging",
         forge_path=None,
@@ -121,6 +122,8 @@ class EModel_pipeline:
                 the e-model building pipeline be based on ipyparallel.
             use_multiprocessing (bool): should the parallelization map used for the different steps
                 of the e-model building pipeline be based on multiprocessing.
+            use_mpi (bool): should the parallelization map used for the different steps
+                of the e-model building pipeline be based on mpi4py.
             data_access_point (str): name of the access_point used to access the data,
                 can be "nexus" or "local".
             access_token (str): access token used to connect to Nexus.
@@ -128,15 +131,17 @@ class EModel_pipeline:
 
         # pylint: disable=too-many-arguments
 
-        if use_ipyparallel and use_multiprocessing:
+        if sum(bool(x) for x in (use_ipyparallel, use_multiprocessing, use_mpi)) > 1:
             raise ValueError(
-                "use_ipyparallel and use_multiprocessing cannot be both True at the same time. "
-                "Please choose one."
+                "use_ipyparallel, use_multiprocessing, and use_mpi cannot be more than one True "
+                "at the same time. Please choose one."
             )
         if use_ipyparallel:
             self.mapper = get_mapper(backend="ipyparallel")
         elif use_multiprocessing:
             self.mapper = get_mapper(backend="multiprocessing")
+        elif use_mpi:
+            self.mapper = get_mapper(backend="mpi")
         else:
             self.mapper = map
 
