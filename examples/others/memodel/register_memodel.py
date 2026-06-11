@@ -2,20 +2,13 @@
 
 import copy
 import getpass
-import pathlib
 
 from kgforge.core import KnowledgeGraphForge
-from kgforge.specializations.resources import Dataset
 
 from bluepyemodel.access_point.forge_access_point import get_brain_region_notation
 from bluepyemodel.access_point.nexus import NexusAccessPoint
 from bluepyemodel.emodel_pipeline.memodel import MEModel
 from bluepyemodel.emodel_pipeline.plotting import plot_models
-from bluepyemodel.emodel_pipeline.plotting import scores
-from bluepyemodel.evaluation.evaluation import compute_responses
-from bluepyemodel.evaluation.evaluation import get_evaluator_from_access_point
-from bluepyemodel.tools.search_pdfs import copy_emodel_pdf_dependencies_to_new_path
-from bluepyemodel.validation.validation import compute_scores
 
 
 def connect_forge(bucket, endpoint, access_token, forge_path=None):
@@ -25,11 +18,8 @@ def connect_forge(bucket, endpoint, access_token, forge_path=None):
             "https://raw.githubusercontent.com/BlueBrain/nexus-forge/"
             + "master/examples/notebooks/use-cases/prod-forge-nexus.yml"
         )
-    forge = KnowledgeGraphForge(
-        forge_path, bucket=bucket, endpoint=endpoint, token=access_token
-    )
+    forge = KnowledgeGraphForge(forge_path, bucket=bucket, endpoint=endpoint, token=access_token)
     return forge
-
 
 
 def get_morph_mtype(annotation):
@@ -56,7 +46,9 @@ def get_morph_metadata(access_point, morph_id):
             if hasattr(resource.brainLocation.brainRegion, "label"):
                 morph_brain_region = resource.brainLocation.brainRegion.label
             else:
-                raise AttributeError("Morphology resource has no label in brainLocation.brainRegion")
+                raise AttributeError(
+                    "Morphology resource has no label in brainLocation.brainRegion"
+                )
         else:
             raise AttributeError("Morphology resource has no brainRegion in brainLocation.")
     else:
@@ -68,15 +60,14 @@ def get_morph_metadata(access_point, morph_id):
 
     if isinstance(resource.annotation, dict):
         if hasattr(resource.annotation, "type") and (
-            "MTypeAnnotation" in resource.annotation.type or
-            "nsg:MTypeAnnotation" in resource.annotation.type
+            "MTypeAnnotation" in resource.annotation.type
+            or "nsg:MTypeAnnotation" in resource.annotation.type
         ):
             morph_mtype = get_morph_mtype(resource.annotation)
     elif isinstance(resource.annotation, list):
         for annotation in resource.annotation:
             if hasattr(annotation, "type") and (
-                "MTypeAnnotation" in annotation.type or
-                "nsg:MTypeAnnotation" in annotation.type
+                "MTypeAnnotation" in annotation.type or "nsg:MTypeAnnotation" in annotation.type
             ):
                 morph_mtype = get_morph_mtype(annotation)
 
@@ -146,11 +137,10 @@ def plot(access_point, seed, cell_evaluator, figures_dir, mapper):
     return emodel_score, emodel_holding, emodel_threshold
 
 
-
 if __name__ == "__main__":
-    project = "mmb-point-neuron-framework-model" # replace with a valid Nexus project name
-    organisation = "bbp" # replace with the organisation name
-    endpoint = "https://openbluebrain.com/api/nexus/v1" # replace with the Nexus endpoint url
+    project = "mmb-point-neuron-framework-model"  # replace with a valid Nexus project name
+    organisation = "bbp"  # replace with the organisation name
+    endpoint = "https://openbluebrain.com/api/nexus/v1"  # replace with the Nexus endpoint url
     forge_path = "./forge.yml"  # this file has to be present
     forge_ontology_path = "./forge_ontology_path.yml"  # this file also
     # memodel_id = "<MEMODEL ID>" # replace with the id of the MEModel you want to update
@@ -161,8 +151,6 @@ if __name__ == "__main__":
     update_emodel_name = True
     use_brain_region_from_morphology = True
     use_mtype_in_githash = True  # to distinguish from other MEModel
-    add_score = True
-
 
     # create forge and retrieve ME-Model
     access_token = getpass.getpass()
@@ -170,7 +158,7 @@ if __name__ == "__main__":
         bucket=f"{organisation}/{project}",
         endpoint=endpoint,
         access_token=access_token,
-        forge_path=forge_path
+        forge_path=forge_path,
     )
 
     # memodel resource
@@ -189,11 +177,19 @@ if __name__ == "__main__":
     species = None
     if hasattr(emodel_r, "subject"):
         if hasattr(emodel_r.subject, "species"):
-            species = emodel_r.subject.species.label if hasattr(emodel_r.subject.species, "label") else None
+            species = (
+                emodel_r.subject.species.label
+                if hasattr(emodel_r.subject.species, "label")
+                else None
+            )
     brain_region = None
     if hasattr(emodel_r, "brainLocation"):
         if hasattr(emodel_r.brainLocation, "brainRegion"):
-            brain_region = emodel_r.brainLocation.brainRegion.label if hasattr(emodel_r.brainLocation.brainRegion, "label") else None
+            brain_region = (
+                emodel_r.brainLocation.brainRegion.label
+                if hasattr(emodel_r.brainLocation.brainRegion, "label")
+                else None
+            )
     iteration_tag = emodel_r.iteration if hasattr(emodel_r, "iteration") else None
     synapse_class = emodel_r.synapse_class if hasattr(emodel_r, "synapseClass") else None
     seed = int(emodel_r.seed if hasattr(emodel_r, "seed") else 0)
@@ -250,10 +246,9 @@ if __name__ == "__main__":
         validated=False,
     )
 
-
     def store_memodel(access_point, memodel, description=None):
         """Store an MEModel on Nexus"""
-        
+
         access_point.store_object(
             memodel,
             seed=memodel.seed,

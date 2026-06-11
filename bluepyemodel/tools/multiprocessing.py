@@ -94,7 +94,7 @@ def mpi_map_function():
         Only the root process (rank 0) returns results; other processes
         participate in computation but return None.
     """
-    from mpi4py import MPI
+    from mpi4py import MPI  # pylint: disable=no-name-in-module
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -111,7 +111,7 @@ def mpi_map_function():
             # Divide work among processes
             chunk_sizes = [n_items // size + (1 if i < n_items % size else 0) for i in range(size)]
             offsets = [sum(chunk_sizes[:i]) for i in range(size)]
-            chunks = [items[offsets[i]:offsets[i] + chunk_sizes[i]] for i in range(size)]
+            chunks = [items[offsets[i] : offsets[i] + chunk_sizes[i]] for i in range(size)]
         else:
             chunks = None
 
