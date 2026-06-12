@@ -14,23 +14,7 @@ requires-python = ">= 3.11"
 dynamic = ["version"]
 dependencies = [
     "numpy",
-    "scipy>=1.16.1",
-    "pandas",
-    "ipyparallel>=6.3",
-    "tqdm",
-    "pyyaml",
-    "gitpython",
-    "bluepyopt>=1.14.10",
-    "bluepyefe>=2.3.48",
-    "neurom>=3.0",
-    "efel>=5.5.5",
-    "configparser",
-    "neuron>=8.0",
-    "morph_tool>=2.8",
-    "morphio",
     "fasteners>=0.16",
-    "jinja2>=3.0.3",
-    "currentscape>=0.0.11",
 ]
 keywords=[
     "computational neuroscience",
@@ -50,9 +34,56 @@ classifiers=[
 ]
 
 [project.optional-dependencies]
+extraction = [
+    "bluepyefe>=2.3.48",
+    "efel>=5.5.5",
+    "scipy>=1.16.1",
+]
+optimisation = [
+    "bluepyopt>=1.14.10",
+    "bluepyefe>=2.3.48",
+    "neuron>=8.0",
+    "efel>=5.5.5",
+    "scipy>=1.16.1",
+    "neurom>=3.0",
+    "morph_tool>=2.8",
+    "morphio",
+]
+validation = [
+    "bluepyopt>=1.14.10",
+    "neuron>=8.0",
+    "efel>=5.5.5",
+    "scipy>=1.16.1",
+    "neurom>=3.0",
+    "morph_tool>=2.8",
+    "morphio",
+    "matplotlib",
+    "bluepyefe>=2.3.48",
+    "currentscape>=0.0.11",
+]
+export = [
+    "bluepyopt>=1.14.10",
+    "bluepyefe>=2.3.48",
+    "neuron>=8.0",
+    "efel>=5.5.5",
+    "h5py",
+    "jinja2>=3.0.3",
+    "neurom>=3.0",
+    "morph_tool>=2.8",
+    "morphio",
+]
+parallel = [
+    "ipyparallel>=6.3",
+]
 luigi = [
     "luigi>=3.7.2",
     "luigi-tools>=0.0.12",
+]
+nexus = [
+    "nexusforge>=0.8.2",
+    "entity_management>=1.2",
+    "pyJWT>=2.1.0",
+    "pandas",
 ]
 docs = [
     "graphviz",
@@ -65,19 +96,11 @@ test = [
     "pytest>=6.2",
     "dictdiffer>=0.8",
 ]
-nexus = [
-    "nexusforge>=0.8.2",
-    "entity_management>=1.2",
-    "pyJWT>=2.1.0",
-]
 all = [
-    "luigi>=3.7.2",
-    "luigi-tools>=0.0.12",
-    "nexusforge>=0.8.2",
-    "entity_management>=1.2",
-    "pyJWT>=2.1.0",
-    "pytest>=6.2",
-    "dictdiffer>=0.8",
+    "bluepyemodel[local,parallel,luigi,nexus,test]",
+]
+local = [
+    "bluepyemodel[extraction,optimisation,validation,export]",
 ]
 
 [project.urls]
