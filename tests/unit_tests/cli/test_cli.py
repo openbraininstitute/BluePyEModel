@@ -75,6 +75,7 @@ def test_optimise_help(cli_runner):
     assert "--emodel" in result.output
     assert "--recipes-path" in result.output
     assert "--seed" in result.output
+    assert "--workers" in result.output
     assert "Run EModel optimisation." in result.output
 
 
@@ -142,13 +143,33 @@ def test_optimise_runs_optimisation(cli_runner, recipes_path, optimise_mocks):
         emodel="L5PC",
         recipes_path=Path(recipes_path),
     )
-    optimise_mocks["nested_pool_cls"].assert_called_once_with()
+    optimise_mocks["nested_pool_cls"].assert_called_once_with(processes=None)
     optimise_mocks["setup_and_run"].assert_called_once_with(
         optimise_mocks["access_point"],
         seed=7,
         mapper=optimise_mocks["nested_pool"].map,
         terminator=None,
     )
+
+
+def test_optimise_uses_workers(cli_runner, recipes_path, optimise_mocks):
+    result = cli_runner.invoke(
+        main,
+        [
+            "optimise",
+            "--seed",
+            "7",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+            "--workers",
+            "4",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    optimise_mocks["nested_pool_cls"].assert_called_once_with(processes="4")
 
 
 def test_optimise_command_direct(cli_runner, recipes_path, optimise_mocks):
@@ -169,6 +190,7 @@ def test_optimise_command_direct(cli_runner, recipes_path, optimise_mocks):
         emodel="cADpyr_L5TPC",
         recipes_path=Path(recipes_path),
     )
+    optimise_mocks["nested_pool_cls"].assert_called_once_with(processes=None)
     optimise_mocks["setup_and_run"].assert_called_once_with(
         optimise_mocks["access_point"],
         seed=3,
