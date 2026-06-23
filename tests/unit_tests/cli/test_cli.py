@@ -21,8 +21,8 @@ from pathlib import Path
 
 import pytest
 
-from bluepyemodel.cli import __main__ as cli_main_module
-from bluepyemodel.cli.__main__ import main
+import bluepyemodel.__main__ as package_main_module
+from bluepyemodel.cli.cli import main
 from bluepyemodel.cli.optimise import optimise
 
 
@@ -48,17 +48,17 @@ def test_main_unknown_subcommand(cli_runner):
 
 
 def test_main_module_entry_point(monkeypatch):
-    monkeypatch.setattr(sys, "argv", ["bluepyemodel.cli", "--help"])
+    monkeypatch.setattr(sys, "argv", ["bluepyemodel", "--help"])
 
     with pytest.raises(SystemExit) as exc_info:
-        runpy.run_path(str(cli_main_module.__file__), run_name="__main__")
+        runpy.run_path(str(package_main_module.__file__), run_name="__main__")
 
     assert exc_info.value.code == 0
 
 
 def test_main_module_runs_as_subprocess():
     result = subprocess.run(
-        [sys.executable, "-m", "bluepyemodel.cli", "--help"],
+        [sys.executable, "-m", "bluepyemodel", "--help"],
         capture_output=True,
         text=True,
         check=False,

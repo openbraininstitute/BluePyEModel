@@ -19,7 +19,7 @@ from unittest.mock import MagicMock
 import pytest
 from click.testing import CliRunner
 
-from bluepyemodel.cli.__main__ import main
+from bluepyemodel.cli.cli import main
 from bluepyemodel.cli.optimise import optimise
 from tests.utils import DATA
 

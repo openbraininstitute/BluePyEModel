@@ -86,7 +86,7 @@ all = [
 Homepage = "https://github.com/openbraininstitute/BluePyEModel"
 
 [project.scripts]
-bluepyemodel = "bluepyemodel.cli.__main__:main"
+bluepyemodel = "bluepyemodel.__main__:main"
 
 [tool.setuptools]
 include-package-data = true

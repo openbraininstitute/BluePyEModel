@@ -1,4 +1,4 @@
-"""Module entry point for ``python -m bluepyemodel.cli``."""
+"""BluePyEModel command-line interface."""
 
 """
 Copyright 2023-2024 Blue Brain Project / EPFL
@@ -27,7 +27,3 @@ def main():
 
 
 main.add_command(optimise)
-
-
-if __name__ == "__main__":
-    main()
