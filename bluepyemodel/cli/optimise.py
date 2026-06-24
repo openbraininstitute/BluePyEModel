@@ -27,12 +27,18 @@ import click
 @click.option("--emodel", required=True, help="EModel name")
 @click.option("--workers", required=False, default=None, help="Number of parallel workers.")
 @click.option(
+    "--checkpoints-dir",
+    required=False,
+    type=click.Path(path_type=Path),
+    default=Path("./checkpoints"),
+)
+@click.option(
     "--recipes-path",
     required=True,
     type=click.Path(path_type=Path),
     help="Path to recipes file or directory",
 )
-def optimise(seed, emodel, workers, recipes_path):
+def optimise(seed, emodel, workers, checkpoints_dir, recipes_path):
     """Run EModel optimisation."""
     from bluepyemodel.access_point.local import LocalAccessPoint
     from bluepyemodel.optimisation import setup_and_run_optimisation
@@ -54,4 +60,5 @@ def optimise(seed, emodel, workers, recipes_path):
             seed=seed,
             mapper=pool.map,
             terminator=None,
+            checkpoints_dir=checkpoints_dir,
         )

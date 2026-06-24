@@ -123,6 +123,7 @@ def setup_and_run_optimisation(
     seed,
     mapper=None,
     terminator=None,
+    checkpoints_dir: Path = Path("./checkpoints"),
 ):
     cell_evaluator = get_evaluator_from_access_point(
         access_point=access_point, include_validation_protocols=False
@@ -145,7 +146,9 @@ def setup_and_run_optimisation(
         use_stagnation_criterion=use_stagnation_criterion,
     )
 
-    checkpoint_path = get_checkpoint_path(access_point.emodel_metadata, seed)
+    checkpoint_path = get_checkpoint_path(
+        access_point.emodel_metadata, seed, base_dir=checkpoints_dir
+    )
 
     optimisation_checkpoint_period = access_point.pipeline_settings.optimisation_checkpoint_period
     run_optimisation(

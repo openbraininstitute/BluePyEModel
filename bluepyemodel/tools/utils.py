@@ -83,9 +83,9 @@ def checkpoint_path_exists(checkpoint_path):
     )
 
 
-def get_checkpoint_path(metadata, seed=None):
+def get_checkpoint_path(metadata, seed=None, base_dir: Path = Path("./checkpoints")):
     """Get checkpoint path. Use legacy format if any is found, else use latest format."""
-    base_path = f"./checkpoints/{metadata.emodel}/{metadata.iteration}/"
+    base_path = f"{base_dir}/{metadata.emodel}/{metadata.iteration}/"
     # legacy case 1 (2023.05.11 - 2023.10.19)
     filename = metadata.as_string(
         seed=seed, use_allen_notation=False, replace_semicolons=False, replace_spaces=False
