@@ -19,12 +19,15 @@ limitations under the License.
 import glob
 import logging
 import pickle
+import re
 from pathlib import Path
 
+import h5py
 import numpy
 
 from bluepyemodel.ecode import IDrest
 from bluepyemodel.ecode import eCodes
+from bluepyemodel.tools.checkpoint_hdf5 import read_checkpoint_h5
 
 logger = logging.getLogger("__main__")
 
@@ -39,9 +42,14 @@ def existing_checkpoint_paths(emodel_metadata, checkpoint_paths=None):
             using metadata. If None, will be created on the spot.
     """
     if checkpoint_paths is None:
-        checkpoint_paths = glob.glob("./checkpoints/**/*.pkl", recursive=True)
+        checkpoint_paths = (
+            glob.glob("./checkpoints/**/*.pkl", recursive=True)
+            + glob.glob("./checkpoints/**/*.h5", recursive=True)
+        )
         if not checkpoint_paths:
-            raise ValueError("The checkpoints directory is empty, or there are no .pkl files.")
+            raise ValueError(
+                "The checkpoints directory is empty, or there are no .pkl/.h5 files."
+            )
 
     if not emodel_metadata.iteration:
         return [chkp for chkp in checkpoint_paths if emodel_metadata.emodel in chkp.split("/")]
@@ -149,9 +157,18 @@ def get_seed_from_checkpoint_path(path):
 
 
 def read_checkpoint(checkpoint_path):
-    """Reads a BluePyOpt checkpoint file"""
+    """Reads a BluePyOpt checkpoint file (.pkl or .h5).
+
+    Supports both pickle and HDF5 formats transparently.
+    """
 
     p = Path(checkpoint_path)
+
+    # HDF5 format
+    if p.suffix in (".h5", ".hdf5"):
+        return read_checkpoint_h5(str(p))
+
+    # Pickle format (original behaviour)
     p_tmp = p.with_suffix(p.suffix + ".tmp")
 
     try:
