@@ -165,7 +165,7 @@ def read_checkpoint(checkpoint_path):
     p = Path(checkpoint_path)
 
     # HDF5 format
-    if p.suffix in (".h5", ".hdf5"):
+    if p.suffix in (".h5"):
         return read_checkpoint_h5(str(p))
 
     # Pickle format (original behaviour)
