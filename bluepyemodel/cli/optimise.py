@@ -21,6 +21,8 @@ from pathlib import Path
 
 import click
 
+L = logging.getLogger(__name__)
+
 
 @click.command()
 @click.option("--seed", type=int, required=True, help="Random seed")
@@ -38,23 +40,26 @@ import click
     type=click.Path(path_type=Path),
     help="Path to recipes file or directory",
 )
-def optimise(seed, emodel, workers, checkpoints_dir, recipes_path):
+@click.option(
+    "--convert-checkpoint",
+    is_flag=True,
+    default=False,
+    help="Convert the optimisation checkpoint pickle to HDF5 after the run.",
+)
+def optimise(seed, emodel, workers, checkpoints_dir, recipes_path, convert_checkpoint):
     """Run EModel optimisation."""
     from bluepyemodel.access_point.local import LocalAccessPoint
     from bluepyemodel.optimisation import setup_and_run_optimisation
+    from bluepyemodel.tools.conversion import pickle_to_hdf5
     from bluepyemodel.tools.multiprocessing import NestedPool
+    from bluepyemodel.tools.utils import get_checkpoint_path
 
-    logging.basicConfig(
-        level=logging.INFO,
-        handlers=[
-            logging.StreamHandler(),
-        ],
-    )
     access_point = LocalAccessPoint(
         emodel=emodel,
         recipes_path=recipes_path,
     )
     with NestedPool(processes=workers) as pool:
+        L.info("Running optimisation with %n workers", pool._processes)
         setup_and_run_optimisation(
             access_point,
             seed=seed,
@@ -62,3 +67,14 @@ def optimise(seed, emodel, workers, checkpoints_dir, recipes_path):
             terminator=None,
             checkpoints_dir=checkpoints_dir,
         )
+
+    if convert_checkpoint:
+        L.info("Convering pickle checkpoint to hdf5...")
+        checkpoint_path = Path(
+            get_checkpoint_path(
+                access_point.emodel_metadata,
+                seed=seed,
+                base_dir=checkpoints_dir,
+            )
+        )
+        pickle_to_hdf5(checkpoint_path, checkpoint_path.with_suffix(".h5"))

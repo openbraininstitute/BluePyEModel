@@ -22,8 +22,10 @@ from pathlib import Path
 import pytest
 
 import bluepyemodel.__main__ as package_main_module
+from bluepyemodel.cli.analysis import analyse
 from bluepyemodel.cli.cli import main
 from bluepyemodel.cli.optimise import optimise
+from bluepyemodel.cli.validation import validate
 
 
 def test_main_help(cli_runner):
@@ -31,7 +33,45 @@ def test_main_help(cli_runner):
 
     assert result.exit_code == 0
     assert "BluePyEModel command-line interface." in result.output
+    assert "--log-level" in result.output
     assert "optimise" in result.output
+    assert "analyse" in result.output
+    assert "validate" in result.output
+
+
+def test_main_configures_log_level(cli_runner, recipes_path, analyse_mocks, monkeypatch):
+    import logging
+
+    basic_config_calls = []
+    monkeypatch.setattr(
+        logging,
+        "basicConfig",
+        lambda **kwargs: basic_config_calls.append(kwargs),
+    )
+
+    result = cli_runner.invoke(
+        main,
+        [
+            "--log-level",
+            "DEBUG",
+            "analyse",
+            "--seed",
+            "7",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert basic_config_calls == [
+        {
+            "level": logging.DEBUG,
+            "handlers": basic_config_calls[0]["handlers"],
+            "force": True,
+        }
+    ]
 
 
 def test_main_requires_subcommand(cli_runner):
@@ -65,7 +105,10 @@ def test_main_module_runs_as_subprocess():
     )
 
     assert result.returncode == 0, result.stderr
+    assert "--log-level" in result.stdout
     assert "optimise" in result.stdout
+    assert "analyse" in result.stdout
+    assert "validate" in result.stdout
 
 
 def test_optimise_help(cli_runner):
@@ -76,6 +119,7 @@ def test_optimise_help(cli_runner):
     assert "--recipes-path" in result.output
     assert "--seed" in result.output
     assert "--workers" in result.output
+    assert "--convert-checkpoint" in result.output
     assert "Run EModel optimisation." in result.output
 
 
@@ -149,6 +193,35 @@ def test_optimise_runs_optimisation(cli_runner, recipes_path, optimise_mocks):
         seed=7,
         mapper=optimise_mocks["nested_pool"].map,
         terminator=None,
+        checkpoints_dir=Path("./checkpoints"),
+    )
+    optimise_mocks["pickle_to_hdf5"].assert_not_called()
+
+
+def test_optimise_converts_checkpoint(cli_runner, recipes_path, optimise_mocks):
+    result = cli_runner.invoke(
+        main,
+        [
+            "optimise",
+            "--seed",
+            "7",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+            "--convert-checkpoint",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    optimise_mocks["get_checkpoint_path"].assert_called_once_with(
+        optimise_mocks["emodel_metadata"],
+        seed=7,
+        base_dir=Path("./checkpoints"),
+    )
+    optimise_mocks["pickle_to_hdf5"].assert_called_once_with(
+        Path("./checkpoints/emodel=L5PC__seed=7.pkl"),
+        Path("./checkpoints/emodel=L5PC__seed=7.h5"),
     )
 
 
@@ -196,4 +269,187 @@ def test_optimise_command_direct(cli_runner, recipes_path, optimise_mocks):
         seed=3,
         mapper=optimise_mocks["nested_pool"].map,
         terminator=None,
+        checkpoints_dir=Path("./checkpoints"),
+    )
+
+
+def test_analyse_help(cli_runner):
+    result = cli_runner.invoke(main, ["analyse", "--help"])
+
+    assert result.exit_code == 0
+    assert "--emodel" in result.output
+    assert "--recipes-path" in result.output
+    assert "--seed" in result.output
+    assert "--checkpoint-path" in result.output
+    assert "Analyse an optimisation checkpoint" in result.output
+
+
+def test_analyse_requires_emodel(cli_runner, recipes_path):
+    result = cli_runner.invoke(
+        main,
+        ["analyse", "--seed", "42", "--recipes-path", str(recipes_path)],
+    )
+
+    assert result.exit_code != 0
+    assert "Missing option '--emodel'" in result.output
+
+
+def test_analyse_runs_analysis_pipeline(cli_runner, recipes_path, analyse_mocks):
+    result = cli_runner.invoke(
+        main,
+        [
+            "analyse",
+            "--seed",
+            "7",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    analyse_mocks["emodel_pipeline_cls"].assert_called_once_with(
+        emodel="L5PC",
+        recipes_path=Path(recipes_path),
+    )
+    analyse_mocks["get_checkpoint_path"].assert_called_once()
+    analyse_mocks["store_best_model"].assert_called_once_with(
+        analyse_mocks["access_point"],
+        seed=7,
+        checkpoint_path=str(Path("./checkpoints/emodel=L5PC__seed=7.pkl")),
+    )
+    analyse_mocks["pipeline"].plot.assert_called_once_with(only_validated=False, seeds=[7])
+    analyse_mocks["export_emodels_sonata"].assert_called_once_with(
+        analyse_mocks["access_point"],
+        only_validated=False,
+        only_best=False,
+        seeds=[7],
+        map_function=analyse_mocks["pipeline"].mapper,
+    )
+    analyse_mocks["create_em_json"].assert_called_once_with(
+        analyse_mocks["access_point"],
+        seed=7,
+        map_function=analyse_mocks["pipeline"].mapper,
+        output_dir=Path("."),
+    )
+
+
+def test_analyse_uses_explicit_checkpoint_path(cli_runner, recipes_path, analyse_mocks, tmp_path):
+    checkpoint_path = tmp_path / "checkpoint.pkl"
+    checkpoint_path.write_bytes(b"checkpoint")
+
+    result = cli_runner.invoke(
+        main,
+        [
+            "analyse",
+            "--seed",
+            "3",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+            "--checkpoint-path",
+            str(checkpoint_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    analyse_mocks["get_checkpoint_path"].assert_not_called()
+    analyse_mocks["store_best_model"].assert_called_once_with(
+        analyse_mocks["access_point"],
+        seed=3,
+        checkpoint_path=str(checkpoint_path),
+    )
+
+
+def test_analyse_command_direct(cli_runner, recipes_path, analyse_mocks):
+    result = cli_runner.invoke(
+        analyse,
+        [
+            "--seed",
+            "2",
+            "--emodel",
+            "cADpyr_L5TPC",
+            "--recipes-path",
+            str(recipes_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    analyse_mocks["emodel_pipeline_cls"].assert_called_once_with(
+        emodel="cADpyr_L5TPC",
+        recipes_path=Path(recipes_path),
+    )
+
+
+def test_validate_help(cli_runner):
+    result = cli_runner.invoke(main, ["validate", "--help"])
+
+    assert result.exit_code == 0
+    assert "--emodel" in result.output
+    assert "--recipes-path" in result.output
+    assert "--preselect-for-validation" in result.output
+    assert "Validate stored e-models from final.json." in result.output
+
+
+def test_validate_requires_emodel(cli_runner, recipes_path):
+    result = cli_runner.invoke(main, ["validate", "--recipes-path", str(recipes_path)])
+
+    assert result.exit_code != 0
+    assert "Missing option '--emodel'" in result.output
+
+
+def test_validate_runs_validation(cli_runner, recipes_path, validate_mocks):
+    result = cli_runner.invoke(
+        main,
+        [
+            "validate",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    validate_mocks["emodel_pipeline_cls"].assert_called_once_with(
+        emodel="L5PC",
+        recipes_path=Path(recipes_path),
+    )
+    validate_mocks["pipeline"].validation.assert_called_once_with(preselect_for_validation=False)
+
+
+def test_validate_preselect_for_validation(cli_runner, recipes_path, validate_mocks):
+    result = cli_runner.invoke(
+        main,
+        [
+            "validate",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+            "--preselect-for-validation",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    validate_mocks["pipeline"].validation.assert_called_once_with(preselect_for_validation=True)
+
+
+def test_validate_command_direct(cli_runner, recipes_path, validate_mocks):
+    result = cli_runner.invoke(
+        validate,
+        [
+            "--emodel",
+            "cADpyr_L5TPC",
+            "--recipes-path",
+            str(recipes_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    validate_mocks["emodel_pipeline_cls"].assert_called_once_with(
+        emodel="cADpyr_L5TPC",
+        recipes_path=Path(recipes_path),
     )
