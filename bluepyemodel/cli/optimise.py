@@ -27,7 +27,7 @@ L = logging.getLogger(__name__)
 @click.command()
 @click.option("--seed", type=int, required=True, help="Random seed")
 @click.option("--emodel", required=True, help="EModel name")
-@click.option("--workers", required=False, default=None, help="Number of parallel workers.")
+@click.option("--workers", type=int, required=False, default=None, help="Number of parallel workers.")
 @click.option(
     "--checkpoints-dir",
     required=False,
