@@ -85,7 +85,6 @@ class _CMAStatus:
 
     def check_termination(self, gen):
         """No-op. The active flag was determined at checkpoint save time."""
-        pass
 
 
 class _History:
@@ -160,11 +159,10 @@ def read_checkpoint_h5(h5_path):
         if "fitness_weights" in h5.attrs:
             fw = h5.attrs["fitness_weights"]
             if hasattr(fw, "__len__") and len(fw) > 0:
-                fitness_weights = fw.tolist()
+                fitness_weights = list(fw)
 
         param_names = [
-            s.decode("utf-8") if isinstance(s, bytes) else s
-            for s in h5["param_names"][:]
+            s.decode("utf-8") if isinstance(s, bytes) else s for s in h5["param_names"][:]
         ]
 
         halloffame = _read_individuals_from_group(h5["halloffame"], fitness_weights)
@@ -221,12 +219,8 @@ def _individuals_to_arrays(individuals):
     if not individuals:
         return np.empty((0, 0)), np.empty((0, 0)), np.empty((0,))
     genes = np.array([list(ind) for ind in individuals], dtype=np.float64)
-    fitness_values = np.array(
-        [list(ind.fitness.values) for ind in individuals], dtype=np.float64
-    )
-    fitness_reduce = np.array(
-        [sum(ind.fitness.values) for ind in individuals], dtype=np.float64
-    )
+    fitness_values = np.array([list(ind.fitness.values) for ind in individuals], dtype=np.float64)
+    fitness_reduce = np.array([sum(ind.fitness.values) for ind in individuals], dtype=np.float64)
     return genes, fitness_values, fitness_reduce
 
 
@@ -307,9 +301,9 @@ def convert_checkpoint(pickle_path, output_path=None, optimizer_override=None):
     n_params = len(param_names) if param_names else (len(population[0]) if population else 0)
     sample_ind = halloffame[0] if halloffame else (population[0] if population else None)
     n_objectives = len(sample_ind.fitness.values) if sample_ind else 0
-    fitness_weights = np.array(
-        sample_ind.fitness.weights, dtype=np.float64
-    ) if sample_ind else np.empty(0)
+    fitness_weights = (
+        np.array(sample_ind.fitness.weights, dtype=np.float64) if sample_ind else np.empty(0)
+    )
 
     with h5py.File(output_path, "w") as h5:
         h5.attrs["content_type"] = "optimisation_summary"
@@ -339,14 +333,18 @@ def convert_checkpoint(pickle_path, output_path=None, optimizer_override=None):
         if history is not None:
             _write_history(hist_grp, history)
         else:
-            hist_grp.create_dataset(
-                "genealogy_genes", data=np.empty((0, 0), dtype=np.float64)
-            )
+            hist_grp.create_dataset("genealogy_genes", data=np.empty((0, 0), dtype=np.float64))
 
     logger.info(
         "Written: %s (optimizer=%s, generation=%d, seed=%d, n_params=%d, "
         "n_objectives=%d, halloffame=%d, population=%d)",
-        output_path, optimizer, generation, seed, n_params,
-        n_objectives, len(halloffame), len(population),
+        output_path,
+        optimizer,
+        generation,
+        seed,
+        n_params,
+        n_objectives,
+        len(halloffame),
+        len(population),
     )
     return str(output_path)

@@ -319,9 +319,8 @@ class DataAccessPoint:
         str_ += f"  Has a model configuration: {self.has_model_configuration()}\n\n"
 
         if pathlib.Path("./checkpoints/").is_dir():
-            checkpoints = (
-                glob.glob("./checkpoints/**/*.pkl", recursive=True)
-                + glob.glob("./checkpoints/**/*.h5", recursive=True)
+            checkpoints = glob.glob("./checkpoints/**/*.pkl", recursive=True) + glob.glob(
+                "./checkpoints/**/*.h5", recursive=True
             )
             template_path = self.emodel_metadata.as_string()
             checkpoints = [c for c in checkpoints if template_path in c]

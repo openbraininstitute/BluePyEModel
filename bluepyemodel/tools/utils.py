@@ -19,10 +19,8 @@ limitations under the License.
 import glob
 import logging
 import pickle
-import re
 from pathlib import Path
 
-import h5py
 import numpy
 
 from bluepyemodel.ecode import IDrest
@@ -42,14 +40,11 @@ def existing_checkpoint_paths(emodel_metadata, checkpoint_paths=None):
             using metadata. If None, will be created on the spot.
     """
     if checkpoint_paths is None:
-        checkpoint_paths = (
-            glob.glob("./checkpoints/**/*.pkl", recursive=True)
-            + glob.glob("./checkpoints/**/*.h5", recursive=True)
+        checkpoint_paths = glob.glob("./checkpoints/**/*.pkl", recursive=True) + glob.glob(
+            "./checkpoints/**/*.h5", recursive=True
         )
         if not checkpoint_paths:
-            raise ValueError(
-                "The checkpoints directory is empty, or there are no .pkl/.h5 files."
-            )
+            raise ValueError("The checkpoints directory is empty, or there are no .pkl/.h5 files.")
 
     if not emodel_metadata.iteration:
         return [chkp for chkp in checkpoint_paths if emodel_metadata.emodel in chkp.split("/")]
@@ -165,7 +160,7 @@ def read_checkpoint(checkpoint_path):
     p = Path(checkpoint_path)
 
     # HDF5 format
-    if p.suffix in (".h5"):
+    if p.suffix == ".h5":
         return read_checkpoint_h5(str(p))
 
     # Pickle format (original behaviour)
