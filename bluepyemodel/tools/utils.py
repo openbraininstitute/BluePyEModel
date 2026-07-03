@@ -30,6 +30,18 @@ from bluepyemodel.tools.checkpoint_hdf5 import read_checkpoint_h5
 logger = logging.getLogger("__main__")
 
 
+def deduplicate_checkpoint_paths(checkpoint_paths):
+    """If both .h5 and .pkl exist for the same checkpoint, prefer .pkl."""
+    by_stem = {}
+    for p in checkpoint_paths:
+        stem = Path(p).with_suffix("")
+        if stem not in by_stem:
+            by_stem[stem] = p
+        elif p.endswith(".pkl"):
+            by_stem[stem] = p
+    return list(by_stem.values())
+
+
 def existing_checkpoint_paths(emodel_metadata, checkpoint_paths=None):
     """Returns a list of existing checkpoint paths conforming to metadata.
 
@@ -45,6 +57,8 @@ def existing_checkpoint_paths(emodel_metadata, checkpoint_paths=None):
         )
         if not checkpoint_paths:
             raise ValueError("The checkpoints directory is empty, or there are no .pkl/.h5 files.")
+
+    checkpoint_paths = deduplicate_checkpoint_paths(checkpoint_paths)
 
     if not emodel_metadata.iteration:
         return [chkp for chkp in checkpoint_paths if emodel_metadata.emodel in chkp.split("/")]

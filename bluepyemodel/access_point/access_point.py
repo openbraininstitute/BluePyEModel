@@ -29,6 +29,7 @@ from bluepyopt.deapext.stoppingCriteria import MaxNGen
 
 from bluepyemodel.emodel_pipeline.emodel_metadata import EModelMetadata
 from bluepyemodel.emodel_pipeline.emodel_settings import EModelPipelineSettings
+from bluepyemodel.tools.utils import deduplicate_checkpoint_paths
 from bluepyemodel.tools.utils import get_checkpoint_path
 from bluepyemodel.tools.utils import read_checkpoint
 
@@ -324,6 +325,8 @@ class DataAccessPoint:
             )
             template_path = self.emodel_metadata.as_string()
             checkpoints = [c for c in checkpoints if template_path in c]
+            # Prefer .h5 over .pkl when both exist for the same checkpoint
+            checkpoints = deduplicate_checkpoint_paths(checkpoints)
             str_ += "OPTIMISATION STATUS\n"
             str_ += f"  Number of checkpoints: {len(checkpoints)}\n"
             for c in checkpoints:
