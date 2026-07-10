@@ -59,7 +59,6 @@ def optimise(seed, emodel, workers, checkpoints_dir, recipes_path, convert_check
         recipes_path=recipes_path,
     )
     with NestedPool(processes=workers) as pool:
-        L.info("Running optimisation with %n workers", pool._processes)
         setup_and_run_optimisation(
             access_point,
             seed=seed,
