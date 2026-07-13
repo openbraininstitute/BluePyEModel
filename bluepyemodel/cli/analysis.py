@@ -16,6 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import logging
 import shutil
 from pathlib import Path
 
@@ -88,6 +89,10 @@ def _resolve_checkpoint_path(access_point, seed, checkpoint_path, checkpoints_di
 )
 def analyse(seed, emodel, workers, checkpoints_dir, checkpoint_path, recipes_path, em_json_dir, output_figures_dir, output_nodes_dir, output_em_dir):
     """Analyse an optimisation checkpoint: store results, plot, export, and write EM JSON."""
+
+    # fontTools is extremely noisy at INFO level
+    logging.getLogger("fontTools").setLevel(logging.WARNING)
+
     from bluepyemodel.export_emodel.export_emodel import export_emodels_sonata
     from bluepyemodel.access_point.local import LocalAccessPoint
     from bluepyemodel.optimisation import store_best_model
