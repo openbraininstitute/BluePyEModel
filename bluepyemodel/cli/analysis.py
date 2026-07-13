@@ -1,21 +1,5 @@
 """Analysis CLI subcommand."""
 
-"""
-Copyright 2023-2024 Blue Brain Project / EPFL
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-
 import logging
 import shutil
 from pathlib import Path
@@ -39,7 +23,9 @@ def _resolve_checkpoint_path(access_point, seed, checkpoint_path, checkpoints_di
 @click.command()
 @click.option("--seed", type=int, required=True, help="Random seed")
 @click.option("--emodel", required=True, help="EModel name")
-@click.option("--workers", type=int, required=False, default=None, help="Number of parallel workers.")
+@click.option(
+    "--workers", type=int, required=False, default=None, help="Number of parallel workers."
+)
 @click.option(
     "--checkpoints-dir",
     required=False,
@@ -87,18 +73,28 @@ def _resolve_checkpoint_path(access_point, seed, checkpoint_path, checkpoints_di
     type=click.Path(path_type=Path),
     default=Path("./em"),
 )
-def analyse(seed, emodel, workers, checkpoints_dir, checkpoint_path, recipes_path, em_json_dir, output_figures_dir, output_nodes_dir, output_em_dir):
+def analyse(
+    seed,
+    emodel,
+    workers,
+    checkpoints_dir,
+    checkpoint_path,
+    recipes_path,
+    output_figures_dir,
+    output_nodes_dir,
+    output_em_dir,
+):
     """Analyse an optimisation checkpoint: store results, plot, export, and write EM JSON."""
 
     # fontTools is extremely noisy at INFO level
     logging.getLogger("fontTools").setLevel(logging.WARNING)
 
-    from bluepyemodel.export_emodel.export_emodel import export_emodels_sonata
     from bluepyemodel.access_point.local import LocalAccessPoint
+    from bluepyemodel.emodel_pipeline.plotting import plot_models
+    from bluepyemodel.export_emodel.export_emodel import export_emodels_sonata
     from bluepyemodel.optimisation import store_best_model
     from bluepyemodel.tools.create_em_json import create_em_json
     from bluepyemodel.tools.multiprocessing import NestedPool
-    from bluepyemodel.emodel_pipeline.plotting import plot_models
 
     access_point = LocalAccessPoint(
         emodel=emodel,
@@ -154,7 +150,9 @@ def analyse(seed, emodel, workers, checkpoints_dir, checkpoint_path, recipes_pat
         )
 
         # flatten images and put to output directory
-        for image_file in list(tmp_figures_dir.rglob("*.pdf")) + list(tmp_figures_dir.rglob("*.png")):
+        for image_file in list(tmp_figures_dir.rglob("*.pdf")) + list(
+            tmp_figures_dir.rglob("*.png")
+        ):
             target_file = output_figures_dir / image_file.name
             shutil.move(str(image_file), str(target_file))
         shutil.rmtree(tmp_figures_dir)
