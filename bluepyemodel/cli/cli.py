@@ -21,7 +21,7 @@ import logging
 import click
 
 from bluepyemodel.cli.analysis import analyse
-from bluepyemodel.cli.optimise import optimise
+from bluepyemodel.cli.optimisation import optimise
 from bluepyemodel.cli.validation import validate
 
 LOG_LEVELS = {
