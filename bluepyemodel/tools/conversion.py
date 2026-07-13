@@ -368,7 +368,7 @@ def load_checkpoint_hdf5(hdf5_path):
         if "fitness_weights" in hdf5_file.attrs:
             weights = hdf5_file.attrs["fitness_weights"]
             if hasattr(weights, "__len__") and len(weights) > 0:
-                fitness_weights = weights.tolist()
+                fitness_weights = np.asarray(weights).tolist()
 
         checkpoint = {
             "generation": generation,
