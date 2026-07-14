@@ -24,7 +24,7 @@ import pytest
 import bluepyemodel.__main__ as package_main_module
 from bluepyemodel.cli.analysis import analyse
 from bluepyemodel.cli.cli import main
-from bluepyemodel.cli.optimise import optimise
+from bluepyemodel.cli.optimisation import optimise
 from bluepyemodel.cli.validation import validate
 
 

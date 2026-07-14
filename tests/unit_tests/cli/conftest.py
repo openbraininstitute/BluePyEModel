@@ -22,7 +22,7 @@ import pytest
 from click.testing import CliRunner
 
 from bluepyemodel.cli.cli import main
-from bluepyemodel.cli.optimise import optimise
+from bluepyemodel.cli.optimisation import optimise
 from tests.utils import DATA
 
 
