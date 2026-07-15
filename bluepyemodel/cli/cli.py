@@ -6,7 +6,6 @@ import click
 
 from bluepyemodel.cli.analysis import analyse
 from bluepyemodel.cli.optimisation import optimise
-from bluepyemodel.cli.validation import validate
 
 LOG_LEVELS = {
     "DEBUG": logging.DEBUG,
@@ -35,4 +34,3 @@ def main(log_level):
 
 main.add_command(analyse)
 main.add_command(optimise)
-main.add_command(validate)

@@ -25,7 +25,6 @@ import bluepyemodel.__main__ as package_main_module
 from bluepyemodel.cli.analysis import analyse
 from bluepyemodel.cli.cli import main
 from bluepyemodel.cli.optimisation import optimise
-from bluepyemodel.cli.validation import validate
 
 
 def test_main_help(cli_runner):
@@ -36,7 +35,6 @@ def test_main_help(cli_runner):
     assert "--log-level" in result.output
     assert "optimise" in result.output
     assert "analyse" in result.output
-    assert "validate" in result.output
 
 
 def test_main_configures_log_level(cli_runner, recipes_path, analyse_mocks, monkeypatch):
@@ -108,7 +106,6 @@ def test_main_module_runs_as_subprocess():
     assert "--log-level" in result.stdout
     assert "optimise" in result.stdout
     assert "analyse" in result.stdout
-    assert "validate" in result.stdout
 
 
 def test_optimise_help(cli_runner):
@@ -378,78 +375,6 @@ def test_analyse_command_direct(cli_runner, recipes_path, analyse_mocks):
 
     assert result.exit_code == 0, result.output
     analyse_mocks["emodel_pipeline_cls"].assert_called_once_with(
-        emodel="cADpyr_L5TPC",
-        recipes_path=Path(recipes_path),
-    )
-
-
-def test_validate_help(cli_runner):
-    result = cli_runner.invoke(main, ["validate", "--help"])
-
-    assert result.exit_code == 0
-    assert "--emodel" in result.output
-    assert "--recipes-path" in result.output
-    assert "--preselect-for-validation" in result.output
-    assert "Validate stored e-models from final.json." in result.output
-
-
-def test_validate_requires_emodel(cli_runner, recipes_path):
-    result = cli_runner.invoke(main, ["validate", "--recipes-path", str(recipes_path)])
-
-    assert result.exit_code != 0
-    assert "Missing option '--emodel'" in result.output
-
-
-def test_validate_runs_validation(cli_runner, recipes_path, validate_mocks):
-    result = cli_runner.invoke(
-        main,
-        [
-            "validate",
-            "--emodel",
-            "L5PC",
-            "--recipes-path",
-            str(recipes_path),
-        ],
-    )
-
-    assert result.exit_code == 0, result.output
-    validate_mocks["emodel_pipeline_cls"].assert_called_once_with(
-        emodel="L5PC",
-        recipes_path=Path(recipes_path),
-    )
-    validate_mocks["pipeline"].validation.assert_called_once_with(preselect_for_validation=False)
-
-
-def test_validate_preselect_for_validation(cli_runner, recipes_path, validate_mocks):
-    result = cli_runner.invoke(
-        main,
-        [
-            "validate",
-            "--emodel",
-            "L5PC",
-            "--recipes-path",
-            str(recipes_path),
-            "--preselect-for-validation",
-        ],
-    )
-
-    assert result.exit_code == 0, result.output
-    validate_mocks["pipeline"].validation.assert_called_once_with(preselect_for_validation=True)
-
-
-def test_validate_command_direct(cli_runner, recipes_path, validate_mocks):
-    result = cli_runner.invoke(
-        validate,
-        [
-            "--emodel",
-            "cADpyr_L5TPC",
-            "--recipes-path",
-            str(recipes_path),
-        ],
-    )
-
-    assert result.exit_code == 0, result.output
-    validate_mocks["emodel_pipeline_cls"].assert_called_once_with(
         emodel="cADpyr_L5TPC",
         recipes_path=Path(recipes_path),
     )
