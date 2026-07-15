@@ -104,11 +104,11 @@ def test_main_unknown_subcommand(cli_runner):
     assert "No such command" in result.output
 
 
-def test_main_module_entry_point(monkeypatch):
+def test_main_module_executes_main(monkeypatch):
     monkeypatch.setattr(sys, "argv", ["bluepyemodel", "--help"])
 
     with pytest.raises(SystemExit) as exc_info:
-        runpy.run_path(str(package_main_module.__file__), run_name="__main__")
+        runpy.run_module("bluepyemodel.__main__", run_name="__main__")
 
     assert exc_info.value.code == 0
 

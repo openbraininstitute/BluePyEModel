@@ -20,9 +20,14 @@ import h5py
 import numpy as np
 import pytest
 
+from bluepyemodel.tools.conversion import CONTENT_TYPE_CELLS
 from bluepyemodel.tools.conversion import CONTENT_TYPE_OPTIMISATION_SUMMARY
+from bluepyemodel.tools.conversion import CONTENT_TYPE_PROTOCOLS
 from bluepyemodel.tools.conversion import FORMAT_VERSION
 from bluepyemodel.tools.conversion import _CMAStatus
+from bluepyemodel.tools.conversion import _Fitness
+from bluepyemodel.tools.conversion import _GeneOnlyIndividual
+from bluepyemodel.tools.conversion import _History
 from bluepyemodel.tools.conversion import _Individual
 from bluepyemodel.tools.conversion import _Logbook
 from bluepyemodel.tools.conversion import checkpoint_hdf5_to_pickle
@@ -44,6 +49,7 @@ def _sample_checkpoint():
             _Individual([0.5, 0.6], fitness_values=[2.5], fitness_weights=[-1.0]),
         ],
         "logbook": _Logbook({"gen": [1, 2, 3], "nevals": [10, 20, 30]}, ["gen", "nevals"]),
+        "history": _History({1: _GeneOnlyIndividual([0.1, 0.2])}),
         "CMA_es": _CMAStatus(active=True),
     }
 
@@ -109,6 +115,42 @@ def test_hdf5_to_pickle_dispatches_optimisation_summary(tmp_path):
     with open(restored_pickle_path, "rb") as pickle_file:
         restored = pickle.load(pickle_file, encoding="latin1")
     assert restored["generation"] == 3
+
+
+def test_checkpoint_pickle_hdf5_roundtrip_with_logbook_and_history(tmp_path):
+    pickle_path = tmp_path / "emodel=L5PC__seed=7.pkl"
+    hdf5_path = tmp_path / "emodel=L5PC__seed=7.h5"
+
+    checkpoint = _sample_checkpoint()
+    with open(pickle_path, "wb") as pickle_file:
+        pickle.dump(checkpoint, pickle_file)
+
+    checkpoint_pickle_to_hdf5(pickle_path, hdf5_path)
+    loaded = load_checkpoint_hdf5(hdf5_path)
+
+    assert loaded["logbook"].select("gen") == [1, 2, 3]
+    assert len(loaded["history"].genealogy_history) == 1
+
+
+def test_load_checkpoint_hdf5_without_fitness_weights(tmp_path):
+    pickle_path = tmp_path / "emodel=L5PC__seed=2.pkl"
+    hdf5_path = tmp_path / "checkpoint.h5"
+    checkpoint = {
+        "generation": 1,
+        "param_names": [],
+        "halloffame": [],
+        "population": [],
+    }
+
+    with open(pickle_path, "wb") as pickle_file:
+        pickle.dump(checkpoint, pickle_file)
+    checkpoint_pickle_to_hdf5(pickle_path, hdf5_path, optimizer_override="IBEA")
+
+    loaded = load_checkpoint_hdf5(hdf5_path)
+
+    assert loaded["generation"] == 1
+    assert loaded["halloffame"] == []
+    assert loaded["population"] == []
 
 
 def test_load_checkpoint_hdf5_rejects_unsupported_format(tmp_path):
@@ -192,3 +234,62 @@ def test_protocols_pickle_hdf5_roundtrip(tmp_path):
 
     assert restored[0].name == "IDrest"
     assert restored[0].amplitude == 0.15
+
+
+def test_fitness_wrapper_properties():
+    fitness = _Fitness([1.0, 2.0], weights=[-1.0, -1.0])
+
+    assert fitness.valid is True
+    assert fitness.reduce == 3.0
+    assert fitness.weighted_reduce == -3.0
+
+
+def test_load_checkpoint_hdf5_rejects_wrong_content_type(tmp_path):
+    hdf5_path = tmp_path / "wrong.h5"
+    with h5py.File(hdf5_path, "w") as hdf5_file:
+        hdf5_file.attrs["content_type"] = CONTENT_TYPE_CELLS
+        hdf5_file.attrs["format_version"] = FORMAT_VERSION
+
+    with pytest.raises(ValueError, match="does not contain an optimisation summary"):
+        load_checkpoint_hdf5(hdf5_path)
+
+
+def test_hdf5_to_pickle_rejects_unsupported_content_type(tmp_path):
+    hdf5_path = tmp_path / "unsupported.h5"
+    with h5py.File(hdf5_path, "w") as hdf5_file:
+        hdf5_file.attrs["content_type"] = "unknown"
+        hdf5_file.attrs["format_version"] = FORMAT_VERSION
+
+    with pytest.raises(ValueError, match="Unsupported content type"):
+        hdf5_to_pickle(hdf5_path, tmp_path / "out.pkl")
+
+
+def test_pickle_to_hdf5_with_explicit_content_type(tmp_path):
+    pickle_path = tmp_path / "cells.pkl"
+    hdf5_path = tmp_path / "cells.h5"
+    cells = [_FakeCell()]
+    with open(pickle_path, "wb") as pickle_file:
+        pickle.dump(cells, pickle_file)
+
+    pickle_to_hdf5(pickle_path, hdf5_path, content_type=CONTENT_TYPE_CELLS)
+
+    with h5py.File(hdf5_path, "r") as hdf5_file:
+        assert hdf5_file.attrs["content_type"] == CONTENT_TYPE_CELLS
+
+
+def test_checkpoint_pickle_to_hdf5_without_history(tmp_path):
+    pickle_path = tmp_path / "emodel=L5PC__seed=4.pkl"
+    hdf5_path = tmp_path / "checkpoint.h5"
+    checkpoint = {
+        "generation": 0,
+        "param_names": ["a"],
+        "halloffame": [_Individual([1.0], fitness_values=[0.5])],
+        "population": [],
+    }
+    with open(pickle_path, "wb") as pickle_file:
+        pickle.dump(checkpoint, pickle_file)
+
+    checkpoint_pickle_to_hdf5(pickle_path, hdf5_path)
+    loaded = load_checkpoint_hdf5(hdf5_path)
+
+    assert loaded["history"].genealogy_history == {}
