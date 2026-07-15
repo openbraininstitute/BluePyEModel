@@ -239,7 +239,7 @@ def test_optimise_uses_workers(cli_runner, recipes_path, optimise_mocks):
     )
 
     assert result.exit_code == 0, result.output
-    optimise_mocks["nested_pool_cls"].assert_called_once_with(processes="4")
+    optimise_mocks["nested_pool_cls"].assert_called_once_with(processes=4)
 
 
 def test_optimise_command_direct(cli_runner, recipes_path, optimise_mocks):
@@ -306,7 +306,7 @@ def test_analyse_runs_analysis_pipeline(cli_runner, recipes_path, analyse_mocks)
     )
 
     assert result.exit_code == 0, result.output
-    analyse_mocks["emodel_pipeline_cls"].assert_called_once_with(
+    analyse_mocks["local_access_point"].assert_called_once_with(
         emodel="L5PC",
         recipes_path=Path(recipes_path),
     )
@@ -316,19 +316,25 @@ def test_analyse_runs_analysis_pipeline(cli_runner, recipes_path, analyse_mocks)
         seed=7,
         checkpoint_path=str(Path("./checkpoints/emodel=L5PC__seed=7.pkl")),
     )
-    analyse_mocks["pipeline"].plot.assert_called_once_with(only_validated=False, seeds=[7])
+    analyse_mocks["plot_models"].assert_called_once()
+    plot_models_kwargs = analyse_mocks["plot_models"].call_args.kwargs
+    assert plot_models_kwargs["access_point"] is analyse_mocks["access_point"]
+    assert plot_models_kwargs["mapper"] is analyse_mocks["nested_pool"].map
+    assert plot_models_kwargs["seeds"] == [7]
+    assert plot_models_kwargs["only_validated"] is False
     analyse_mocks["export_emodels_sonata"].assert_called_once_with(
         analyse_mocks["access_point"],
         only_validated=False,
         only_best=False,
         seeds=[7],
-        map_function=analyse_mocks["pipeline"].mapper,
+        map_function=analyse_mocks["nested_pool"].map,
+        output_dir=Path("./nodes"),
     )
     analyse_mocks["create_em_json"].assert_called_once_with(
         analyse_mocks["access_point"],
         seed=7,
-        map_function=analyse_mocks["pipeline"].mapper,
-        output_dir=Path("."),
+        map_function=analyse_mocks["nested_pool"].map,
+        output_dir=Path("./em"),
     )
 
 
@@ -374,7 +380,7 @@ def test_analyse_command_direct(cli_runner, recipes_path, analyse_mocks):
     )
 
     assert result.exit_code == 0, result.output
-    analyse_mocks["emodel_pipeline_cls"].assert_called_once_with(
+    analyse_mocks["local_access_point"].assert_called_once_with(
         emodel="cADpyr_L5TPC",
         recipes_path=Path(recipes_path),
     )

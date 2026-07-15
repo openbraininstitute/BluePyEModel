@@ -76,6 +76,7 @@ def analyse_mocks(monkeypatch):
     access_point = MagicMock()
     emodel_metadata = MagicMock()
     access_point.emodel_metadata = emodel_metadata
+    access_point.pipeline_settings = MagicMock()
     local_access_point = MagicMock(return_value=access_point)
 
     nested_pool = MagicMock()
@@ -84,23 +85,14 @@ def analyse_mocks(monkeypatch):
     nested_pool.__exit__ = MagicMock(return_value=False)
     nested_pool_cls = MagicMock(return_value=nested_pool)
 
-    pipeline = MagicMock()
-    pipeline.access_point = access_point
-    pipeline.mapper = nested_pool.map
-    emodel_pipeline_cls = MagicMock(return_value=pipeline)
-
     store_best_model = MagicMock()
+    plot_models = MagicMock()
     export_emodels_sonata = MagicMock()
     create_em_json = MagicMock()
     get_checkpoint_path = MagicMock(return_value=Path("./checkpoints/emodel=L5PC__seed=7.pkl"))
 
-    fake_emodel_pipeline_module = MagicMock()
-    fake_emodel_pipeline_module.EModel_pipeline = emodel_pipeline_cls
-    monkeypatch.setitem(
-        sys.modules,
-        "bluepyemodel.emodel_pipeline.emodel_pipeline",
-        fake_emodel_pipeline_module,
-    )
+    monkeypatch.setattr("bluepyemodel.access_point.local.LocalAccessPoint", local_access_point)
+    monkeypatch.setattr("bluepyemodel.emodel_pipeline.plotting.plot_models", plot_models)
     monkeypatch.setattr("bluepyemodel.optimisation.store_best_model", store_best_model)
     monkeypatch.setattr(
         "bluepyemodel.export_emodel.export_emodel.export_emodels_sonata",
@@ -113,10 +105,10 @@ def analyse_mocks(monkeypatch):
     return {
         "access_point": access_point,
         "emodel_metadata": emodel_metadata,
-        "pipeline": pipeline,
-        "emodel_pipeline_cls": emodel_pipeline_cls,
+        "local_access_point": local_access_point,
         "nested_pool": nested_pool,
         "nested_pool_cls": nested_pool_cls,
+        "plot_models": plot_models,
         "store_best_model": store_best_model,
         "export_emodels_sonata": export_emodels_sonata,
         "create_em_json": create_em_json,
