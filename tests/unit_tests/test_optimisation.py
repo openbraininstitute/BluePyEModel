@@ -67,3 +67,20 @@ def test_get_seed_from_checkpoint_path():
         "./checkpoints/L5PC/test/emodel=L5PC__seed=0__iteration=test__ttype=t_type.pkl"
     )
     assert seed == 0
+
+
+def test_get_checkpoint_path_uses_custom_base_dir(workspace):
+    metadata = EModelMetadata(
+        emodel="L5PC",
+        mtype="L5TPC:A",
+        ttype="t type",
+        iteration_tag="test",
+        brain_region="somatosensory cortex",
+        allen_notation="SSCX",
+    )
+    custom_dir = workspace / "custom_checkpoints"
+
+    path = get_checkpoint_path(metadata, seed=0, base_dir=custom_dir)
+
+    assert str(path).startswith(f"{custom_dir}/L5PC/test/")
+    assert str(path).endswith("__seed=0.pkl")

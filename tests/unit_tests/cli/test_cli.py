@@ -14,14 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import logging
 import runpy
 import subprocess
 import sys
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 
 import bluepyemodel.__main__ as package_main_module
+from bluepyemodel.cli.analysis import _resolve_checkpoint_path
 from bluepyemodel.cli.analysis import analyse
 from bluepyemodel.cli.cli import main
 from bluepyemodel.cli.optimisation import optimise
@@ -38,8 +41,6 @@ def test_main_help(cli_runner):
 
 
 def test_main_configures_log_level(cli_runner, recipes_path, analyse_mocks, monkeypatch):
-    import logging
-
     basic_config_calls = []
     monkeypatch.setattr(
         logging,
@@ -70,6 +71,24 @@ def test_main_configures_log_level(cli_runner, recipes_path, analyse_mocks, monk
             "force": True,
         }
     ]
+
+
+def test_analyse_sets_fonttools_log_level(cli_runner, recipes_path, analyse_mocks):
+    result = cli_runner.invoke(
+        main,
+        [
+            "analyse",
+            "--seed",
+            "7",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert logging.getLogger("fontTools").level == logging.WARNING
 
 
 def test_main_requires_subcommand(cli_runner):
@@ -383,4 +402,138 @@ def test_analyse_command_direct(cli_runner, recipes_path, analyse_mocks):
     analyse_mocks["local_access_point"].assert_called_once_with(
         emodel="cADpyr_L5TPC",
         recipes_path=Path(recipes_path),
+    )
+
+
+def test_resolve_checkpoint_path_uses_explicit_path():
+    access_point = MagicMock()
+
+    resolved = _resolve_checkpoint_path(
+        access_point,
+        seed=7,
+        checkpoint_path=Path("/tmp/checkpoint.h5"),
+        checkpoints_dir=Path("./checkpoints"),
+    )
+
+    assert resolved == Path("/tmp/checkpoint.h5")
+
+
+def test_resolve_checkpoint_path_uses_metadata_path(analyse_mocks):
+    access_point = analyse_mocks["access_point"]
+    checkpoints_dir = Path("/data/checkpoints")
+
+    resolved = _resolve_checkpoint_path(
+        access_point,
+        seed=7,
+        checkpoint_path=None,
+        checkpoints_dir=checkpoints_dir,
+    )
+
+    analyse_mocks["get_checkpoint_path"].assert_called_once_with(
+        access_point.emodel_metadata,
+        seed=7,
+        base_dir=checkpoints_dir,
+    )
+    assert resolved == Path("./checkpoints/emodel=L5PC__seed=7.pkl")
+
+
+def _write_dummy_figures(**kwargs):
+    figures_dir = kwargs["figures_dir"]
+    nested_dir = figures_dir / "seed_7"
+    nested_dir.mkdir(parents=True, exist_ok=True)
+    (nested_dir / "trace.pdf").write_bytes(b"pdf")
+    (nested_dir / "thumb.png").write_bytes(b"png")
+
+
+def test_analyse_flattens_figure_outputs(cli_runner, recipes_path, analyse_mocks, tmp_path):
+    analyse_mocks["plot_models"].side_effect = _write_dummy_figures
+    output_figures_dir = tmp_path / "figures"
+
+    result = cli_runner.invoke(
+        main,
+        [
+            "analyse",
+            "--seed",
+            "7",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+            "--output-figures-dir",
+            str(output_figures_dir),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert (output_figures_dir / "trace.pdf").is_file()
+    assert (output_figures_dir / "thumb.png").is_file()
+    assert not (output_figures_dir / "tmp").exists()
+
+
+def test_analyse_uses_custom_output_dirs(cli_runner, recipes_path, analyse_mocks, tmp_path):
+    output_figures_dir = tmp_path / "custom_figures"
+    output_nodes_dir = tmp_path / "custom_nodes"
+    output_em_dir = tmp_path / "custom_em"
+
+    result = cli_runner.invoke(
+        main,
+        [
+            "analyse",
+            "--seed",
+            "7",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+            "--output-figures-dir",
+            str(output_figures_dir),
+            "--output-nodes-dir",
+            str(output_nodes_dir),
+            "--output-em-dir",
+            str(output_em_dir),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    analyse_mocks["export_emodels_sonata"].assert_called_once_with(
+        analyse_mocks["access_point"],
+        only_validated=False,
+        only_best=False,
+        seeds=[7],
+        map_function=analyse_mocks["nested_pool"].map,
+        output_dir=output_nodes_dir,
+    )
+    analyse_mocks["create_em_json"].assert_called_once_with(
+        analyse_mocks["access_point"],
+        seed=7,
+        map_function=analyse_mocks["nested_pool"].map,
+        output_dir=output_em_dir,
+    )
+
+
+def test_optimise_uses_custom_checkpoints_dir(cli_runner, recipes_path, optimise_mocks, tmp_path):
+    checkpoints_dir = tmp_path / "my_checkpoints"
+
+    result = cli_runner.invoke(
+        main,
+        [
+            "optimise",
+            "--seed",
+            "7",
+            "--emodel",
+            "L5PC",
+            "--recipes-path",
+            str(recipes_path),
+            "--checkpoints-dir",
+            str(checkpoints_dir),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    optimise_mocks["setup_and_run"].assert_called_once_with(
+        optimise_mocks["access_point"],
+        seed=7,
+        mapper=optimise_mocks["nested_pool"].map,
+        terminator=None,
+        checkpoints_dir=checkpoints_dir,
     )
