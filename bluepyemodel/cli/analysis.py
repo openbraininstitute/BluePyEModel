@@ -47,13 +47,6 @@ def _resolve_checkpoint_path(access_point, seed, checkpoint_path, checkpoints_di
     help="Path to recipes file or directory",
 )
 @click.option(
-    "--em-json-dir",
-    required=False,
-    type=click.Path(path_type=Path),
-    default=Path("."),
-    help="Directory where the EModel JSON file will be written.",
-)
-@click.option(
     "--output-figures-dir",
     required=False,
     type=click.Path(path_type=Path),
