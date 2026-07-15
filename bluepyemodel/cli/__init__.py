@@ -1,2 +1,1 @@
 """BluePyEModel command-line interface."""
-"""
