@@ -41,7 +41,10 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
+    "sphinx.ext.doctest",
 ]
+
+suppress_warnings = ["docutils", "autodoc.mocked_object"]
 
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ['_templates']
@@ -49,7 +52,7 @@ extensions = [
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = ["_autosummary/bluepyemodel.icselector.met_type_ic_profile_generator.rst"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -57,16 +60,30 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx-bluebrain-theme"
+html_theme = "obi_sphinx_theme"
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/openbraininstitute/BluePyEModel",
+            "icon": "fa-brands fa-github",
+        },
+    ],
+    "navbar_align": "left",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
+doctest_global_setup = """
+from bluepyemodel.tools.utils import (
+    get_curr_name,
+    get_loc_name,
+    get_protocol_name,
+    parse_feature_name_parts,
+)
+"""
 # html_static_path = ['_static']
-
-# html_theme_options = {
-#    "metadata_distribution": "BluepyEModel",
-# }
 
 html_title = "BluePyEModel"
 
@@ -91,4 +108,10 @@ intersphinx_mapping = {
     "luigi": ("https://luigi.readthedocs.io/en/stable", None),
 }
 
-autodoc_mock_imports = ["bluepyemodel.tasks.luigi_tools"]
+autodoc_mock_imports = [
+    "bluepyemodel.tasks.luigi_tools",
+    "bluepyemodel.icselector.met_type_ic_profile_generator",
+    "entity_management",
+    "jwt",
+    "kgforge",
+]
