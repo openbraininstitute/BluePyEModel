@@ -5,6 +5,9 @@ on:
     # allows this workflow to be reusable (e.g. by the build workflow)
     workflow_call:
 
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   tests:
@@ -29,8 +32,8 @@ jobs:
       if: ${{matrix.python-version == '3.12'}}
       uses: codecov/codecov-action@v6
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: false
+        use_oidc: true
+        fail_ci_if_error: true
 
   lint:
     runs-on: ubuntu-latest
