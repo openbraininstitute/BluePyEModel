@@ -61,16 +61,6 @@ exclude_patterns = ["_autosummary/bluepyemodel.icselector.met_type_ic_profile_ge
 # a list of builtin themes.
 #
 html_theme = "obi_sphinx_theme"
-html_theme_options = {
-    "icon_links": [
-        {
-            "name": "GitHub",
-            "url": "https://github.com/openbraininstitute/BluePyEModel",
-            "icon": "fa-brands fa-github",
-        },
-    ],
-    "navbar_align": "left",
-}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
