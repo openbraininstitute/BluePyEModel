@@ -121,6 +121,7 @@ def get_parser():
     parser.add_argument("--githash", type=str, required=False, default=None)
     parser.add_argument("--use_ipyparallel", action="store_true", default=False)
     parser.add_argument("--use_multiprocessing", action="store_true", default=False)
+    parser.add_argument("--use_mpi", action="store_true", default=False)
     parser.add_argument("-v", "--verbose", action="count", dest="verbosity", default=0)
 
     return parser
@@ -152,6 +153,7 @@ def main():
         iteration_tag=args.githash,
         use_ipyparallel=args.use_ipyparallel,
         use_multiprocessing=args.use_multiprocessing,
+        use_mpi=args.use_mpi,
     )
 
     if args.step == "extract":
