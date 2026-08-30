@@ -32,6 +32,7 @@ class EModelWorkflow:
         fitness_configuration_id=None,
         emodels=None,
         emodel_scripts_id=None,
+        simulatable_neuron_ids=None,
         state="not launched",
     ):
         """Init
@@ -42,6 +43,8 @@ class EModelWorkflow:
             emodel_configuration (str): NeuronModelConfiguration id
             fitness_configuration_id (str): FitnessCalculatorConfiguration id
             emodels (list): list of EModel ids
+            emodel_scripts_id (list): list of EModelScript ids
+            simulatable_neuron_ids (list): list of SimulatableNeuron ids
             state (str): can be "not launched", "running" or "done"
         """
         self.targets_configuration_id = targets_configuration_id
@@ -50,6 +53,7 @@ class EModelWorkflow:
         self.fitness_configuration_id = fitness_configuration_id
         self.emodels = emodels if emodels else []
         self.emodel_scripts_id = emodel_scripts_id if emodel_scripts_id else []
+        self.simulatable_neuron_ids = simulatable_neuron_ids if simulatable_neuron_ids else []
         self.state = state
 
     def add_emodel_id(self, emodel_id):
@@ -57,8 +61,12 @@ class EModelWorkflow:
         self.emodels.append(emodel_id)
 
     def add_emodel_script_id(self, emodel_script_id):
-        """Add an emodel id to the list of emodels"""
+        """Add an emodel script id to the list of emodel scripts"""
         self.emodel_scripts_id.append(emodel_script_id)
+
+    def add_simulatable_neuron_id(self, simulatable_neuron_id):
+        """Add an simulatable neuron id to the list of simulatable neurons"""
+        self.emodel_scripts_id.append(simulatable_neuron_id)
 
     def get_configuration_ids(self):
         """Return all configuration id parameters"""
@@ -75,7 +83,10 @@ class EModelWorkflow:
     def get_related_nexus_ids(self):
         emodels_ids = [{"id": id_, "type": "EModel"} for id_ in self.emodels]
         emodel_scripts_ids = [{"id": id_, "type": "EModelScript"} for id_ in self.emodel_scripts_id]
-        generates = emodels_ids + emodel_scripts_ids
+        simulatable_neuron_ids = [
+            {"id": id_, "type": "SimulatableNeuron"} for id_ in self.simulatable_neuron_ids
+        ]
+        generates = emodels_ids + emodel_scripts_ids + simulatable_neuron_ids
         if self.fitness_configuration_id:
             generates.append(
                 {
