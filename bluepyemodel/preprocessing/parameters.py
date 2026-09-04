@@ -515,6 +515,11 @@ def _validate_myelinated_capability(
     raise ValueError(msg)
 
 
+def _sorted_names(names: Iterable[Any]) -> list[str]:
+    """Render section-list names as plain sorted strings for error messages."""
+    return sorted(str(name) for name in names)
+
+
 def _validate_physical_section_availability(
     selection: ParametersSelection,
     capabilities: MorphologyCapabilities,
@@ -534,10 +539,9 @@ def _validate_physical_section_availability(
         missing = expanded - available
         if missing:
             msg = (
-                f"Configured region '{location.value}' expands to "
-                f"{sorted(section.value for section in expanded)}, but the "
-                f"imported morphology has no source sections for "
-                f"{sorted(section.value for section in missing)}."
+                f"Configured region '{location}' expands to {_sorted_names(expanded)}, "
+                f"but the imported morphology has no source sections for "
+                f"{_sorted_names(missing)}."
             )
             raise ValueError(msg)
 

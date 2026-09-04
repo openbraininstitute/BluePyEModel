@@ -1039,9 +1039,14 @@ class ParamsDefinitionInput(BaseModel):
 
     parameters_selection: ParametersSelection
     distance_dependent_distributions: Annotated[
-        dict[str, CustomDistanceDependentDistribution],
+        dict[str, DistanceDependentDistribution],
         Field(default_factory=dict),
     ]
+    """Distributions declared alongside the built-in standard catalogue.
+
+    Normally user-defined, but a standard name may be declared to override the
+    built-in definition, so the base class is accepted here.
+    """
 
 
 class OptimizationArtifactInput(BaseModel):
@@ -1056,9 +1061,14 @@ class OptimizationArtifactInput(BaseModel):
     mtype: str | None
     morphology_filename: str
     distance_dependent_distributions: Annotated[
-        dict[str, CustomDistanceDependentDistribution],
+        dict[str, DistanceDependentDistribution],
         Field(default_factory=dict),
     ]
+    """Distributions declared alongside the built-in standard catalogue.
+
+    Normally user-defined, but a standard name may be declared to override the
+    built-in definition, so the base class is accepted here.
+    """
     morphology_capabilities: MorphologyCapabilities | None = None
 
 
