@@ -5,29 +5,25 @@ from types import SimpleNamespace
 
 import pytest
 
-from bluepyemodel.preprocessing import (
-    PARAMS_ARTIFACT_PATH,
-    RECIPES_ARTIFACT_PATH,
-    TASK2_ARTIFACT_CONTRACT_VERSION,
-    TASK2_CONFIG_CONTRACT_VERSION,
-    OptimizationArtifactInput,
-    ParamsDefinitionInput,
-    build_optimization_artifacts,
-    build_optimization_recipe,
-    build_params_definition,
-    normalize_ion_channel_model,
-)
-from bluepyemodel.preprocessing.schemas import (
-    DEFAULT_SECTION_LIST_CATALOG,
-    CustomDistanceDependentDistribution,
-    GlobalParameterSelection,
-    IonChannelModelRef,
-    MechanismRegionSelection,
-    OptimizationValue,
-    ParameterSelection,
-    ParametersSelection,
-)
+from bluepyemodel.preprocessing import PARAMS_ARTIFACT_PATH
+from bluepyemodel.preprocessing import RECIPES_ARTIFACT_PATH
+from bluepyemodel.preprocessing import TASK2_ARTIFACT_CONTRACT_VERSION
+from bluepyemodel.preprocessing import TASK2_CONFIG_CONTRACT_VERSION
+from bluepyemodel.preprocessing import OptimizationArtifactInput
+from bluepyemodel.preprocessing import ParamsDefinitionInput
+from bluepyemodel.preprocessing import build_optimization_artifacts
+from bluepyemodel.preprocessing import build_optimization_recipe
+from bluepyemodel.preprocessing import build_params_definition
+from bluepyemodel.preprocessing import normalize_ion_channel_model
 from bluepyemodel.preprocessing.recipes import update_pipeline_settings
+from bluepyemodel.preprocessing.schemas import DEFAULT_SECTION_LIST_CATALOG
+from bluepyemodel.preprocessing.schemas import CustomDistanceDependentDistribution
+from bluepyemodel.preprocessing.schemas import GlobalParameterSelection
+from bluepyemodel.preprocessing.schemas import IonChannelModelRef
+from bluepyemodel.preprocessing.schemas import MechanismRegionSelection
+from bluepyemodel.preprocessing.schemas import OptimizationValue
+from bluepyemodel.preprocessing.schemas import ParameterSelection
+from bluepyemodel.preprocessing.schemas import ParametersSelection
 
 
 def _model_entity(useion=None):
@@ -200,3 +196,15 @@ def test_update_pipeline_settings_skips_none_values():
     recipes = {"emodel": {"pipeline_settings": {"optimiser": "MO-CMA"}}}
     update_pipeline_settings(recipes, emodel="emodel", overrides={"max_ngen": 50, "seed": None})
     assert recipes["emodel"]["pipeline_settings"] == {"optimiser": "MO-CMA", "max_ngen": 50}
+
+
+def test_update_pipeline_settings_rejects_unknown_emodel():
+    with pytest.raises(KeyError, match="not in recipes"):
+        update_pipeline_settings({}, emodel="missing", overrides={"max_ngen": 1})
+
+
+def test_build_optimization_recipe_rejects_invalid_filenames():
+    with pytest.raises(ValueError, match="relative filename"):
+        build_optimization_recipe("L5PC", "L5PC", "/abs/morph.swc")
+    with pytest.raises(ValueError, match="params_filename must be"):
+        build_optimization_recipe("L5PC", "L5PC", "morph.swc", params_filename="other.json")

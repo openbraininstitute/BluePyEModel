@@ -505,6 +505,7 @@ def _make_default_section_list_definitions() -> tuple[SectionListDefinition, ...
         ),
     )
 
+
 DEFAULT_SECTION_LIST_CATALOG = SectionListCatalog()
 
 

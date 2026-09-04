@@ -3,15 +3,13 @@
 import pytest
 
 from bluepyemodel.preprocessing.distributions import resolve_distance_dependent_distribution
-from bluepyemodel.preprocessing.schemas import (
-    STANDARD_DISTANCE_DEPENDENT_DISTRIBUTIONS,
-    CustomDistanceDependentDistribution,
-    DistanceDependentDistribution,
-    ExponentialDistanceDependentDistribution,
-    LinearHDPasDistanceDependentDistribution,
-    StepDistanceDependentDistribution,
-    UniformDistanceDependentDistribution,
-)
+from bluepyemodel.preprocessing.schemas import STANDARD_DISTANCE_DEPENDENT_DISTRIBUTIONS
+from bluepyemodel.preprocessing.schemas import CustomDistanceDependentDistribution
+from bluepyemodel.preprocessing.schemas import DistanceDependentDistribution
+from bluepyemodel.preprocessing.schemas import ExponentialDistanceDependentDistribution
+from bluepyemodel.preprocessing.schemas import LinearHDPasDistanceDependentDistribution
+from bluepyemodel.preprocessing.schemas import StepDistanceDependentDistribution
+from bluepyemodel.preprocessing.schemas import UniformDistanceDependentDistribution
 
 
 @pytest.mark.parametrize(
@@ -102,3 +100,13 @@ def test_standard_distributions_are_available_without_declaration():
     resolved = resolve_distance_dependent_distribution("linear_hdpas", {})
     assert isinstance(resolved, LinearHDPasDistanceDependentDistribution)
     assert resolved.function == "(1. + 3./100. * {distance})*{value}"
+
+
+def test_resolve_returns_custom_distribution_when_not_standard():
+    custom = CustomDistanceDependentDistribution(
+        name="mouse_decay",
+        function="math.exp({distance})*{value}",
+    )
+    resolved = resolve_distance_dependent_distribution("mouse_decay", {"mouse_decay": custom})
+    assert resolved is custom
+    assert resolve_distance_dependent_distribution("missing", {}) is None

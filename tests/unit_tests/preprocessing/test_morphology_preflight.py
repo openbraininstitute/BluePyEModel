@@ -3,7 +3,8 @@
 import pytest
 
 from bluepyemodel.preprocessing.morphology_preflight import preflight_morphology
-from bluepyemodel.preprocessing.schemas import AxonModifier, PhysicalSectionListName
+from bluepyemodel.preprocessing.schemas import AxonModifier
+from bluepyemodel.preprocessing.schemas import PhysicalSectionListName
 
 # Three-point soma (type 1) followed by an unbranched axon (type 2) and a basal
 # dendrite (type 3). MorphIO stores the soma samples on ``morphology.soma`` and
@@ -52,6 +53,29 @@ def test_tapered_replacement_requires_enough_source_axon_sections(tmp_path):
             _write_morphology(tmp_path, "1 1 0.0 0.0 0.0 1.0 -1\n"),
             AxonModifier.replace_axon_with_taper,
         )
+
+
+def test_replacement_modifiers_set_myelination_flags(tmp_path):
+    # Bifurcated axon yields three MorphIO sections (parent + two children).
+    swc = """\
+1 1 0.0 0.0 0.0 1.0 -1
+2 1 0.0 -1.0 0.0 1.0 1
+3 1 0.0 1.0 0.0 1.0 1
+4 2 0.0 1.0 0.0 0.5 1
+5 2 0.0 5.0 0.0 0.5 4
+6 2 0.0 9.0 0.0 0.5 5
+7 2 1.0 13.0 0.0 0.5 6
+8 2 1.0 17.0 0.0 0.5 7
+9 2 -1.0 13.0 0.0 0.5 6
+10 2 -1.0 17.0 0.0 0.5 9
+"""
+    path = _write_morphology(tmp_path, swc)
+    assert preflight_morphology(path, AxonModifier.replace_axon_with_taper).has_myelinated is True
+    assert (
+        preflight_morphology(path, AxonModifier.replace_axon_olfactory_bulb).has_myelinated is True
+    )
+    assert preflight_morphology(path, AxonModifier.replace_axon_legacy).has_myelinated is False
+    assert preflight_morphology(path, AxonModifier.bluepyopt_replace_axon).has_myelinated is False
 
 
 def test_preflight_rejects_a_missing_asset(tmp_path):
