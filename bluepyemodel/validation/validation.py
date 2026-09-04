@@ -22,10 +22,8 @@ from importlib.machinery import SourceFileLoader
 
 import numpy
 
-from bluepyemodel.evaluation.evaluation import compute_responses
-from bluepyemodel.evaluation.evaluation import get_evaluator_from_access_point
-from bluepyemodel.tools.utils import are_same_protocol
-from bluepyemodel.tools.utils import get_protocol_name
+from bluepyemodel.evaluation.evaluation import compute_responses, get_evaluator_from_access_point
+from bluepyemodel.tools.utils import are_same_protocol, get_protocol_name
 from bluepyemodel.validation import validation_functions
 
 logger = logging.getLogger(__name__)

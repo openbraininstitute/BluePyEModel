@@ -20,9 +20,7 @@ from .apwaveform import APWaveform
 from .comb import Comb
 from .customfromfile import CustomFromFile
 from .dehyperpol import DeHyperpol
-from .dendrite import BAC
-from .dendrite import DendriticStep
-from .dendrite import Synaptic
+from .dendrite import BAC, DendriticStep, Synaptic
 from .firepattern import FirePattern
 from .hyperdepol import HyperDepol
 from .idrest import IDrest

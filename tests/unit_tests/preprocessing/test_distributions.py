@@ -3,13 +3,15 @@
 import pytest
 
 from bluepyemodel.preprocessing.distributions import resolve_distance_dependent_distribution
-from bluepyemodel.preprocessing.schemas import STANDARD_DISTANCE_DEPENDENT_DISTRIBUTIONS
-from bluepyemodel.preprocessing.schemas import CustomDistanceDependentDistribution
-from bluepyemodel.preprocessing.schemas import DistanceDependentDistribution
-from bluepyemodel.preprocessing.schemas import ExponentialDistanceDependentDistribution
-from bluepyemodel.preprocessing.schemas import LinearHDPasDistanceDependentDistribution
-from bluepyemodel.preprocessing.schemas import StepDistanceDependentDistribution
-from bluepyemodel.preprocessing.schemas import UniformDistanceDependentDistribution
+from bluepyemodel.preprocessing.schemas import (
+    STANDARD_DISTANCE_DEPENDENT_DISTRIBUTIONS,
+    CustomDistanceDependentDistribution,
+    DistanceDependentDistribution,
+    ExponentialDistanceDependentDistribution,
+    LinearHDPasDistanceDependentDistribution,
+    StepDistanceDependentDistribution,
+    UniformDistanceDependentDistribution,
+)
 
 
 @pytest.mark.parametrize(

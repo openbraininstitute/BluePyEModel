@@ -4,23 +4,25 @@ import math
 
 import pytest
 
-from bluepyemodel.preprocessing.schemas import DEFAULT_SECTION_LIST_CATALOG
-from bluepyemodel.preprocessing.schemas import AxonModifier
-from bluepyemodel.preprocessing.schemas import CustomDistanceDependentDistribution
-from bluepyemodel.preprocessing.schemas import DistanceDependentDistribution
-from bluepyemodel.preprocessing.schemas import GlobalParameterSelection
-from bluepyemodel.preprocessing.schemas import IonChannelModelRef
-from bluepyemodel.preprocessing.schemas import MechanismRegionSelection
-from bluepyemodel.preprocessing.schemas import OptimizationValue
-from bluepyemodel.preprocessing.schemas import OptimizationValueMode
-from bluepyemodel.preprocessing.schemas import ParameterSelection
-from bluepyemodel.preprocessing.schemas import ParametersSelection
-from bluepyemodel.preprocessing.schemas import PhysicalSectionListName
-from bluepyemodel.preprocessing.schemas import SectionListAvailability
-from bluepyemodel.preprocessing.schemas import SectionListCatalog
-from bluepyemodel.preprocessing.schemas import SectionListChoice
-from bluepyemodel.preprocessing.schemas import SectionListDefinition
-from bluepyemodel.preprocessing.schemas import SectionListName
+from bluepyemodel.preprocessing.schemas import (
+    DEFAULT_SECTION_LIST_CATALOG,
+    AxonModifier,
+    CustomDistanceDependentDistribution,
+    DistanceDependentDistribution,
+    GlobalParameterSelection,
+    IonChannelModelRef,
+    MechanismRegionSelection,
+    OptimizationValue,
+    OptimizationValueMode,
+    ParameterSelection,
+    ParametersSelection,
+    PhysicalSectionListName,
+    SectionListAvailability,
+    SectionListCatalog,
+    SectionListChoice,
+    SectionListDefinition,
+    SectionListName,
+)
 
 
 def test_section_list_definition_validation_errors():

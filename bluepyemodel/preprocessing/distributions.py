@@ -2,9 +2,11 @@
 
 from collections.abc import Mapping
 
-from bluepyemodel.preprocessing.schemas import STANDARD_DISTANCE_DEPENDENT_DISTRIBUTIONS
-from bluepyemodel.preprocessing.schemas import CustomDistanceDependentDistribution
-from bluepyemodel.preprocessing.schemas import DistanceDependentDistributionUnion
+from bluepyemodel.preprocessing.schemas import (
+    STANDARD_DISTANCE_DEPENDENT_DISTRIBUTIONS,
+    CustomDistanceDependentDistribution,
+    DistanceDependentDistributionUnion,
+)
 
 
 def resolve_distance_dependent_distribution(

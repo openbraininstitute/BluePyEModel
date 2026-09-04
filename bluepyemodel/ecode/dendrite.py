@@ -17,8 +17,7 @@ limitations under the License.
 """
 
 import numpy as np
-from bluepyopt.ephys.locations import NrnSomaDistanceCompLocation
-from bluepyopt.ephys.locations import NrnTrunkSomaDistanceCompLocation
+from bluepyopt.ephys.locations import NrnSomaDistanceCompLocation, NrnTrunkSomaDistanceCompLocation
 
 from .idrest import IDrest
 

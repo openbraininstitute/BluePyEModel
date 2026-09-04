@@ -27,16 +27,16 @@ from bluepyemodel.access_point.access_point import OptimisationState
 from bluepyemodel.access_point.nexus import NexusAccessPoint
 from bluepyemodel.efeatures_extraction.efeatures_extraction import extract_save_features_protocols
 from bluepyemodel.efeatures_extraction.targets_configurator import TargetsConfigurator
-from bluepyemodel.emodel_pipeline.plotting import optimisation
-from bluepyemodel.emodel_pipeline.plotting import plot_models
-from bluepyemodel.optimisation import get_checkpoint_path
-from bluepyemodel.optimisation import store_best_model
+from bluepyemodel.emodel_pipeline.plotting import optimisation, plot_models
+from bluepyemodel.optimisation import get_checkpoint_path, store_best_model
 from bluepyemodel.tasks.config import EmodelAPIConfig
-from bluepyemodel.tasks.luigi_tools import IPyParallelTask
-from bluepyemodel.tasks.luigi_tools import WorkflowTarget
-from bluepyemodel.tasks.luigi_tools import WorkflowTask
-from bluepyemodel.tasks.luigi_tools import WorkflowTaskRequiringMechanisms
-from bluepyemodel.tasks.luigi_tools import WorkflowWrapperTask
+from bluepyemodel.tasks.luigi_tools import (
+    IPyParallelTask,
+    WorkflowTarget,
+    WorkflowTask,
+    WorkflowTaskRequiringMechanisms,
+    WorkflowWrapperTask,
+)
 from bluepyemodel.tools.mechanisms import compile_mechs_in_emodel_dir
 
 # pylint: disable=W0235,W0621,W0404,W0611,W0703,E1128

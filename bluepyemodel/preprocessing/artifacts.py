@@ -3,12 +3,13 @@
 from collections.abc import Mapping
 
 from bluepyemodel.preprocessing.parameters import build_params_definition
-from bluepyemodel.preprocessing.recipes import build_optimization_recipe
-from bluepyemodel.preprocessing.recipes import update_pipeline_settings
-from bluepyemodel.preprocessing.schemas import NormalizedIonChannelModel
-from bluepyemodel.preprocessing.schemas import OptimizationArtifactInput
-from bluepyemodel.preprocessing.schemas import OptimizationArtifacts
-from bluepyemodel.preprocessing.schemas import ParamsDefinitionInput
+from bluepyemodel.preprocessing.recipes import build_optimization_recipe, update_pipeline_settings
+from bluepyemodel.preprocessing.schemas import (
+    NormalizedIonChannelModel,
+    OptimizationArtifactInput,
+    OptimizationArtifacts,
+    ParamsDefinitionInput,
+)
 
 TASK2_CONFIG_CONTRACT_VERSION = "task2-config-v2"
 TASK2_ARTIFACT_CONTRACT_VERSION = "task2-artifacts-v1"

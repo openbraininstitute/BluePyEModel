@@ -2,24 +2,25 @@
 
 import logging
 import math
-from collections.abc import Iterable
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from typing import Any
 
-from bluepyemodel.preprocessing.schemas import DEFAULT_SECTION_LIST_CATALOG
-from bluepyemodel.preprocessing.schemas import REGIONAL_PARAMETER_LOCATIONS
-from bluepyemodel.preprocessing.schemas import STANDARD_DISTANCE_DEPENDENT_DISTRIBUTIONS
-from bluepyemodel.preprocessing.schemas import IonChannelVariable
-from bluepyemodel.preprocessing.schemas import MorphologyCapabilities
-from bluepyemodel.preprocessing.schemas import NormalizedIonChannelModel
-from bluepyemodel.preprocessing.schemas import OptimizationValue
-from bluepyemodel.preprocessing.schemas import OptimizationValueMode
-from bluepyemodel.preprocessing.schemas import ParametersSelection
-from bluepyemodel.preprocessing.schemas import ParamsDefinitionInput
-from bluepyemodel.preprocessing.schemas import PhysicalSectionListName
-from bluepyemodel.preprocessing.schemas import SectionListName
-from bluepyemodel.preprocessing.schemas import StandardDistanceDependentDistributionName
-from bluepyemodel.preprocessing.schemas import VariableType
+from bluepyemodel.preprocessing.schemas import (
+    DEFAULT_SECTION_LIST_CATALOG,
+    REGIONAL_PARAMETER_LOCATIONS,
+    STANDARD_DISTANCE_DEPENDENT_DISTRIBUTIONS,
+    IonChannelVariable,
+    MorphologyCapabilities,
+    NormalizedIonChannelModel,
+    OptimizationValue,
+    OptimizationValueMode,
+    ParametersSelection,
+    ParamsDefinitionInput,
+    PhysicalSectionListName,
+    SectionListName,
+    StandardDistanceDependentDistributionName,
+    VariableType,
+)
 
 L = logging.getLogger(__name__)
 

@@ -4,21 +4,25 @@ from types import SimpleNamespace
 
 import pytest
 
-from bluepyemodel.preprocessing import ParamsDefinitionInput
-from bluepyemodel.preprocessing import build_params_definition
-from bluepyemodel.preprocessing import normalize_ion_channel_model
-from bluepyemodel.preprocessing.schemas import DEFAULT_SECTION_LIST_CATALOG
-from bluepyemodel.preprocessing.schemas import CustomDistanceDependentDistribution
-from bluepyemodel.preprocessing.schemas import GlobalParameterSelection
-from bluepyemodel.preprocessing.schemas import IonChannelModelRef
-from bluepyemodel.preprocessing.schemas import MechanismRegionSelection
-from bluepyemodel.preprocessing.schemas import MorphologyCapabilities
-from bluepyemodel.preprocessing.schemas import OptimizationValue
-from bluepyemodel.preprocessing.schemas import OptimizationValueMode
-from bluepyemodel.preprocessing.schemas import ParameterSelection
-from bluepyemodel.preprocessing.schemas import ParametersSelection
-from bluepyemodel.preprocessing.schemas import PhysicalSectionListName
-from bluepyemodel.preprocessing.schemas import SectionListName
+from bluepyemodel.preprocessing import (
+    ParamsDefinitionInput,
+    build_params_definition,
+    normalize_ion_channel_model,
+)
+from bluepyemodel.preprocessing.schemas import (
+    DEFAULT_SECTION_LIST_CATALOG,
+    CustomDistanceDependentDistribution,
+    GlobalParameterSelection,
+    IonChannelModelRef,
+    MechanismRegionSelection,
+    MorphologyCapabilities,
+    OptimizationValue,
+    OptimizationValueMode,
+    ParameterSelection,
+    ParametersSelection,
+    PhysicalSectionListName,
+    SectionListName,
+)
 
 
 def _entity(

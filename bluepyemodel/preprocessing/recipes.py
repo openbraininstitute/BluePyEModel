@@ -4,8 +4,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from bluepyemodel.preprocessing.schemas import DEFAULT_SECTION_LIST_CATALOG
-from bluepyemodel.preprocessing.schemas import PARAMS_ARTIFACT_PATH
+from bluepyemodel.preprocessing.schemas import DEFAULT_SECTION_LIST_CATALOG, PARAMS_ARTIFACT_PATH
 
 
 def update_pipeline_settings(

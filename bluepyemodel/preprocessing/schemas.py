@@ -2,20 +2,11 @@
 
 import math
 from dataclasses import dataclass
-from enum import StrEnum
-from enum import auto
+from enum import StrEnum, auto
 from pathlib import Path
-from typing import Annotated
-from typing import Any
-from typing import Self
-from typing import TypeAlias
+from typing import Annotated, Any, Self, TypeAlias
 
-from pydantic import BaseModel
-from pydantic import ConfigDict
-from pydantic import Discriminator
-from pydantic import Field
-from pydantic import NonNegativeInt
-from pydantic import model_validator
+from pydantic import BaseModel, ConfigDict, Discriminator, Field, NonNegativeInt, model_validator
 
 from bluepyemodel.utils.io import write_json
 

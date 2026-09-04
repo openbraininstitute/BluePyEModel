@@ -20,14 +20,11 @@ import getpass
 import json
 import logging
 import pathlib
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
+from datetime import datetime, timedelta, timezone
 
 import jwt
 from entity_management.state import refresh_token
-from kgforge.core import KnowledgeGraphForge
-from kgforge.core import Resource
+from kgforge.core import KnowledgeGraphForge, Resource
 from kgforge.core.commons.strategies import ResolvingStrategy
 from kgforge.specializations.resources import Dataset
 

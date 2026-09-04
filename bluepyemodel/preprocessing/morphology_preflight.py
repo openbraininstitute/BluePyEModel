@@ -5,10 +5,12 @@ from typing import Any
 
 import morphio
 
-from bluepyemodel.preprocessing.schemas import PHYSICAL_SECTION_LIST_NAMES
-from bluepyemodel.preprocessing.schemas import AxonModifier
-from bluepyemodel.preprocessing.schemas import MorphologyCapabilities
-from bluepyemodel.preprocessing.schemas import PhysicalSectionListName
+from bluepyemodel.preprocessing.schemas import (
+    PHYSICAL_SECTION_LIST_NAMES,
+    AxonModifier,
+    MorphologyCapabilities,
+    PhysicalSectionListName,
+)
 
 __all__ = ["MorphologyCapabilities", "load_morphology_nrn_order", "preflight_morphology"]
 

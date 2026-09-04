@@ -29,9 +29,11 @@ from bluepyopt.deapext.stoppingCriteria import MaxNGen
 
 from bluepyemodel.emodel_pipeline.emodel_metadata import EModelMetadata
 from bluepyemodel.emodel_pipeline.emodel_settings import EModelPipelineSettings
-from bluepyemodel.tools.utils import deduplicate_checkpoint_paths
-from bluepyemodel.tools.utils import get_checkpoint_path
-from bluepyemodel.tools.utils import read_checkpoint
+from bluepyemodel.tools.utils import (
+    deduplicate_checkpoint_paths,
+    get_checkpoint_path,
+    read_checkpoint,
+)
 
 # pylint: disable=no-member,unused-argument,assignment-from-no-return,no-value-for-parameter
 

@@ -22,9 +22,7 @@ import numpy
 from bluepyopt import ephys
 
 from ..ecode import eCodes
-from .recordings import LooseDtRecordingCustom
-from .recordings import LooseDtRecordingStimulus
-from .recordings import check_recordings
+from .recordings import LooseDtRecordingCustom, LooseDtRecordingStimulus, check_recordings
 
 # pylint: disable=abstract-method
 

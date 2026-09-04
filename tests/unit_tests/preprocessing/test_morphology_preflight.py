@@ -3,8 +3,7 @@
 import pytest
 
 from bluepyemodel.preprocessing.morphology_preflight import preflight_morphology
-from bluepyemodel.preprocessing.schemas import AxonModifier
-from bluepyemodel.preprocessing.schemas import PhysicalSectionListName
+from bluepyemodel.preprocessing.schemas import AxonModifier, PhysicalSectionListName
 
 # Three-point soma (type 1) followed by an unbranched axon (type 2) and a basal
 # dendrite (type 3). MorphIO stores the soma samples on ``morphology.soma`` and

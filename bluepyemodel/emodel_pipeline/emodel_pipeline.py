@@ -27,8 +27,7 @@ from bluepyemodel.efeatures_extraction.efeatures_extraction import extract_save_
 from bluepyemodel.emodel_pipeline import plotting
 from bluepyemodel.export_emodel.export_emodel import export_emodels_sonata
 from bluepyemodel.model.model_configuration import configure_model
-from bluepyemodel.optimisation import setup_and_run_optimisation
-from bluepyemodel.optimisation import store_best_model
+from bluepyemodel.optimisation import setup_and_run_optimisation, store_best_model
 from bluepyemodel.tools.multiprocessing import get_mapper
 from bluepyemodel.tools.utils import get_checkpoint_path
 from bluepyemodel.validation.validation import validate

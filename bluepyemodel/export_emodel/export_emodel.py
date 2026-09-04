@@ -23,11 +23,8 @@ import shutil
 
 import h5py
 
-from bluepyemodel.evaluation.evaluation import compute_responses
-from bluepyemodel.evaluation.evaluation import get_evaluator_from_access_point
-from bluepyemodel.export_emodel.utils import get_hoc_file_path
-from bluepyemodel.export_emodel.utils import get_output_path
-from bluepyemodel.export_emodel.utils import select_emodels
+from bluepyemodel.evaluation.evaluation import compute_responses, get_evaluator_from_access_point
+from bluepyemodel.export_emodel.utils import get_hoc_file_path, get_output_path, select_emodels
 
 # pylint: disable=too-many-locals
 

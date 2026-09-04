@@ -24,9 +24,7 @@ import bluepyopt
 
 from bluepyemodel.emodel_pipeline.emodel import EModel
 from bluepyemodel.evaluation.evaluation import get_evaluator_from_access_point
-from bluepyemodel.tools.utils import get_checkpoint_path
-from bluepyemodel.tools.utils import logger
-from bluepyemodel.tools.utils import read_checkpoint
+from bluepyemodel.tools.utils import get_checkpoint_path, logger, read_checkpoint
 
 logger = logging.getLogger(__name__)
 

@@ -23,8 +23,7 @@ from bluepyefe.auto_targets import AutoTarget
 
 from bluepyemodel.efeatures_extraction.target import Target
 from bluepyemodel.efeatures_extraction.trace_file import TraceFile
-from bluepyemodel.tools.utils import are_same_protocol
-from bluepyemodel.tools.utils import format_protocol_name_to_list
+from bluepyemodel.tools.utils import are_same_protocol, format_protocol_name_to_list
 
 logger = logging.getLogger(__name__)
 

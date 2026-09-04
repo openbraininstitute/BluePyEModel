@@ -27,17 +27,11 @@ from bluepyopt.ephys.objectives import SingletonWeightObjective
 
 from bluepyemodel.ecode.sinespec import SineSpec
 from bluepyemodel.evaluation.efel_feature_bpem import eFELFeatureBPEM
-from bluepyemodel.evaluation.evaluator import PRE_PROTOCOLS
-from bluepyemodel.evaluation.evaluator import define_protocol
-from bluepyemodel.evaluation.evaluator import soma_loc
+from bluepyemodel.evaluation.evaluator import PRE_PROTOCOLS, define_protocol, soma_loc
 from bluepyemodel.evaluation.protocol_configuration import ProtocolConfiguration
-from bluepyemodel.evaluation.protocols import BPEMProtocol
-from bluepyemodel.evaluation.protocols import ThresholdBasedProtocol
-from bluepyemodel.evaluation.recordings import FixedDtRecordingCustom
-from bluepyemodel.evaluation.recordings import FixedDtRecordingStimulus
-from bluepyemodel.tools.utils import get_curr_name
-from bluepyemodel.tools.utils import get_loc_name
-from bluepyemodel.tools.utils import get_protocol_name
+from bluepyemodel.evaluation.protocols import BPEMProtocol, ThresholdBasedProtocol
+from bluepyemodel.evaluation.recordings import FixedDtRecordingCustom, FixedDtRecordingStimulus
+from bluepyemodel.tools.utils import get_curr_name, get_loc_name, get_protocol_name
 
 logger = logging.getLogger("__main__")
 
