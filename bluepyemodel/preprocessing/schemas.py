@@ -96,7 +96,8 @@ AXON_MODIFIER_DESCRIPTIONS: dict[AxonModifier, str] = {
         "Use BluePyOpt's built-in two-section axon replacement without synthesized myelin."
     ),
     AxonModifier.none: (
-        "Keep the imported morphology without an axon replacement; source myelination is unknown."
+        "Keep the imported morphology without an axon replacement. The staged SWC path cannot "
+        "establish a populated myelinated section list."
     ),
 }
 
@@ -324,14 +325,14 @@ class SectionListCatalog(BaseModel):
                 name=definition.name,
                 label=definition.label,
                 description=(
-                    f"{definition.description} The source morphology may or may not provide it; "
-                    "this first-release form does not inspect the morphology asset."
+                    f"{definition.description} The no-replacement staged SWC path does not "
+                    "establish this runtime section list."
                 ),
                 available=False,
                 availability=SectionListAvailability.unavailable,
                 disabled_reason=(
-                    "No replacement leaves source myelination unknown, so the myelinated "
-                    "section list is unavailable without morphology preflight."
+                    "No replacement preserves the source morphology, but staged SWC preflight "
+                    "cannot establish a populated myelinated section list."
                 ),
                 display_order=definition.display_order,
             )
@@ -346,12 +347,12 @@ class SectionListCatalog(BaseModel):
         self,
         *,
         axon_modifier: AxonModifier | str = AxonModifier.replace_axon_with_taper,
-    ) -> list[SectionListChoice]:
+    ) -> tuple[SectionListChoice, ...]:
         """Return all canonical choices in stable catalogue order."""
-        return [
+        return tuple(
             self.choice(definition.name, axon_modifier=axon_modifier)
             for definition in self.definitions
-        ]
+        )
 
     def available(
         self,
@@ -392,8 +393,8 @@ class SectionListCatalog(BaseModel):
         }
 
 
-def _make_default_section_list_definitions() -> list[SectionListDefinition]:
-    return [
+def _make_default_section_list_definitions() -> tuple[SectionListDefinition, ...]:
+    return (
         SectionListDefinition(
             name=SectionListName.all,
             label="All sections",
@@ -502,8 +503,7 @@ def _make_default_section_list_definitions() -> list[SectionListDefinition]:
             is_composite=True,
             display_order=10,
         ),
-    ]
-
+    )
 
 DEFAULT_SECTION_LIST_CATALOG = SectionListCatalog()
 
