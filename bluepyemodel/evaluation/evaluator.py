@@ -22,35 +22,32 @@ import os
 import pathlib
 
 from bluepyopt.ephys.evaluators import CellEvaluator
-from bluepyopt.ephys.locations import (
-    NrnSeclistCompLocation,
-    NrnSomaDistanceCompLocation,
-    NrnTrunkSomaDistanceCompLocation,
-)
+from bluepyopt.ephys.locations import NrnSeclistCompLocation
+from bluepyopt.ephys.locations import NrnSomaDistanceCompLocation
+from bluepyopt.ephys.locations import NrnTrunkSomaDistanceCompLocation
 from bluepyopt.ephys.objectives import SingletonWeightObjective
 from bluepyopt.ephys.objectivescalculators import ObjectivesCalculator
 from bluepyopt.ephys.simulators import NrnSimulator
 
-from ..ecode import eCodes, fixed_timestep_eCodes
+from ..ecode import eCodes
+from ..ecode import fixed_timestep_eCodes
 from ..tools.multiprotocols_efeatures_utils import get_protocol_list_from_protocol_name
 from ..tools.utils import are_same_protocol
-from .efel_feature_bpem import DendFitFeature, DendFitMultiProtocolsFeature, eFELFeatureBPEM
-from .protocols import (
-    BPEMProtocol,
-    NoHoldingCurrent,
-    ProtocolRunner,
-    RinProtocol,
-    RMPProtocol,
-    SearchHoldingCurrent,
-    SearchThresholdCurrent,
-    ThresholdBasedProtocol,
-)
-from .recordings import (
-    FixedDtRecordingCustom,
-    FixedDtRecordingStimulus,
-    LooseDtRecordingCustom,
-    LooseDtRecordingStimulus,
-)
+from .efel_feature_bpem import DendFitFeature
+from .efel_feature_bpem import DendFitMultiProtocolsFeature
+from .efel_feature_bpem import eFELFeatureBPEM
+from .protocols import BPEMProtocol
+from .protocols import NoHoldingCurrent
+from .protocols import ProtocolRunner
+from .protocols import RinProtocol
+from .protocols import RMPProtocol
+from .protocols import SearchHoldingCurrent
+from .protocols import SearchThresholdCurrent
+from .protocols import ThresholdBasedProtocol
+from .recordings import FixedDtRecordingCustom
+from .recordings import FixedDtRecordingStimulus
+from .recordings import LooseDtRecordingCustom
+from .recordings import LooseDtRecordingStimulus
 
 logger = logging.getLogger(__name__)
 

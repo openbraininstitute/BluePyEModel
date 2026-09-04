@@ -16,8 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from bluepyemodel.optimisation.optimisation import (
-    get_checkpoint_path,
-    setup_and_run_optimisation,
-    store_best_model,
-)
+from bluepyemodel.optimisation.optimisation import get_checkpoint_path
+from bluepyemodel.optimisation.optimisation import setup_and_run_optimisation
+from bluepyemodel.optimisation.optimisation import store_best_model

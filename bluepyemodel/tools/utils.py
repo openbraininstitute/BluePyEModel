@@ -23,7 +23,8 @@ from pathlib import Path
 
 import numpy
 
-from bluepyemodel.ecode import IDrest, eCodes
+from bluepyemodel.ecode import IDrest
+from bluepyemodel.ecode import eCodes
 from bluepyemodel.tools.checkpoint_hdf5 import read_checkpoint_h5
 
 logger = logging.getLogger("__main__")

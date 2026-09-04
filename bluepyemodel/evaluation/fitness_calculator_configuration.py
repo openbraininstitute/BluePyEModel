@@ -22,14 +22,13 @@ from copy import deepcopy
 from bluepyopt.ephys.locations import EPhysLocInstantiateException
 
 from bluepyemodel.evaluation.efeature_configuration import EFeatureConfiguration
-from bluepyemodel.evaluation.evaluator import (
-    LEGACY_PRE_PROTOCOLS,
-    PRE_PROTOCOLS,
-    define_location,
-    seclist_to_sec,
-)
+from bluepyemodel.evaluation.evaluator import LEGACY_PRE_PROTOCOLS
+from bluepyemodel.evaluation.evaluator import PRE_PROTOCOLS
+from bluepyemodel.evaluation.evaluator import define_location
+from bluepyemodel.evaluation.evaluator import seclist_to_sec
 from bluepyemodel.evaluation.protocol_configuration import ProtocolConfiguration
-from bluepyemodel.tools.utils import are_same_protocol, get_mapped_protocol_name
+from bluepyemodel.tools.utils import are_same_protocol
+from bluepyemodel.tools.utils import get_mapped_protocol_name
 
 logger = logging.getLogger(__name__)
 

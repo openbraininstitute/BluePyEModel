@@ -28,31 +28,28 @@ import pandas
 from kgforge.core import Resource
 
 from bluepyemodel.access_point.access_point import DataAccessPoint
-from bluepyemodel.access_point.forge_access_point import (
-    DEFAULT_NEXUS_ENDPOINT,
-    NEXUS_PROJECTS_TRACES,
-    AccessPointException,
-    NexusForgeAccessPoint,
-    check_resource,
-    filter_mechanisms_with_brain_region,
-    get_available_traces,
-    get_brain_region_notation,
-    get_curated_morphology,
-    get_nexus_brain_region,
-    ontology_forge_access_point,
-)
+from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
+from bluepyemodel.access_point.forge_access_point import NEXUS_PROJECTS_TRACES
+from bluepyemodel.access_point.forge_access_point import AccessPointException
+from bluepyemodel.access_point.forge_access_point import NexusForgeAccessPoint
+from bluepyemodel.access_point.forge_access_point import check_resource
+from bluepyemodel.access_point.forge_access_point import filter_mechanisms_with_brain_region
+from bluepyemodel.access_point.forge_access_point import get_available_traces
+from bluepyemodel.access_point.forge_access_point import get_brain_region_notation
+from bluepyemodel.access_point.forge_access_point import get_curated_morphology
+from bluepyemodel.access_point.forge_access_point import get_nexus_brain_region
+from bluepyemodel.access_point.forge_access_point import ontology_forge_access_point
 from bluepyemodel.efeatures_extraction.trace_file import TraceFile
 from bluepyemodel.emodel_pipeline.emodel_script import EModelScript
 from bluepyemodel.emodel_pipeline.emodel_settings import EModelPipelineSettings
 from bluepyemodel.emodel_pipeline.emodel_workflow import EModelWorkflow
-from bluepyemodel.export_emodel.utils import (
-    copy_hocs_to_new_output_path,
-    get_hoc_file_path,
-    get_output_path,
-    select_emodels,
-)
+from bluepyemodel.export_emodel.utils import copy_hocs_to_new_output_path
+from bluepyemodel.export_emodel.utils import get_hoc_file_path
+from bluepyemodel.export_emodel.utils import get_output_path
+from bluepyemodel.export_emodel.utils import select_emodels
 from bluepyemodel.model.mechanism_configuration import MechanismConfiguration
-from bluepyemodel.tools.mechanisms import NEURON_BUILTIN_MECHANISMS, discriminate_by_temp
+from bluepyemodel.tools.mechanisms import NEURON_BUILTIN_MECHANISMS
+from bluepyemodel.tools.mechanisms import discriminate_by_temp
 
 # pylint: disable=too-many-arguments,unused-argument
 

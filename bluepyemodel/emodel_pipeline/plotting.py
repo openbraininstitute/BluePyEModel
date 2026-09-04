@@ -31,50 +31,46 @@ import numpy
 from bluepyopt.ephys.protocols import SweepProtocol
 from bluepyopt.ephys.recordings import CompRecording
 from bluepyopt.ephys.stimuli import NrnSquarePulse
-from matplotlib import cm, colors
+from matplotlib import cm
+from matplotlib import colors
 
 from bluepyemodel.data.utils import read_dendritic_data
-from bluepyemodel.efeatures_extraction.efeatures_extraction import (
-    read_extraction_output,
-    read_extraction_output_cells,
-    read_extraction_output_protocols,
-)
-from bluepyemodel.emodel_pipeline.plotting_utils import (
-    extract_experimental_data_for_IV_curve,
-    fill_in_IV_curve_evaluator,
-    get_experimental_FI_curve_for_plotting,
-    get_impedance,
-    get_ordered_currentscape_keys,
-    get_original_protocol_name,
-    get_recording_names,
-    get_simulated_FI_curve_for_plotting,
-    get_sinespec_evaluator,
-    get_title,
-    get_traces_names_and_float_responses,
-    get_traces_ylabel,
-    get_voltage_currents_from_files,
-    plot_fi_curves,
-    rel_to_abs_amplitude,
-    save_fig,
-    update_evaluator,
-)
-from bluepyemodel.evaluation.evaluation import compute_responses, get_evaluator_from_access_point
-from bluepyemodel.evaluation.evaluator import PRE_PROTOCOLS, add_recordings_to_evaluator, soma_loc
+from bluepyemodel.efeatures_extraction.efeatures_extraction import read_extraction_output
+from bluepyemodel.efeatures_extraction.efeatures_extraction import read_extraction_output_cells
+from bluepyemodel.efeatures_extraction.efeatures_extraction import read_extraction_output_protocols
+from bluepyemodel.emodel_pipeline.plotting_utils import extract_experimental_data_for_IV_curve
+from bluepyemodel.emodel_pipeline.plotting_utils import fill_in_IV_curve_evaluator
+from bluepyemodel.emodel_pipeline.plotting_utils import get_experimental_FI_curve_for_plotting
+from bluepyemodel.emodel_pipeline.plotting_utils import get_impedance
+from bluepyemodel.emodel_pipeline.plotting_utils import get_ordered_currentscape_keys
+from bluepyemodel.emodel_pipeline.plotting_utils import get_original_protocol_name
+from bluepyemodel.emodel_pipeline.plotting_utils import get_recording_names
+from bluepyemodel.emodel_pipeline.plotting_utils import get_simulated_FI_curve_for_plotting
+from bluepyemodel.emodel_pipeline.plotting_utils import get_sinespec_evaluator
+from bluepyemodel.emodel_pipeline.plotting_utils import get_title
+from bluepyemodel.emodel_pipeline.plotting_utils import get_traces_names_and_float_responses
+from bluepyemodel.emodel_pipeline.plotting_utils import get_traces_ylabel
+from bluepyemodel.emodel_pipeline.plotting_utils import get_voltage_currents_from_files
+from bluepyemodel.emodel_pipeline.plotting_utils import plot_fi_curves
+from bluepyemodel.emodel_pipeline.plotting_utils import rel_to_abs_amplitude
+from bluepyemodel.emodel_pipeline.plotting_utils import save_fig
+from bluepyemodel.emodel_pipeline.plotting_utils import update_evaluator
+from bluepyemodel.evaluation.evaluation import compute_responses
+from bluepyemodel.evaluation.evaluation import get_evaluator_from_access_point
+from bluepyemodel.evaluation.evaluator import PRE_PROTOCOLS
+from bluepyemodel.evaluation.evaluator import add_recordings_to_evaluator
+from bluepyemodel.evaluation.evaluator import soma_loc
 from bluepyemodel.evaluation.protocols import ThresholdBasedProtocol
-from bluepyemodel.evaluation.utils import (
-    define_bAP_feature,
-    define_bAP_protocol,
-    define_EPSP_feature,
-    define_EPSP_protocol,
-)
+from bluepyemodel.evaluation.utils import define_bAP_feature
+from bluepyemodel.evaluation.utils import define_bAP_protocol
+from bluepyemodel.evaluation.utils import define_EPSP_feature
+from bluepyemodel.evaluation.utils import define_EPSP_protocol
 from bluepyemodel.model.morphology_utils import get_basal_and_apical_max_radial_distances
-from bluepyemodel.tools.utils import (
-    existing_checkpoint_paths,
-    get_amplitude_from_feature_key,
-    make_dir,
-    read_checkpoint,
-    select_rec_for_thumbnail,
-)
+from bluepyemodel.tools.utils import existing_checkpoint_paths
+from bluepyemodel.tools.utils import get_amplitude_from_feature_key
+from bluepyemodel.tools.utils import make_dir
+from bluepyemodel.tools.utils import read_checkpoint
+from bluepyemodel.tools.utils import select_rec_for_thumbnail
 
 # pylint: disable=W0612,W0102,C0209
 

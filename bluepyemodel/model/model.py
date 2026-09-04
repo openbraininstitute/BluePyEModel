@@ -22,14 +22,13 @@ import logging
 
 from bluepyopt import ephys
 from bluepyopt.ephys.morphologies import NrnFileMorphology
-from bluepyopt.ephys.parameterscalers import (
-    NrnSegmentLinearScaler,
-    NrnSegmentSomaDistanceScaler,
-    NrnSegmentSomaDistanceStepScaler,
-)
+from bluepyopt.ephys.parameterscalers import NrnSegmentLinearScaler
+from bluepyopt.ephys.parameterscalers import NrnSegmentSomaDistanceScaler
+from bluepyopt.ephys.parameterscalers import NrnSegmentSomaDistanceStepScaler
 
 from bluepyemodel.evaluation import modifiers
-from bluepyemodel.evaluation.modifiers import replace_axon_hoc, replace_axon_with_taper
+from bluepyemodel.evaluation.modifiers import replace_axon_hoc
+from bluepyemodel.evaluation.modifiers import replace_axon_with_taper
 from bluepyemodel.model.morphology_utils import get_hotspot_location
 
 logger = logging.getLogger(__name__)

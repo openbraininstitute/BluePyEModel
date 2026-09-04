@@ -29,7 +29,8 @@ from bluepyemodel.access_point.local import LocalAccessPoint
 from bluepyemodel.evaluation.evaluator import create_evaluator
 from bluepyemodel.evaluation.protocols import ProtocolRunner
 from bluepyemodel.model import model
-from bluepyemodel.tools.mechanisms import compile_mechs_in_emodel_dir, delete_compiled_mechanisms
+from bluepyemodel.tools.mechanisms import compile_mechs_in_emodel_dir
+from bluepyemodel.tools.mechanisms import delete_compiled_mechanisms
 from bluepyemodel.tools.utils import make_dir
 
 logger = logging.getLogger(__name__)

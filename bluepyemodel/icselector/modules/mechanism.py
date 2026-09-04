@@ -21,7 +21,8 @@ from pprint import pprint
 
 import numpy as np
 
-from .distribution import Distribution, asdict
+from .distribution import Distribution
+from .distribution import asdict
 
 
 class Mechanism:

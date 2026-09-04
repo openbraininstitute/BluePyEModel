@@ -20,7 +20,8 @@ import logging
 
 from ..ecode import eCodes
 from .efel_feature_bpem import DendFitFeature
-from .evaluator import define_location, protocol_type_to_class
+from .evaluator import define_location
+from .evaluator import protocol_type_to_class
 from .recordings import LooseDtRecordingCustom
 
 logger = logging.getLogger(__name__)
