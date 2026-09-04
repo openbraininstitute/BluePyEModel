@@ -18,6 +18,7 @@ from bluepyemodel.preprocessing import (
     normalize_ion_channel_model,
 )
 from bluepyemodel.preprocessing.schemas import (
+    DEFAULT_SECTION_LIST_CATALOG,
     CustomDistanceDependentDistribution,
     GlobalParameterSelection,
     IonChannelModelRef,
@@ -29,7 +30,7 @@ from bluepyemodel.preprocessing.schemas import (
 from bluepyemodel.preprocessing.recipes import update_pipeline_settings
 
 
-def _model_entity():
+def _model_entity(useion=None):
     return SimpleNamespace(
         id="icm-1",
         name="Sodium channel",
@@ -40,6 +41,7 @@ def _model_entity():
         neuron_block=SimpleNamespace(
             range=[{"gNa": "S/cm2"}, {"variable": "vshift", "units": "mV"}],
             global_=[{"variable": "ena", "units": "mV"}],
+            useion=useion,
         ),
     )
 
@@ -110,8 +112,65 @@ def test_build_optimization_recipe_uses_contract_paths():
 def test_build_params_definition_compiles_mechanisms_and_distributions():
     params_input, _, normalized = _compiler_fixture()
     params = build_params_definition(params_input, normalized)
-    assert params["mechanisms"][0]["name"] == "NaTg"
-    assert any(item["name"] == "gNa_NaTg" for item in params["parameters"])
+    assert params["mechanisms"]["apical"] == {"mech": ["NaTg"]}
+    assert params["mechanisms"]["all"] == {"mech": ["pas"]}
+    assert params["parameters"]["apical"] == [
+        {"name": "gNa_NaTg", "val": [0.0, 1.0], "dist": "decay"}
+    ]
+    assert {"name": "Ra", "val": 100.0} in params["parameters"]["all"]
+    assert params["parameters"]["global"] == [{"name": "v_init", "val": -80.0}]
+    assert params["parameters"]["distribution_decay"] == [{"name": "lambda", "val": 0.1}]
+
+
+def test_build_params_definition_emits_legacy_distribution_mapping():
+    params_input, _, normalized = _compiler_fixture()
+    params = build_params_definition(params_input, normalized)
+    assert params["distributions"] == {
+        "decay": {
+            "fun": "math.exp(-{distance}/{lambda})*{value}",
+            "parameters": ["lambda"],
+        }
+    }
+    assert "uniform" not in params["distributions"]
+    assert "morphology" not in params
+
+
+def test_reversal_potentials_are_dropped_without_a_matching_ion():
+    params_input, _, normalized = _compiler_fixture()
+    params_input.parameters_selection.base_parameters["somatic"] = {
+        "ek": ParameterSelection(value=OptimizationValue(value=-90.0)),
+    }
+    params = build_params_definition(params_input, normalized)
+    assert "somatic" not in params["parameters"]
+
+
+def test_reversal_potentials_are_kept_when_the_ion_is_assigned():
+    params_input, _, normalized = _compiler_fixture()
+    reference = IonChannelModelRef(id_str="icm-1")
+    params_input.parameters_selection.mechanism_regions["somatic"] = [
+        MechanismRegionSelection(ion_channel_model=reference),
+    ]
+    params_input.parameters_selection.base_parameters["somatic"] = {
+        "ek": ParameterSelection(value=OptimizationValue(value=-90.0)),
+    }
+    normalized["icm-1"] = normalize_ion_channel_model(_model_entity(useion=[{"ion_name": "K"}]))
+    params = build_params_definition(params_input, normalized)
+    assert params["parameters"]["somatic"] == [{"name": "ek", "val": -90.0}]
+
+
+def test_normalize_ion_channel_model_reads_useion_names():
+    model = normalize_ion_channel_model(
+        _model_entity(useion=[{"ion_name": " Na "}, {"ion_name": "K"}])
+    )
+    assert model.ion_names == frozenset({"na", "k"})
+
+
+def test_recipe_multiloc_map_excludes_the_all_alias():
+    recipe = build_optimization_recipe("L5PC", "L5PC", "morph.swc")
+    multiloc_map = recipe["L5PC"]["multiloc_map"]
+    assert "all" not in multiloc_map
+    assert "alldend" in multiloc_map
+    assert "all" in DEFAULT_SECTION_LIST_CATALOG.to_alias_expansions()
 
 
 def test_artifact_bundle_has_versioned_relative_paths_and_writes_json(tmp_path):

@@ -37,23 +37,32 @@ def _count_axonal_sections(morphology: Any) -> int:
 
 def _available_physical_sections(morphology: Any) -> list[PhysicalSectionListName]:
     """Return the physical section lists with at least one source section."""
-    return [
-        _SECTION_TYPE_TO_PHYSICAL_NAME[section_type]
-        for section_type in set(morphology.section_types)
-        if (
-            section_type in _SECTION_TYPE_TO_PHYSICAL_NAME
-            and _SECTION_TYPE_TO_PHYSICAL_NAME[section_type] in PhysicalSectionListName
-        )
-    ]
+    present: set[PhysicalSectionListName] = set()
+    for section in morphology.sections:
+        physical_name = _SECTION_TYPE_TO_PHYSICAL_NAME.get(section.type)
+        if physical_name is not None:
+            present.add(physical_name)
+
+    # MorphIO keeps soma points on a dedicated ``soma`` object rather than emitting a
+    # ``SectionType.soma`` entry in ``sections``, so the section scan above never sees it.
+    soma = getattr(morphology, "soma", None)
+    soma_points = getattr(soma, "points", None)
+    if soma_points is not None and len(soma_points) > 0:
+        present.add(PhysicalSectionListName.somatic)
+
+    return [name for name in PhysicalSectionListName if name in present]
 
 
 def preflight_morphology(
     path: Path,
     axon_modifier: AxonModifier | str,
-    *,
-    source_has_myelinated: bool | None = None,
 ) -> MorphologyCapabilities:
-    """Load the staged morphology and return its section-list capabilities."""
+    """Load the staged morphology and return its section-list capabilities.
+
+    A staged SWC/ASC asset cannot establish a populated runtime myelinated section
+    list. In no-replacement mode, ``has_myelinated`` therefore remains unknown and
+    myelinated parameter rows are rejected.
+    """
     if not path.is_file():
         msg = f"Morphology preflight asset does not exist: {path}."
         raise ValueError(msg)
@@ -80,7 +89,7 @@ def preflight_morphology(
     }:
         has_myelinated = False
     else:
-        has_myelinated = source_has_myelinated
+        has_myelinated = None
 
     return MorphologyCapabilities(
         has_myelinated=has_myelinated,
