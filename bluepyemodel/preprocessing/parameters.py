@@ -23,9 +23,9 @@ from bluepyemodel.preprocessing.schemas import VariableType
 
 L = logging.getLogger(__name__)
 
-DEFAULT_BOUNDS_FALLBACKS: dict[str, list[float]] = {
-    "g_pas": [1e-5, 6e-5],
-    "e_pas": [-95.0, -60.0],
+DEFAULT_BOUNDS_FALLBACKS: dict[str, tuple[float, float]] = {
+    "g_pas": (1e-5, 6e-5),
+    "e_pas": (-95.0, -60.0),
 }
 REVERSAL_POTENTIAL_IONS = {"ek": "k", "ena": "na"}
 DEFAULT_SOMA_REF_LOCATION = 0.5
@@ -41,7 +41,7 @@ def _normalize_variables(
     entries: Iterable[Any] | None,
     suffix: str,
     variable_type: VariableType,
-) -> list[IonChannelVariable]:
+) -> tuple[IonChannelVariable, ...]:
     variables: list[IonChannelVariable] = []
     seen: set[str] = set()
     for entry in entries or []:
@@ -69,7 +69,7 @@ def _normalize_variables(
                     variable_type=variable_type,
                 )
             )
-    return variables
+    return tuple(variables)
 
 
 def _normalize_ion_names(entries: Iterable[Any] | None) -> frozenset[str]:
@@ -123,7 +123,7 @@ def normalize_ion_channel_model(
     )
 
 
-def _validate_bounds(name: str, bounds: list[float]) -> None:
+def _validate_bounds(name: str, bounds: tuple[float, float]) -> None:
     if any(not math.isfinite(bound) for bound in bounds):
         msg = f"Bounds for parameter '{name}' must be finite."
         raise ValueError(msg)
@@ -135,7 +135,7 @@ def _validate_bounds(name: str, bounds: list[float]) -> None:
 def _resolve_value(
     name: str,
     value: OptimizationValue,
-    bounds_fallbacks: Mapping[str, list[float]],
+    bounds_fallbacks: Mapping[str, tuple[float, float]],
     *,
     fallback_names: Iterable[str] = (),
 ) -> float | list[float]:
@@ -182,7 +182,7 @@ def _parameter_entry(
     mechanism: str | None = None,
     distribution: str | None = None,
     fallback_names: Iterable[str] = (),
-    bounds_fallbacks: Mapping[str, list[float]],
+    bounds_fallbacks: Mapping[str, tuple[float, float]],
 ) -> dict[str, Any]:
     entry: dict[str, Any] = {
         "name": name,
@@ -210,11 +210,11 @@ def _validate_location(location: str) -> None:
         raise ValueError(msg)
 
 
-def _location_sort_key(location: SectionListName) -> list[int | str]:
+def _location_sort_key(location: SectionListName) -> tuple[int | str, ...]:
     """Order broad aliases before narrower section-list rows."""
     if location not in REGIONAL_PARAMETER_LOCATIONS:
-        return [0, location]
-    return [-len(DEFAULT_SECTION_LIST_CATALOG.expand(location)), location]
+        return (0, location)
+    return (-len(DEFAULT_SECTION_LIST_CATALOG.expand(location)), location)
 
 
 def _ordered_locations(locations: Iterable[SectionListName]) -> list[SectionListName]:
@@ -323,7 +323,7 @@ def _build_mechanisms(
 def _build_global_parameters(
     selection: ParametersSelection,
     normalized_models: Mapping[str, NormalizedIonChannelModel],
-    bounds_fallbacks: Mapping[str, list[float]],
+    bounds_fallbacks: Mapping[str, tuple[float, float]],
 ) -> list[dict[str, Any]]:
     parameters: list[dict[str, Any]] = []
     for name in sorted(selection.global_parameters):
@@ -375,7 +375,7 @@ def _assigned_ion_names_by_section(
 def _build_base_parameters(
     selection: ParametersSelection,
     distributions: Mapping[str, Any],
-    bounds_fallbacks: Mapping[str, list[float]],
+    bounds_fallbacks: Mapping[str, tuple[float, float]],
     active_ions_by_section: Mapping[str, frozenset[str]],
 ) -> list[dict[str, Any]]:
     parameters: list[dict[str, Any]] = []
@@ -412,7 +412,7 @@ def _build_mechanism_parameters(
     selection: ParametersSelection,
     normalized_models: Mapping[str, NormalizedIonChannelModel],
     distributions: Mapping[str, Any],
-    bounds_fallbacks: Mapping[str, list[float]],
+    bounds_fallbacks: Mapping[str, tuple[float, float]],
 ) -> list[dict[str, Any]]:
     parameters: list[dict[str, Any]] = []
     overlap_rows: dict[tuple[str, str | None], list[SectionListName]] = {}
@@ -458,7 +458,7 @@ def _build_mechanism_parameters(
 def _build_distribution_parameters(
     selection: ParametersSelection,
     distributions: Mapping[str, Any],
-    bounds_fallbacks: Mapping[str, list[float]],
+    bounds_fallbacks: Mapping[str, tuple[float, float]],
 ) -> list[dict[str, Any]]:
     parameters: list[dict[str, Any]] = []
     for distribution_name in sorted(selection.distribution_parameters):
@@ -602,7 +602,7 @@ def build_params_definition(
     normalized_models: Mapping[str, NormalizedIonChannelModel],
     *,
     morphology_capabilities: MorphologyCapabilities | None = None,
-    bounds_fallbacks: Mapping[str, list[float]] | None = None,
+    bounds_fallbacks: Mapping[str, tuple[float, float]] | None = None,
 ) -> dict[str, Any]:
     """Compile a legacy BluePyEModel params definition from local preprocessing inputs.
 

@@ -66,9 +66,9 @@ class SectionListName(StrEnum):
 
 RegionalSectionListName: TypeAlias = SectionListName
 
-PHYSICAL_SECTION_LIST_NAMES: list[PhysicalSectionListName] = list(PhysicalSectionListName)
+PHYSICAL_SECTION_LIST_NAMES: tuple[PhysicalSectionListName, ...] = tuple(PhysicalSectionListName)
 
-REGIONAL_SECTION_LIST_NAMES: list[RegionalSectionListName] = [
+REGIONAL_SECTION_LIST_NAMES: tuple[RegionalSectionListName, ...] = (
     SectionListName.all,
     SectionListName.alldend,
     SectionListName.somadend,
@@ -80,7 +80,7 @@ REGIONAL_SECTION_LIST_NAMES: list[RegionalSectionListName] = [
     SectionListName.apical,
     SectionListName.axonal,
     SectionListName.myelinated,
-]
+)
 
 AXON_MODIFIER_DESCRIPTIONS: dict[AxonModifier, str] = {
     AxonModifier.replace_axon_with_taper: (
@@ -113,7 +113,7 @@ class SectionListDefinition(BaseModel):
     label: Annotated[str, Field(title="Section-list label")]
     description: Annotated[str, Field(title="Section-list description")]
     expanded_sections: Annotated[
-        list[PhysicalSectionListName],
+        tuple[PhysicalSectionListName, ...],
         Field(
             title="Expanded section lists",
             description="Concrete NEURON section lists used by the BluePyEModel alias.",
@@ -159,9 +159,9 @@ class SectionListDefinition(BaseModel):
         if self.is_composite and len(self.expanded_sections) < _COMPOSITE_SECTION_COUNT:
             msg = f"Composite section-list '{self.name}' must expand to multiple section lists."
             raise ValueError(msg)
-        if self.name == SectionListName.myelinated and self.expanded_sections != [
+        if self.name == SectionListName.myelinated and self.expanded_sections != (
             PhysicalSectionListName.myelinated,
-        ]:
+        ):
             msg = "The myelinated section list may only expand to itself."
             raise ValueError(msg)
         if (
@@ -243,7 +243,7 @@ class SectionListChoice(BaseModel):
         return self.available
 
 
-def _default_section_list_definitions() -> list[SectionListDefinition]:
+def _default_section_list_definitions() -> tuple[SectionListDefinition, ...]:
     """Construct the canonical definitions after the model class is available."""
     return _make_default_section_list_definitions()
 
@@ -254,7 +254,7 @@ class SectionListCatalog(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     definitions: Annotated[
-        list[SectionListDefinition],
+        tuple[SectionListDefinition, ...],
         Field(
             default_factory=_default_section_list_definitions,
             title="Section-list definitions",
@@ -283,7 +283,7 @@ class SectionListCatalog(BaseModel):
         msg = f"Unsupported section-list name: {name}."
         raise ValueError(msg)
 
-    def expand(self, name: SectionListName) -> list[PhysicalSectionListName]:
+    def expand(self, name: SectionListName) -> tuple[PhysicalSectionListName, ...]:
         """Expand a canonical name into concrete NEURON section-list names."""
         return self.definition(name).expanded_sections
 
@@ -398,12 +398,12 @@ def _make_default_section_list_definitions() -> list[SectionListDefinition]:
             name=SectionListName.all,
             label="All sections",
             description="Apical, basal, somatic, and axonal sections.",
-            expanded_sections=[
+            expanded_sections=(
                 PhysicalSectionListName.apical,
                 PhysicalSectionListName.basal,
                 PhysicalSectionListName.somatic,
                 PhysicalSectionListName.axonal,
-            ],
+            ),
             is_composite=True,
             display_order=0,
         ),
@@ -411,7 +411,7 @@ def _make_default_section_list_definitions() -> list[SectionListDefinition]:
             name=SectionListName.myelinated,
             label="Myelinated",
             description="Myelinated sections created by a compatible axon modifier.",
-            expanded_sections=[PhysicalSectionListName.myelinated],
+            expanded_sections=(PhysicalSectionListName.myelinated,),
             requires_myelinated=True,
             display_order=1,
         ),
@@ -419,11 +419,11 @@ def _make_default_section_list_definitions() -> list[SectionListDefinition]:
             name=SectionListName.somadend,
             label="Soma and dendrites",
             description="Apical, basal, and somatic sections.",
-            expanded_sections=[
+            expanded_sections=(
                 PhysicalSectionListName.apical,
                 PhysicalSectionListName.basal,
                 PhysicalSectionListName.somatic,
-            ],
+            ),
             is_composite=True,
             display_order=2,
         ),
@@ -431,38 +431,38 @@ def _make_default_section_list_definitions() -> list[SectionListDefinition]:
             name=SectionListName.somatic,
             label="Somatic",
             description="Somatic sections only.",
-            expanded_sections=[PhysicalSectionListName.somatic],
+            expanded_sections=(PhysicalSectionListName.somatic,),
             display_order=3,
         ),
         SectionListDefinition(
             name=SectionListName.axonal,
             label="Axonal",
             description="Axonal sections only.",
-            expanded_sections=[PhysicalSectionListName.axonal],
+            expanded_sections=(PhysicalSectionListName.axonal,),
             display_order=4,
         ),
         SectionListDefinition(
             name=SectionListName.apical,
             label="Apical",
             description="Apical dendritic sections only.",
-            expanded_sections=[PhysicalSectionListName.apical],
+            expanded_sections=(PhysicalSectionListName.apical,),
             display_order=5,
         ),
         SectionListDefinition(
             name=SectionListName.basal,
             label="Basal",
             description="Basal dendritic sections only.",
-            expanded_sections=[PhysicalSectionListName.basal],
+            expanded_sections=(PhysicalSectionListName.basal,),
             display_order=6,
         ),
         SectionListDefinition(
             name=SectionListName.alldend,
             label="All dendrites",
             description="Apical and basal dendritic sections.",
-            expanded_sections=[
+            expanded_sections=(
                 PhysicalSectionListName.apical,
                 PhysicalSectionListName.basal,
-            ],
+            ),
             is_composite=True,
             display_order=7,
         ),
@@ -470,11 +470,11 @@ def _make_default_section_list_definitions() -> list[SectionListDefinition]:
             name=SectionListName.allnoaxon,
             label="All sections without axon",
             description="Apical, basal, and somatic sections.",
-            expanded_sections=[
+            expanded_sections=(
                 PhysicalSectionListName.apical,
                 PhysicalSectionListName.basal,
                 PhysicalSectionListName.somatic,
-            ],
+            ),
             is_composite=True,
             display_order=8,
         ),
@@ -482,10 +482,10 @@ def _make_default_section_list_definitions() -> list[SectionListDefinition]:
             name=SectionListName.somaxon,
             label="Soma and axon",
             description="Axonal and somatic sections.",
-            expanded_sections=[
+            expanded_sections=(
                 PhysicalSectionListName.axonal,
                 PhysicalSectionListName.somatic,
-            ],
+            ),
             is_composite=True,
             display_order=9,
         ),
@@ -493,12 +493,12 @@ def _make_default_section_list_definitions() -> list[SectionListDefinition]:
             name=SectionListName.allact,
             label="All active sections",
             description="Apical, basal, somatic, and axonal sections for active mechanisms.",
-            expanded_sections=[
+            expanded_sections=(
                 PhysicalSectionListName.apical,
                 PhysicalSectionListName.basal,
                 PhysicalSectionListName.somatic,
                 PhysicalSectionListName.axonal,
-            ],
+            ),
             is_composite=True,
             display_order=10,
         ),
@@ -555,7 +555,7 @@ class DistanceDependentDistribution(BaseModel):
     ] = None
     soma_ref_location: Annotated[float, Field(default=0.5, ge=0.0, le=1.0)] = 0.5
     parameters: Annotated[
-        list[str] | None,
+        tuple[str, ...] | None,
         Field(
             default=None,
             title="Distribution parameters",
@@ -799,7 +799,7 @@ class OptimizationValue(BaseModel):
         Field(default=OptimizationValueMode.fixed),
     ] = OptimizationValueMode.fixed
     value: Annotated[float | None, Field(default=None)] = None
-    bounds: Annotated[list[float] | None, Field(default=None)] = None
+    bounds: Annotated[tuple[float, float] | None, Field(default=None)] = None
 
     @model_validator(mode="after")
     def validate_mode(self) -> Self:
@@ -917,11 +917,11 @@ class ParametersSelection(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     ion_channel_models: Annotated[
-        list[IonChannelModelRef],
-        Field(default_factory=list),
+        tuple[IonChannelModelRef, ...],
+        Field(default_factory=tuple),
     ]
     mechanism_regions: Annotated[
-        dict[SectionListName, list[MechanismRegionSelection]],
+        dict[SectionListName, tuple[MechanismRegionSelection, ...]],
         Field(default_factory=dict),
     ]
     global_parameters: Annotated[
@@ -974,9 +974,15 @@ class MorphologyCapabilities(BaseModel):
     has_myelinated: Annotated[bool | None, Field(default=None)] = None
     axonal_section_count: Annotated[NonNegativeInt | None, Field(default=None)] = None
     available_physical_sections: Annotated[
-        list[PhysicalSectionListName],
-        Field(default_factory=list),
-    ]
+        tuple[PhysicalSectionListName, ...],
+        Field(default=()),
+    ] = ()
+    """Physical section lists (excluding ``myelinated``) with at least one source section.
+
+    Empty by default, which means "not inspected" — callers that construct this model
+    directly (e.g. in tests) opt out of the per-region availability check in the compiler.
+    Only :func:`preflight_morphology` populates this from a real morphology.
+    """
 
 
 class VariableType(StrEnum):
@@ -1006,12 +1012,12 @@ class NormalizedIonChannelModel:
     is_stochastic: bool
     is_ljp_corrected: bool
     temperature_celsius: int | None
-    range_variables: list[IonChannelVariable]
-    global_variables: list[IonChannelVariable]
+    range_variables: tuple[IonChannelVariable, ...]
+    global_variables: tuple[IonChannelVariable, ...]
     ion_names: frozenset[str] = frozenset()
 
     @property
-    def variables(self) -> list[IonChannelVariable]:
+    def variables(self) -> tuple[IonChannelVariable, ...]:
         """All RANGE and GLOBAL variables in metadata order."""
         return self.range_variables + self.global_variables
 

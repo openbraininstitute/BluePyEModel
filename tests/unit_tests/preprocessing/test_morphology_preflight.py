@@ -33,11 +33,11 @@ def test_preflight_reports_somatic_from_soma_points(tmp_path):
 
 def test_preflight_reports_present_neurite_sections(tmp_path):
     capabilities = preflight_morphology(_write_morphology(tmp_path), AxonModifier.none)
-    assert capabilities.available_physical_sections == [
+    assert capabilities.available_physical_sections == (
         PhysicalSectionListName.somatic,
         PhysicalSectionListName.basal,
         PhysicalSectionListName.axonal,
-    ]
+    )
     assert capabilities.axonal_section_count == 1
 
 

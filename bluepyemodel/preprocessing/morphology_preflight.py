@@ -5,6 +5,7 @@ from typing import Any
 
 import morphio
 
+from bluepyemodel.preprocessing.schemas import PHYSICAL_SECTION_LIST_NAMES
 from bluepyemodel.preprocessing.schemas import AxonModifier
 from bluepyemodel.preprocessing.schemas import MorphologyCapabilities
 from bluepyemodel.preprocessing.schemas import PhysicalSectionListName
@@ -35,7 +36,7 @@ def _count_axonal_sections(morphology: Any) -> int:
     return sum(section.type == morphio.SectionType.axon for section in morphology.sections)
 
 
-def _available_physical_sections(morphology: Any) -> list[PhysicalSectionListName]:
+def _available_physical_sections(morphology: Any) -> tuple[PhysicalSectionListName, ...]:
     """Return the physical section lists with at least one source section."""
     present: set[PhysicalSectionListName] = set()
     for section in morphology.sections:
@@ -50,7 +51,7 @@ def _available_physical_sections(morphology: Any) -> list[PhysicalSectionListNam
     if soma_points is not None and len(soma_points) > 0:
         present.add(PhysicalSectionListName.somatic)
 
-    return [name for name in PhysicalSectionListName if name in present]
+    return tuple(name for name in PHYSICAL_SECTION_LIST_NAMES if name in present)
 
 
 def preflight_morphology(
