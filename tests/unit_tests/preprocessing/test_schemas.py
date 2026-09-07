@@ -3,6 +3,7 @@
 import math
 
 import pytest
+from pydantic import ValidationError
 
 from bluepyemodel.preprocessing.schemas import (
     DEFAULT_SECTION_LIST_CATALOG,
@@ -196,6 +197,22 @@ def test_optimization_value_validation():
         OptimizationValue(mode=OptimizationValueMode.fixed, value=1.0, bounds=(0.0, 1.0))
     with pytest.raises(ValueError, match="cannot be provided when mode is 'bounds'"):
         OptimizationValue(mode=OptimizationValueMode.bounds, value=1.0, bounds=(0.0, 1.0))
+
+    with pytest.raises(ValidationError):
+        OptimizationValue(mode=OptimizationValueMode.bounds, bounds=[1.0])
+    with pytest.raises(ValidationError):
+        OptimizationValue(mode=OptimizationValueMode.bounds, bounds=(1.0,))
+    with pytest.raises(ValidationError):
+        OptimizationValue(mode=OptimizationValueMode.bounds, bounds=[1.0, 2.0, 3.0])
+    with pytest.raises(ValidationError):
+        OptimizationValue(mode=OptimizationValueMode.bounds, bounds=(1.0, 2.0, 3.0))
+
+    coerced = OptimizationValue(mode=OptimizationValueMode.bounds, bounds=[0.0, 1.0])
+    assert coerced.bounds == (0.0, 1.0)
+    assert OptimizationValue(mode=OptimizationValueMode.bounds, bounds=(0.0, 1.0)).bounds == (
+        0.0,
+        1.0,
+    )
 
 
 def test_parameters_selection_reference_validation_and_defaults():
