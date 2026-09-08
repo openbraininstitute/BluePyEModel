@@ -144,7 +144,7 @@ This work is licensed under `Apache 2.0 <https://www.apache.org/licenses/LICENSE
                :target: https://bluepyemodel.readthedocs.io/
                :alt: latest documentation
 
-.. |coverage| image:: https://codecov.io/github/openbraininstitute/BluePyEModel/coverage.svg?branch=main
+.. |coverage| image:: https://codecov.io/gh/openbraininstitute/bluepyemodel/branch/main/graph/badge.svg
                    :target: https://codecov.io/gh/openbraininstitute/bluepyemodel
                    :alt: coverage
 

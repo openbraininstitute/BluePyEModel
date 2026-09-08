@@ -13,8 +13,10 @@ license = {file = "LICENSE.txt"}
 requires-python = ">= 3.11"
 dynamic = ["version"]
 dependencies = [
+    "click",
     "numpy",
     "fasteners>=0.16",
+    "h5py>=3.0",
 ]
 keywords=[
     "computational neuroscience",
@@ -66,7 +68,6 @@ export = [
     "bluepyefe>=2.3.48",
     "neuron>=8.0",
     "efel>=5.5.5",
-    "h5py",
     "jinja2>=3.0.3",
     "neurom>=3.0",
     "morph_tool>=2.8",
@@ -87,8 +88,8 @@ nexus = [
 ]
 docs = [
     "graphviz",
-    "sphinx<9",
-    "sphinx-bluebrain-theme",
+    "sphinx>=8.2,<10",
+    "obi-sphinx-theme>=2.0.0",
     "luigi>=3.7.2",
     "luigi-tools>=0.0.12",
 ]
@@ -105,6 +106,9 @@ local = [
 
 [project.urls]
 Homepage = "https://github.com/openbraininstitute/BluePyEModel"
+
+[project.scripts]
+bluepyemodel = "bluepyemodel.__main__:main"
 
 [tool.setuptools]
 include-package-data = true

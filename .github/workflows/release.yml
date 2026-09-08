@@ -9,6 +9,9 @@ on:
 
 jobs:
   call-test-workflow:
+    permissions:
+      contents: read
+      id-token: write
     uses: openbraininstitute/BluePyEModel/.github/workflows/test.yml@main
 
   build-and-publish:
