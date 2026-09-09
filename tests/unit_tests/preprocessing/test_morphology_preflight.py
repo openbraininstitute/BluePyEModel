@@ -54,6 +54,22 @@ def test_tapered_replacement_requires_enough_source_axon_sections(tmp_path):
         )
 
 
+def test_olfactory_bulb_replacement_makes_axon_available_without_source_axon(tmp_path):
+    swc = """\
+1 1 0.0 0.0 0.0 1.0 -1
+2 1 0.0 -1.0 0.0 1.0 1
+3 1 0.0 1.0 0.0 1.0 1
+4 3 0.0 -1.0 0.0 0.5 1
+5 3 0.0 -5.0 0.0 0.5 4
+"""
+    capabilities = preflight_morphology(
+        _write_morphology(tmp_path, swc),
+        AxonModifier.replace_axon_olfactory_bulb,
+    )
+    assert capabilities.axonal_section_count == 0
+    assert PhysicalSectionListName.axonal in capabilities.available_physical_sections
+
+
 def test_replacement_modifiers_set_myelination_flags(tmp_path):
     # Bifurcated axon yields three MorphIO sections (parent + two children).
     swc = """\

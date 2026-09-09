@@ -383,6 +383,26 @@ def test_build_params_definition_rejects_distribution_and_morphology_errors():
         )
 
 
+def test_build_params_definition_accepts_composite_alias_with_partial_morphology():
+    selection = _selection(
+        mechanism_regions={},
+        distribution_parameters={},
+        base_parameters={
+            SectionListName.all: {
+                "Ra": ParameterSelection(value=OptimizationValue(value=100.0)),
+            }
+        },
+    )
+    params = build_params_definition(
+        _params_input(selection, {}),
+        {},
+        morphology_capabilities=MorphologyCapabilities(
+            available_physical_sections=(PhysicalSectionListName.somatic,),
+        ),
+    )
+    assert params["parameters"]["all"] == [{"name": "Ra", "val": 100.0}]
+
+
 def test_build_params_definition_emits_global_mechanism_variable_and_skips_duplicate_pas():
     reference = IonChannelModelRef(id_str="icm-1")
     normalized = {"icm-1": normalize_ion_channel_model(_entity())}

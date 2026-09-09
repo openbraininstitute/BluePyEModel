@@ -175,6 +175,11 @@ def test_distance_dependent_function_placeholder_validation():
             function="{value}+{distance}",
             parameters=["constant"],
         )
+    with pytest.raises(ValueError, match="undeclared placeholders"):
+        CustomDistanceDependentDistribution(
+            name="custom",
+            function="{value}+{distance}+{typo}",
+        )
     distribution = CustomDistanceDependentDistribution(
         name="custom",
         function="({value}+{distance}+{constant})",
@@ -266,5 +271,36 @@ def test_parameters_selection_reference_validation_and_defaults():
 
     selection = ParametersSelection()
     assert "v_init" in selection.global_parameters
-    assert SectionListName.all in selection.base_parameters
+    assert set(selection.base_parameters) == {
+        SectionListName.all,
+        SectionListName.axonal,
+        SectionListName.somatic,
+        SectionListName.apical,
+        SectionListName.basal,
+    }
+    assert SectionListName.myelinated not in selection.base_parameters
+    assert {name for region in selection.base_parameters.values() for name in region} == {
+        "Ra",
+        "g_pas",
+        "e_pas",
+        "cm",
+    }
+    assert selection.base_parameters[SectionListName.all]["Ra"].value.value == 100.0
+    assert selection.base_parameters[SectionListName.all]["g_pas"].value.bounds == (
+        1e-5,
+        6e-5,
+    )
+    assert selection.base_parameters[SectionListName.all]["e_pas"].value.bounds == (
+        -95.0,
+        -60.0,
+    )
+    assert selection.base_parameters[SectionListName.axonal]["cm"].value.value == 1.0
+    assert selection.base_parameters[SectionListName.somatic]["cm"].value.value == 1.0
+    assert selection.base_parameters[SectionListName.apical]["cm"].value.value == 2.0
+    assert selection.base_parameters[SectionListName.basal]["cm"].value.value == 2.0
+    assert all(
+        parameter not in region
+        for region in selection.base_parameters.values()
+        for parameter in ("ena", "ek")
+    )
     assert ParameterSelection(value=OptimizationValue(value=1.0))
