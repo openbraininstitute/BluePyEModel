@@ -895,32 +895,28 @@ def _default_global_parameters() -> dict[str, GlobalParameterSelection]:
 
 
 def _default_base_parameters() -> dict[SectionListName, dict[str, ParameterSelection]]:
+    """Generic passive-cable bootstrap values, not a validated fit for any cell type.
+
+    Only ``Ra``/``cm`` (passive cable properties present on every section) are
+    seeded here. Reversal potentials (``ena``/``ek``) are intentionally excluded:
+    whether a region has active sodium/potassium conductances depends entirely on
+    which ion channel models the user assigns to it (the compiler already drops
+    ``ena``/``ek`` for a region with no matching ion channel; see
+    ``_build_base_parameters``), so a blanket default here would misrepresent
+    regions that are actually passive (e.g. many aspiny dendrites). Override any of
+    these per section list, or add ``ena``/``ek``/other parameters explicitly, for
+    the specific cell type being optimized.
+    """
     return {
         SectionListName.all: {
             "Ra": _fixed_parameter(100.0),
             "g_pas": _bounded_parameter(1e-5, 6e-5),
             "e_pas": _bounded_parameter(-95.0, -60.0),
         },
-        SectionListName.axonal: {
-            "cm": _fixed_parameter(1.0),
-            "ena": _fixed_parameter(50.0),
-            "ek": _fixed_parameter(-90.0),
-        },
-        SectionListName.somatic: {
-            "cm": _fixed_parameter(1.0),
-            "ena": _fixed_parameter(50.0),
-            "ek": _fixed_parameter(-90.0),
-        },
-        SectionListName.apical: {
-            "cm": _fixed_parameter(2.0),
-            "ena": _fixed_parameter(50.0),
-            "ek": _fixed_parameter(-90.0),
-        },
-        SectionListName.basal: {
-            "cm": _fixed_parameter(2.0),
-            "ena": _fixed_parameter(50.0),
-            "ek": _fixed_parameter(-90.0),
-        },
+        SectionListName.axonal: {"cm": _fixed_parameter(1.0)},
+        SectionListName.somatic: {"cm": _fixed_parameter(1.0)},
+        SectionListName.apical: {"cm": _fixed_parameter(2.0)},
+        SectionListName.basal: {"cm": _fixed_parameter(2.0)},
     }
 
 
