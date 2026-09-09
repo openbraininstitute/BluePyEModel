@@ -26,6 +26,15 @@ _MINIMUM_SOURCE_AXONAL_SECTIONS: dict[AxonModifier, int] = {
     AxonModifier.replace_axon_legacy: 2,
 }
 
+_AXON_SYNTHESIZING_MODIFIERS: frozenset[AxonModifier] = frozenset(
+    {
+        AxonModifier.replace_axon_with_taper,
+        AxonModifier.replace_axon_legacy,
+        AxonModifier.replace_axon_olfactory_bulb,
+        AxonModifier.bluepyopt_replace_axon,
+    }
+)
+
 
 def load_morphology_nrn_order(path: Path) -> morphio.Morphology:
     """Load morphology with NEURON-compatible section ordering."""
@@ -38,8 +47,18 @@ def _count_axonal_sections(morphology: Any) -> int:
     return sum(section.type == morphio.SectionType.axon for section in morphology.sections)
 
 
-def _available_physical_sections(morphology: Any) -> tuple[PhysicalSectionListName, ...]:
-    """Return the physical section lists with at least one source section."""
+def _available_physical_sections(
+    morphology: Any,
+    modifier: AxonModifier,
+) -> tuple[PhysicalSectionListName, ...]:
+    """Return the physical section lists with at least one source or synthesized section.
+
+    A source lacking axonal sections still gets a populated ``axonal`` section list under
+    any axon-synthesizing modifier (e.g. ``replace_axon_olfactory_bulb`` creates hillock,
+    node, and myelin sections regardless of the source; see
+    ``bluepyemodel.evaluation.modifiers``), so ``axonal`` availability must not depend
+    solely on the raw source scan.
+    """
     present: set[PhysicalSectionListName] = set()
     for section in morphology.sections:
         physical_name = _SECTION_TYPE_TO_PHYSICAL_NAME.get(section.type)
@@ -52,6 +71,9 @@ def _available_physical_sections(morphology: Any) -> tuple[PhysicalSectionListNa
     soma_points = getattr(soma, "points", None)
     if soma_points is not None and len(soma_points) > 0:
         present.add(PhysicalSectionListName.somatic)
+
+    if modifier in _AXON_SYNTHESIZING_MODIFIERS:
+        present.add(PhysicalSectionListName.axonal)
 
     return tuple(name for name in PHYSICAL_SECTION_LIST_NAMES if name in present)
 
@@ -97,5 +119,5 @@ def preflight_morphology(
     return MorphologyCapabilities(
         has_myelinated=has_myelinated,
         axonal_section_count=axonal_section_count,
-        available_physical_sections=_available_physical_sections(morphology),
+        available_physical_sections=_available_physical_sections(morphology, modifier),
     )

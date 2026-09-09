@@ -525,17 +525,25 @@ def _validate_physical_section_availability(
     selection: ParametersSelection,
     capabilities: MorphologyCapabilities,
 ) -> None:
-    """Reject a configured region the source morphology does not physically provide.
+    """Reject a primitive region the source morphology does not physically provide.
 
     ``available_physical_sections`` is empty when preflight was skipped (e.g. a caller
     constructed ``MorphologyCapabilities`` directly, as tests and the strategy-only
     fallback in ``task.py`` do); in that case this check is intentionally a no-op.
+
+    Composite aliases (e.g. ``all``, ``somadend``) are skipped here: legacy BluePyEModel
+    treats them as "whatever physical sections exist" rather than requiring every
+    expanded section to be present, so a morphology missing one neurite class (e.g. an
+    aspiny or axon-less reconstruction) must still compile with the default ``all``
+    parameters. Only primitive, single-section locations are enforced.
     """
     if not capabilities.available_physical_sections:
         return
     available = set(capabilities.available_physical_sections) | {PhysicalSectionListName.myelinated}
     configured_locations = set(selection.base_parameters) | set(selection.mechanism_regions)
     for location in sorted(configured_locations):
+        if DEFAULT_SECTION_LIST_CATALOG.definition(location).is_composite:
+            continue
         expanded = set(DEFAULT_SECTION_LIST_CATALOG.expand(location))
         missing = expanded - available
         if missing:

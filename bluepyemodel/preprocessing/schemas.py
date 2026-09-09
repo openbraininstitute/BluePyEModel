@@ -1,10 +1,11 @@
 """Preprocessing schemas, dataclasses, and related constants."""
 
 import math
+import re
 from dataclasses import dataclass
 from enum import StrEnum, auto
 from pathlib import Path
-from typing import Annotated, Any, Self, TypeAlias
+from typing import Annotated, Any, ClassVar, Self, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Discriminator, Field, NonNegativeInt, model_validator
 
@@ -520,10 +521,21 @@ class StandardDistanceDependentDistributionName(StrEnum):
     sigmoid_kdbm_apic = auto()
 
 
+_PLACEHOLDER_PATTERN = re.compile(r"\{(\w+)\}")
+
+
 class DistanceDependentDistribution(BaseModel):
     """A BluePyEModel distance-dependent parameter transformation."""
 
     model_config = ConfigDict(extra="forbid")
+
+    _runtime_placeholders: ClassVar[frozenset[str]] = frozenset()
+    """Placeholders resolved by BluePyEModel at runtime, not user-declared here.
+
+    Empty for every distribution except ``step``, whose ``{step_begin}``/``{step_end}``
+    placeholders are computed from the morphology (see the subclass docstring) rather
+    than supplied via ``parameters``.
+    """
 
     name: Annotated[
         str | None,
@@ -586,6 +598,14 @@ class DistanceDependentDistribution(BaseModel):
                         f"Distance-dependent functions must contain the {placeholder} placeholder."
                     )
                     raise ValueError(msg)
+            declared = {"value", "distance", *(self.parameters or []), *self._runtime_placeholders}
+            undeclared = set(_PLACEHOLDER_PATTERN.findall(self.function)) - declared
+            if undeclared:
+                msg = (
+                    "Distance-dependent function contains undeclared placeholders: "
+                    f"{sorted(undeclared)}. Add them to 'parameters' or remove them."
+                )
+                raise ValueError(msg)
         # pylint: enable=unsupported-membership-test
         return self
 
@@ -630,6 +650,8 @@ class StepDistanceDependentDistribution(DistanceDependentDistribution):
     ``get_hotspot_location()`` (Larkum & Zhu, 2002). Do not add them to
     ``parameters``; they must remain in the function string verbatim.
     """
+
+    _runtime_placeholders: ClassVar[frozenset[str]] = frozenset({"step_begin", "step_end"})
 
     name: Annotated[str, Field(default="step", frozen=True)] = "step"
     function: Annotated[
@@ -879,7 +901,6 @@ def _default_base_parameters() -> dict[SectionListName, dict[str, ParameterSelec
             "g_pas": _bounded_parameter(1e-5, 6e-5),
             "e_pas": _bounded_parameter(-95.0, -60.0),
         },
-        SectionListName.myelinated: {"cm": _fixed_parameter(0.02)},
         SectionListName.axonal: {
             "cm": _fixed_parameter(1.0),
             "ena": _fixed_parameter(50.0),
