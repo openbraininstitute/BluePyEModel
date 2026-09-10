@@ -37,6 +37,7 @@ classifiers=[
 
 [project.optional-dependencies]
 extraction = [
+    "bluepyopt>=1.14.10",
     "bluepyefe>=2.3.48",
     "efel>=5.5.5",
     "scipy>=1.16.1",
