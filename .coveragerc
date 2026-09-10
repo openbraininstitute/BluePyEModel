@@ -1,5 +1,12 @@
 [run]
 source = bluepyemodel
+omit =
+    # Luigi workflow orchestration depends on the internal, non-public
+    # bbp_workflow package (not available in this repo's dependencies or
+    # in CI), so these modules cannot be imported/exercised in tests.
+    bluepyemodel/tasks/emodel_creation/*
+    bluepyemodel/tasks/luigi_tools.py
+    bluepyemodel/tasks/luigi_custom.py
 
 [report]
 exclude_lines =
