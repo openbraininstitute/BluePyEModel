@@ -1,0 +1,57 @@
+{
+    "_comments": [],
+    "distributions": {
+        "exp": {"fun": "{value} * math.exp({distance} / {constant})", "parameters": ["constant"]}
+    },
+    "misc_parameters": {
+        "v_init": {"global": -80},
+        "celsius": {"global": 34},
+        "ena": {"local": 50},
+        "ek": {"local": -90}
+    },
+    "mechanism_parameters": {
+        "_comments": "Settings defined here will override any information from the gene mapping table.",
+        "pas": {
+            "gbar": [1e-5, 6e-5],
+            "distribution": "uniform",
+            "bounds": {"e": [-95, -60]}
+        },
+        "K_Tst": [0, 1],
+        "SKv3_1": [0, 0.005]
+    },
+    "mechanisms": {
+        "_comment": "All available mechanisms",
+        "pas": {
+            "model": {"suffix": "pas", "gbar": "g", "parameters": ["e"]},
+            "status": "stable"
+        },
+        "K_Tst": {
+            "nexus": {"name": "K_Tst", "modelId": "sscx"},
+            "model": {"suffix": "K_Tst", "gbar": "gK_Tstbar", "read": ["ek"], "write": ["ik"]},
+            "status": "stable",
+            "type": "generic"
+        },
+        "SKv3_1": {
+            "nexus": {"name": "SKv3_1", "modelId": "sscx"},
+            "model": {"suffix": "SKv3_1", "gbar": "gSKv3_1bar", "read": ["ek"], "write": ["ik"]},
+            "status": "stable",
+            "type": "generic"
+        },
+        "Kv1_1": {
+            "nexus": {"name": "Kv1_1", "modelId": "0122"},
+            "model": {"suffix": "Kv1_1", "gbar": "gkbar", "read": ["ek"], "write": ["ik"]},
+            "status": "stable",
+            "type": "genetic"
+        }
+    },
+    "channels": {
+        "_comment": "Map ion channels to models in Nexus",
+        "Kv1.1": ["Kv1_1", "K_Tst"],
+        "Kv3.1": ["SKv3_1"]
+    },
+    "genes": {
+        "_comment": "Map genes to ion channels",
+        "Kcna1": "Kv1.1",
+        "Kcnc1": "Kv3.1"
+    }
+}
