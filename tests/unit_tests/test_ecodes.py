@@ -22,6 +22,7 @@ from bluepyopt.ephys.locations import NrnSeclistCompLocation
 from bluepyopt.ephys.simulators import NrnSimulator
 
 from bluepyemodel.ecode import *
+from bluepyemodel.ecode.stimulus import BPEM_stimulus
 from tests.test_models import dummycells
 
 soma_loc = NrnSeclistCompLocation(name="soma", seclist_name="somatic", sec_index=0, comp_x=0.5)
@@ -1279,3 +1280,413 @@ def test_spikerecmultispikes_instantiate():
     check_spikerecmultispikes_stim(
         time, current, delay, n_spikes, spike_duration, delta, total_duration, 0.0, amp
     )
+
+
+# ---------------------------------------------------------------------------
+# BPEM_stimulus base class
+# ---------------------------------------------------------------------------
+
+
+def test_bpem_stimulus_defaults():
+    """Test BPEM_stimulus base class default properties and destroy."""
+    stimulus = BPEM_stimulus(location=soma_loc)
+
+    assert stimulus.stim_start == 0.0
+    assert stimulus.stim_end == 0.0
+    assert stimulus.amplitude == 0.0
+    assert stimulus.generate() == ([], [])
+    assert str(stimulus) == f" current played at {soma_loc}"
+
+
+def test_bpem_stimulus_destroy():
+    """Test that destroy resets the iclamp/time/current vectors."""
+    stimulus, *_ = get_idrest_stimulus()
+    run_stim_on_dummy_cell(stimulus)
+    assert stimulus.iclamp is not None
+
+    stimulus.destroy()
+    assert stimulus.iclamp is None
+    assert stimulus.time_vec is None
+    assert stimulus.current_vec is None
+
+
+# ---------------------------------------------------------------------------
+# Comb
+# ---------------------------------------------------------------------------
+
+
+def get_comb_stimulus():
+    """Return Comb stimulus and stim properties."""
+    delay = 200.0
+    inter_delay = 5.0
+    n_steps = 3
+    duration = 0.5
+    amp = 40.0
+    total_duration = 350.0
+
+    prot_def = {
+        "delay": delay,
+        "inter_delay": inter_delay,
+        "n_steps": n_steps,
+        "duration": duration,
+        "amp": amp,
+        "totduration": total_duration,
+    }
+    stimulus = eCodes["highfreq"](location=soma_loc, **prot_def)
+
+    return stimulus, delay, inter_delay, n_steps, duration, amp, total_duration
+
+
+def test_comb_raises_when_stim_end_exceeds_total_duration():
+    """Test Comb raises when the steps do not fit in total_duration."""
+    with pytest.raises(ValueError):
+        eCodes["highfreq"](
+            location=soma_loc,
+            delay=200.0,
+            n_steps=100,
+            duration=10.0,
+            totduration=350.0,
+        )
+
+
+def test_comb_generate():
+    """Test Comb generate."""
+    stimulus, delay, inter_delay, n_steps, duration, amp, total_duration = get_comb_stimulus()
+    time, current = stimulus.generate()
+
+    assert stimulus.name == "Comb"
+    assert stimulus.total_duration == total_duration
+    assert stimulus.stim_start == delay
+    assert stimulus.stim_end == delay + n_steps * duration
+    assert stimulus.amplitude == amp
+
+    # before stimulus
+    current_before = current[numpy.where((0 <= time) & (time < delay))]
+    assert numpy.all(current_before == 0.0)
+
+    for step in range(n_steps):
+        step_delay = step * inter_delay + delay
+        current_step = current[numpy.where((step_delay < time) & (time < step_delay + duration))]
+        assert numpy.all(current_step == amp)
+
+
+def test_comb_instantiate():
+    """Test Comb instantiate."""
+    stimulus, delay, inter_delay, n_steps, duration, amp, _ = get_comb_stimulus()
+    time, current = run_stim_on_dummy_cell(stimulus)
+
+    for step in range(n_steps):
+        step_delay = step * inter_delay + delay
+        current_step = current[numpy.where((step_delay < time) & (time < step_delay + duration))]
+        assert numpy.all(current_step == amp)
+
+
+# ---------------------------------------------------------------------------
+# CustomFromFile
+# ---------------------------------------------------------------------------
+
+
+def test_customfromfile(tmp_path):
+    """Test CustomFromFile generate."""
+    data_file = tmp_path / "custom_stim.txt"
+    time_series = numpy.array([0.0, 1.0, 2.0, 3.0])
+    current_series = numpy.array([0.0, 0.5, 0.5, 0.0])
+    numpy.savetxt(data_file, numpy.column_stack([time_series, current_series]))
+
+    stimulus = eCodes["custom"](location=soma_loc, data_filepath=str(data_file))
+
+    assert stimulus.name == "CustomFromFile"
+    assert stimulus.total_duration == time_series[-1]
+    assert stimulus.stim_start == 0.0
+    assert stimulus.stim_end == time_series[-1]
+
+    time, current = stimulus.generate()
+    assert numpy.array_equal(time, time_series)
+    assert numpy.array_equal(current, current_series)
+
+
+def test_customfromfile_instantiate(tmp_path):
+    """Test CustomFromFile instantiate."""
+    data_file = tmp_path / "custom_stim.txt"
+    time_series = numpy.array([0.0, 1.0, 2.0, 3.0])
+    current_series = numpy.array([0.0, 0.5, 0.5, 0.0])
+    numpy.savetxt(data_file, numpy.column_stack([time_series, current_series]))
+
+    stimulus = eCodes["custom"](location=soma_loc, data_filepath=str(data_file))
+    # BPEM_stimulus.instantiate uses self.generate(dt=0.1), which for
+    # CustomFromFile returns the raw (small) series regardless of dt.
+    time, _ = run_stim_on_dummy_cell(stimulus)
+    assert len(time) > 0
+
+
+# ---------------------------------------------------------------------------
+# ThresholdAddition
+# ---------------------------------------------------------------------------
+
+
+def test_thresholdaddition_raises_without_amp():
+    """Test ThresholdAddition raises TypeError when amp is None."""
+    with pytest.raises(TypeError):
+        eCodes["thresholdaddition"](location=soma_loc, thresh_perc=None, amp=None)
+
+
+def test_thresholdaddition_amplitude_requires_threshold_current():
+    """Test ThresholdAddition.amplitude raises without threshold_current."""
+    stimulus = eCodes["thresholdaddition"](location=soma_loc, amp=0.1)
+    with pytest.raises(ValueError):
+        _ = stimulus.amplitude
+
+
+def test_thresholdaddition_amplitude():
+    """Test ThresholdAddition.amplitude is threshold_current + amp."""
+    stimulus = eCodes["thresholdaddition"](location=soma_loc, amp=0.1)
+    stimulus.threshold_current = 0.05
+    assert stimulus.amplitude == pytest.approx(0.15)
+
+
+# ---------------------------------------------------------------------------
+# BPOSquarePulse
+# ---------------------------------------------------------------------------
+
+
+def get_square_stimulus():
+    """Return BPOSquarePulse stimulus and stim properties."""
+    delay = 250.0
+    duration = 1350.0
+    total_duration = 1850.0
+
+    prot_def = {"amp": 0.2, "holding_current": -0.001}
+    stimulus = eCodes["bposquarepulse"](location=soma_loc, **prot_def)
+
+    return (
+        stimulus,
+        delay,
+        duration,
+        total_duration,
+        prot_def["amp"],
+        prot_def["holding_current"],
+    )
+
+
+def test_bposquarepulse_generate():
+    """Test BPOSquarePulse generate."""
+    stimulus, delay, duration, total_duration, amp, holding_curr = get_square_stimulus()
+    time, current = stimulus.generate()
+
+    assert stimulus.name == ""
+    assert stimulus.total_duration == total_duration
+    assert stimulus.stim_start == delay
+    assert stimulus.stim_end == delay + duration
+    assert stimulus.amplitude == amp
+    check_idrest_stim(time, current, delay, duration, total_duration, holding_curr, amp)
+
+    stimulus.holding_current = None
+    time, current = stimulus.generate()
+    check_idrest_stim(time, current, delay, duration, total_duration, 0.0, amp)
+
+
+def test_bposquarepulse_instantiate():
+    """Test BPOSquarePulse instantiate with and without holding current."""
+    stimulus, _, _, _, amp, holding_curr = get_square_stimulus()
+    nrn_sim = NrnSimulator()
+    dummy_cell = dummycells.DummyCellModel1()
+    icell = dummy_cell.instantiate(sim=nrn_sim)
+
+    stimulus.instantiate(sim=nrn_sim, icell=icell)
+    assert stimulus.iclamp.amp == amp
+    assert stimulus.holding_iclamp.amp == holding_curr
+
+    stimulus.destroy()
+    assert stimulus.iclamp is None
+    assert stimulus.holding_iclamp is None
+
+    stimulus.holding_current = None
+    stimulus.instantiate(sim=nrn_sim, icell=icell)
+    assert stimulus.holding_iclamp is None
+
+
+def test_bposquarepulse_str():
+    """Test BPOSquarePulse string representation."""
+    stimulus, *_ = get_square_stimulus()
+    assert str(stimulus) == f" current played at {soma_loc}"
+
+
+# ---------------------------------------------------------------------------
+# ProbAMPANMDA_EMS
+# ---------------------------------------------------------------------------
+
+
+def test_probampanmda_ems_raises_without_syn_weight_or_delay():
+    """Test ProbAMPANMDA_EMS raises TypeError without syn_weight/syn_delay."""
+    with pytest.raises(TypeError):
+        eCodes["probampanmda_ems"](location=soma_loc, syn_delay=1.0)
+
+    with pytest.raises(TypeError):
+        eCodes["probampanmda_ems"](location=soma_loc, syn_weight=1.0)
+
+
+def test_probampanmda_ems_defaults():
+    """Test ProbAMPANMDA_EMS default properties."""
+    stimulus = eCodes["probampanmda_ems"](
+        location=soma_loc, syn_weight=1.0, syn_delay=10.0, totduration=100.0
+    )
+    assert stimulus.name == "ProbAMPANMDA_EMS"
+    assert stimulus.stim_start == 10.0
+    assert stimulus.stim_end == 100.0
+
+
+def test_probampanmda_ems_destroy_resets_fields():
+    """Test ProbAMPANMDA_EMS.destroy resets synapse/netstim/netcon fields.
+
+    Note: instantiate() creates an h.ProbAMPANMDA_EMS point process, which
+    requires the ProbAMPANMDA_EMS.mod mechanism to be compiled and loaded.
+    That mechanism is not part of this repo's test mechanisms, so only the
+    destroy() reset behavior (independent of the mechanism) is tested here.
+    """
+    stimulus = eCodes["probampanmda_ems"](
+        location=soma_loc, syn_weight=1.0, syn_delay=10.0, totduration=100.0
+    )
+    stimulus.synapse = object()
+    stimulus.netstim = object()
+    stimulus.netcon = object()
+
+    stimulus.destroy()
+    assert stimulus.synapse is None
+    assert stimulus.netstim is None
+    assert stimulus.netcon is None
+
+
+# ---------------------------------------------------------------------------
+# MultipleRandomStepInputs
+# ---------------------------------------------------------------------------
+
+
+def test_multiplerandomstepinputs_raises_without_amp():
+    """Test MultipleRandomStepInputs raises when amp and thresh_perc are both None."""
+    with pytest.raises(TypeError):
+        eCodes["randomsteps"](location=soma_loc, amp=None, thresh_perc=None)
+
+
+def test_multiplerandomstepinputs_defaults():
+    """Test MultipleRandomStepInputs default properties."""
+    stimulus = eCodes["randomsteps"](
+        location=soma_loc, amp=0.1, delay=250.0, duration=350.0, totduration=1000.0, n_inputs=3
+    )
+    assert stimulus.name == "MultipleRandomStepInputs"
+    assert stimulus.stim_start == 250.0
+    assert stimulus.stim_end == 600.0
+    assert stimulus.amplitude == 0.1
+    assert len(stimulus.inputs_start) == 3
+
+
+def test_multiplerandomstepinputs_instantiate():
+    """Test MultipleRandomStepInputs instantiate places dend_clamps on apical sections."""
+    stimulus = eCodes["randomsteps"](
+        location=soma_loc,
+        amp=0.1,
+        delay=250.0,
+        duration=350.0,
+        totduration=1000.0,
+        n_inputs=2,
+        sections=["apic"],
+    )
+    nrn_sim = NrnSimulator()
+    dummy_cell = dummycells.DummyCellModel1()
+    icell = dummy_cell.instantiate(sim=nrn_sim)
+
+    stimulus.instantiate(sim=nrn_sim, icell=icell)
+    assert len(stimulus.dend_clamps) == 2
+    for clamp in stimulus.dend_clamps:
+        assert clamp.amp == pytest.approx(0.1)
+
+
+# ---------------------------------------------------------------------------
+# DendriticStep / Synaptic / BAC (dendrite.py)
+# ---------------------------------------------------------------------------
+
+
+def test_dendriticstep_apical_trunk_requires_apical_seclist():
+    """Test DendriticStep raises when direction is apical_trunk but seclist isn't apical."""
+    with pytest.raises(ValueError):
+        eCodes["dendritic"](
+            location=None,
+            amp=0.1,
+            direction="apical_trunk",
+            seclist_name="basal",
+            somadistance=100.0,
+        )
+
+
+def test_dendriticstep_unknown_direction_raises():
+    """Test DendriticStep raises on unknown direction keyword."""
+    with pytest.raises(ValueError):
+        eCodes["dendritic"](
+            location=None,
+            amp=0.1,
+            direction="unknown",
+            somadistance=100.0,
+        )
+
+
+def _instantiate_connected_dummy_cell():
+    """Instantiate a dummy cell and connect its apical section to the soma,
+    so that NrnSomaDistanceCompLocation-based locations can be resolved."""
+    nrn_sim = NrnSimulator()
+    dummy_cell = dummycells.DummyCellModel1()
+    icell = dummy_cell.instantiate(sim=nrn_sim)
+    icell.apic[0].connect(icell.soma[0], 1, 0)
+    return nrn_sim, icell
+
+
+def test_dendriticstep_instantiate_forces_zero_holding():
+    """Test DendriticStep forces holding_current to 0 on instantiate."""
+    stimulus = eCodes["dendritic"](
+        location=None,
+        amp=0.1,
+        holding_current=-0.05,
+        direction="random",
+        seclist_name="apical",
+        somadistance=50.0,
+    )
+    nrn_sim, icell = _instantiate_connected_dummy_cell()
+
+    stimulus.instantiate(sim=nrn_sim, icell=icell)
+    assert stimulus.holding_current == 0
+
+
+def test_synaptic_instantiate():
+    """Test Synaptic instantiate produces a plausible EPSP-shaped current."""
+    stimulus = eCodes["synaptic"](
+        location=None,
+        amp=0.1,
+        direction="random",
+        seclist_name="apical",
+        somadistance=50.0,
+        syn_delay=0.0,
+        syn_amp=0.1,
+        syn_rise=0.5,
+        syn_decay=5.0,
+    )
+    nrn_sim, icell = _instantiate_connected_dummy_cell()
+
+    stimulus.instantiate(sim=nrn_sim, icell=icell)
+    assert stimulus.iclamp is not None
+    assert stimulus.time_vec.size() > 0
+
+
+def test_bac_instantiate():
+    """Test BAC instantiate combines a bAP (IDrest) and an EPSP (Synaptic)."""
+    stimulus = eCodes["bac"](
+        location=soma_loc,
+        amp=0.1,
+        direction="random",
+        seclist_name="apical",
+        somadistance=50.0,
+        syn_delay=0.0,
+        syn_amp=0.1,
+    )
+    nrn_sim, icell = _instantiate_connected_dummy_cell()
+
+    stimulus.instantiate(sim=nrn_sim, icell=icell)
+    assert stimulus.bap.iclamp is not None
+    assert stimulus.epsp.iclamp is not None
