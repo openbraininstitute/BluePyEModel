@@ -15,7 +15,7 @@ Jan 1999, Mickey London, Hebrew University, mikilon@lobster.ls.huji.ac.il
 23 Nov 2011 Werner Van Geit @ BBP. Changed the file so that it can use the neuron random number generator. Tuned voltage dependence
 16 Mar 2016 James G King @ BBP.  Incorporate modifications suggested by Michael Hines to improve stiching to deterministic mode, thread safety, and using Random123
 26 Sep 2016 Christian Roessert @ BBP. Adding inactivation, changing dynamics to values reported in Mendonca et al. 2016
-: LJP: OK, whole-cell patch, corrected by 10 mV (Mendonca et al. 2016)
+: LJP: not corrected!
 
 ----------------------------------------------------------------
 ENDCOMMENT
@@ -23,7 +23,7 @@ ENDCOMMENT
 INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
 
 NEURON {
-    SUFFIX StochKv3
+    SUFFIX StochKv2
     THREADSAFE
     USEION k READ ek WRITE ik
     RANGE N, eta, gk, gamma, deterministic, gkbar, ik
@@ -229,13 +229,11 @@ PROCEDURE trates(v (mV)) {
     DEPEND dt
     FROM vmin TO vmax WITH 199
 
-    v = v + 10
     linf = 1/(1+exp((-30(mV)-v)/10(mV)))
     ltau = 0.346(ms)*exp(-v/(18.272(mV)))+2.09(ms)
 
     ninf = 1/(1+exp(0.0878(1/mV)*(v+55.1(mV))))
     ntau = 2.1(ms)*exp(-v/21.2(mV))+4.627(ms)
-    v = v - 10
 
     al = linf/ltau
     bl = 1/ltau - al
