@@ -337,3 +337,15 @@ def test_configure_morphology_dependent_locations(config_dict_bad_recordings, db
     for feat in config.efeatures:
         # this efeature should have been removed
         assert feat.recording_name != "dend10000.v"
+
+
+def test_empty_configuration_and_stochasticity_modes():
+    configuration = FitnessCalculatorConfiguration(stochasticity=["Step_150"])
+
+    assert configuration.protocols == []
+    assert configuration.efeatures == []
+    assert configuration.check_stochasticity("Step_150") is True
+    assert configuration.check_stochasticity("Step_250") is False
+
+    boolean_configuration = FitnessCalculatorConfiguration(stochasticity=True)
+    assert boolean_configuration.check_stochasticity("any_protocol") is True
