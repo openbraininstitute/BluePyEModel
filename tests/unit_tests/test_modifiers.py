@@ -1,6 +1,9 @@
 """Tests for morphology modifier helpers."""
 
+from types import SimpleNamespace
+
 import numpy
+import pytest
 
 from bluepyemodel.evaluation.modifiers import (
     ZERO,
@@ -8,6 +11,9 @@ from bluepyemodel.evaluation.modifiers import (
     isolate_axon,
     isolate_soma,
     remove_axon,
+    remove_soma,
+    replace_axon_legacy,
+    replace_axon_with_taper,
     taper_function,
 )
 
@@ -82,3 +88,56 @@ def test_isolate_axon_deletes_non_axonal_sections():
     isolate_axon(sim=sim, icell=icell)
 
     assert h.deleted == [basal, apical, soma]
+
+
+def test_remove_soma_reconnects_only_soma_children():
+    class Section:
+        def __init__(self, parent=None):
+            self.parent = parent
+            self.diam = 1.0
+            self.connections = []
+
+        def parentseg(self):
+            return SimpleNamespace(sec=self.parent)
+
+        def connect(self, parent):
+            self.connections.append(parent)
+
+    class H:
+        def __init__(self):
+            self.disconnected = []
+
+        def disconnect(self, section):
+            self.disconnected.append(section)
+
+    soma = Section()
+    axon = Section()
+    basal_child = Section(soma)
+    basal_other = Section(axon)
+    apical_child = Section(soma)
+    h = H()
+    icell = SimpleNamespace(
+        soma=[soma],
+        axon=[axon],
+        basal=[basal_child, basal_other],
+        apical=[apical_child],
+    )
+    sim = SimpleNamespace(neuron=SimpleNamespace(h=h))
+
+    remove_soma(sim=sim, icell=icell)
+
+    assert h.disconnected == [basal_child, apical_child]
+    assert basal_child.connections == [axon]
+    assert basal_other.connections == []
+    assert apical_child.connections == [axon]
+    assert soma.diam == ZERO
+
+
+def test_replace_axon_with_taper_rejects_short_axons():
+    with pytest.raises(ValueError, match="Less than three axon sections"):
+        replace_axon_with_taper(icell=SimpleNamespace(axonal=[1, 2]))
+
+
+def test_replace_axon_legacy_rejects_single_section():
+    with pytest.raises(ValueError, match="Less than two axon sections"):
+        replace_axon_legacy(icell=SimpleNamespace(axonal=[1]))
