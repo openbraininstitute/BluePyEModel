@@ -14,15 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import os
+
 import pytest
 
+from bluepyemodel.tools.mechanisms import compile_mechs
+from bluepyemodel.tools.mechanisms import compile_mechs_in_emodel_dir
+from bluepyemodel.tools.mechanisms import copy_and_compile_mechanisms
+from bluepyemodel.tools.mechanisms import copy_mechs
+from bluepyemodel.tools.mechanisms import delete_compiled_mechanisms
+from bluepyemodel.tools.mechanisms import discriminate_by_temp
 from bluepyemodel.tools.mechanisms import get_mechanism_currents
+from bluepyemodel.tools.mechanisms import get_mechanism_name
 from bluepyemodel.tools.utils import are_same_protocol
 from bluepyemodel.tools.utils import format_protocol_name_to_list
-from bluepyemodel.tools.utils import select_rec_for_thumbnail
-from bluepyemodel.tools.utils import get_protocol_name
-from bluepyemodel.tools.utils import get_loc_name
 from bluepyemodel.tools.utils import get_curr_name
+from bluepyemodel.tools.utils import get_loc_name
+from bluepyemodel.tools.utils import get_protocol_name
+from bluepyemodel.tools.utils import select_rec_for_thumbnail
 from tests.utils import DATA
 
 
@@ -194,6 +203,7 @@ def test_get_loc_name():
     feature_name = "ProtocolA.1.soma.v"
     assert get_loc_name(feature_name) == "soma"
 
+
 def test_get_curr_name():
     # feature keys
     feature_name = "IV_40.0.soma.v.voltage_base"
@@ -215,3 +225,143 @@ def test_get_curr_name():
 
     feature_name = "ProtocolA.1.soma.v"
     assert get_curr_name(feature_name) == "v"
+
+
+# ---------------------------------------------------------------------------
+# bluepyemodel.tools.mechanisms
+# ---------------------------------------------------------------------------
+
+
+def test_copy_mechs(tmp_path):
+    src_mech = DATA / "mechanisms" / "Ih.mod"
+    out_dir = tmp_path / "mechanisms"
+
+    copy_mechs([{"path": str(src_mech)}], out_dir)
+
+    assert (out_dir / "Ih.mod").is_file()
+
+
+def test_copy_mechs_empty_list_is_noop(tmp_path):
+    out_dir = tmp_path / "mechanisms"
+
+    copy_mechs([], out_dir)
+
+    assert not out_dir.exists()
+
+
+def test_copy_mechs_raises_on_missing_file(tmp_path):
+    out_dir = tmp_path / "mechanisms"
+
+    with pytest.raises(FileNotFoundError):
+        copy_mechs([{"path": str(tmp_path / "does_not_exist.mod")}], out_dir)
+
+
+def test_delete_compiled_mechanisms(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "x86_64").mkdir()
+
+    delete_compiled_mechanisms()
+
+    assert not (tmp_path / "x86_64").is_dir()
+
+
+def test_delete_compiled_mechanisms_noop_when_absent(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    # Should not raise even if x86_64 does not exist.
+    delete_compiled_mechanisms()
+
+
+def test_compile_mechs_raises_on_missing_dir(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        compile_mechs(tmp_path / "does_not_exist")
+
+
+def test_compile_mechs_in_emodel_dir_logs_exception_and_restores_cwd(tmp_path, caplog):
+    original_cwd = os.getcwd()
+    # The parent directory exists, but it contains no "mechanisms" subdirectory,
+    # so compile_mechs (called with "./mechanisms") raises FileNotFoundError.
+    mechanisms_directory = tmp_path / "mechanisms"
+
+    compile_mechs_in_emodel_dir(mechanisms_directory)
+
+    # cwd must be restored even though compile_mechs raised internally.
+    assert os.getcwd() == original_cwd
+    assert "Cannot compile the mechanisms" in caplog.text
+
+
+def test_copy_and_compile_mechanisms_noop_for_local_access_point():
+    class FakeLocalAccessPoint:
+        """Minimal stand-in with the class name LocalAccessPoint."""
+
+    access_point = FakeLocalAccessPoint()
+
+    # Should not raise, and should not attempt to compile anything since
+    # the class name is not NexusAccessPoint.
+    copy_and_compile_mechanisms(access_point)
+
+
+def test_get_mechanism_name_suffix():
+    mech_file = DATA / "mechanisms" / "Ih.mod"
+    assert get_mechanism_name(mech_file) == "Ih"
+
+
+def test_get_mechanism_name_point_process(tmp_path):
+    mech_file = tmp_path / "MyPointProcess.mod"
+    mech_file.write_text(
+        "NEURON {\n    POINT_PROCESS MyPointProcess\n}\n",
+    )
+    assert get_mechanism_name(mech_file) == "MyPointProcess"
+
+
+def test_get_mechanism_name_raises_when_not_found(tmp_path):
+    mech_file = tmp_path / "empty.mod"
+    mech_file.write_text("NEURON {\n}\n")
+
+    with pytest.raises(RuntimeError, match="Could not find SUFFIX nor POINT_PROCESS"):
+        get_mechanism_name(mech_file)
+
+
+class _FakeTemperature:
+    def __init__(self, value):
+        self.value = value
+
+
+class _FakeResource:
+    def __init__(self, temperature=None):
+        if temperature is not None:
+            self.temperature = _FakeTemperature(temperature)
+
+
+def test_discriminate_by_temp_no_temperatures_returns_all():
+    resources = [_FakeResource(34), _FakeResource(37)]
+    assert discriminate_by_temp(resources, None) == resources
+    assert discriminate_by_temp(resources, []) == resources
+
+
+def test_discriminate_by_temp_filters_matching_resources():
+    r34 = _FakeResource(34)
+    r37 = _FakeResource(37)
+    resources = [r34, r37]
+
+    result = discriminate_by_temp(resources, [34])
+
+    assert result == [r34]
+
+
+def test_discriminate_by_temp_falls_back_to_next_temperature():
+    r37 = _FakeResource(37)
+    resources = [r37]
+
+    # No resource matches 34, so it should recurse and match 37.
+    result = discriminate_by_temp(resources, [34, 37])
+
+    assert result == [r37]
+
+
+def test_discriminate_by_temp_returns_all_when_none_match_any_temperature():
+    resources = [_FakeResource(20)]
+
+    result = discriminate_by_temp(resources, [34, 37])
+
+    assert result == resources

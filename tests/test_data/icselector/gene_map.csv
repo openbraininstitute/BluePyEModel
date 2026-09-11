@@ -1,0 +1,6 @@
+me-type,t-type,modality,Kcna1,Kcnc1
+L5_TPC:A_cAC,0001 Test Ttype_1,presence,1,1
+L5_TPC:A_cAC,0001 Test Ttype_1,dendrites distribution,uniform,uniform
+L5_TPC:A_cAC,0001 Test Ttype_1,axon distribution,uniform,uniform
+L5_TPC:A_cAC,0001 Test Ttype_1,soma distribution,uniform,uniform
+L5_TPC:A_cAC,0001 Test Ttype_1,g_bar_max,0.005,0.01

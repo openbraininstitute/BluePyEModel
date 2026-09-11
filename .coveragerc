@@ -1,5 +1,17 @@
 [run]
 source = bluepyemodel
+omit =
+    # Luigi workflow orchestration depends on the internal, non-public
+    # bbp_workflow package (not available in this repo's dependencies or
+    # in CI), so these modules cannot be imported/exercised in tests.
+    bluepyemodel/tasks/emodel_creation/*
+    bluepyemodel/tasks/luigi_tools.py
+    bluepyemodel/tasks/luigi_custom.py
+    # Standalone data-preprocessing script with a module-level pd.read_csv()
+    # call on a hardcoded relative path to an input file that is not
+    # shipped in this repo. It cannot be imported without that file, and
+    # it is already excluded from the docs build via autodoc_mock_imports.
+    bluepyemodel/icselector/met_type_ic_profile_generator.py
 
 [report]
 exclude_lines =

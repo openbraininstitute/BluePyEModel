@@ -156,3 +156,4 @@ myvenv_cli/
 
 # pytest
 .pytest_cache
+.venv-cov
