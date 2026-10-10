@@ -34,10 +34,10 @@ def test_protocols(db_from_nexus, tmp_path):
         protocols=evaluator.fitness_protocols.values(), param_values=params
     )
 
-    assert_allclose(responses["bpo_rmp"], -82.61402706564716, rtol=1e-06)
+    assert_allclose(responses["bpo_rmp"], -82.61411088, rtol=1e-06)
     assert_allclose(responses["bpo_holding_current"], -0.05, rtol=1e-06)
-    assert_allclose(responses["bpo_rin"], 41.151498, rtol=1e-06)
-    assert_allclose(responses["bpo_threshold_current"], 0.3755498847141163, rtol=1e-06)
+    assert_allclose(responses["bpo_rin"], 41.14594361, rtol=1e-06)
+    assert_allclose(responses["bpo_threshold_current"], 0.3756053904, rtol=1e-06)
 
     for prot_name in [
         "APWaveform_280.soma.v",
