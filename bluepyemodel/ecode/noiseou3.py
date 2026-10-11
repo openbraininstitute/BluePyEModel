@@ -17,11 +17,11 @@ limitations under the License.
 """
 
 import logging
-from importlib import resources
 
 import numpy
 
 from bluepyemodel.ecode.noise import NoiseMixin
+from bluepyemodel.ecode.noise_data import load_noise_data
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class NoiseOU3(NoiseMixin):
             mu (float): mu is a factor in [nA] changing the noise from the file as
                 Noise_{injected} = Noise_{file} * (mu/2) + mu
             data_filepath (str): path to the noise .txt data file
-                If not given, will use the default one at bluepyemodel/ecodes/data/NoiseOU3.txt
+                If not given, loads bundled bluepyemodel/ecode/data/NoiseOU3.npz.
         """
 
         self.holding_current = kwargs.get("holding_current", None)
@@ -55,9 +55,7 @@ class NoiseOU3(NoiseMixin):
         if data_filepath is not None:
             series = numpy.loadtxt(data_filepath)
         else:
-            resource = resources.files("bluepyemodel") / "ecode" / "data" / "NoiseOU3.txt"
-            with open(resource, "r") as f:
-                series = numpy.loadtxt(f)
+            series = load_noise_data(self.name)
 
         self.current_series = series[:, 1]
         self.time_series = series[:, 0]
