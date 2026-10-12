@@ -17,10 +17,10 @@ limitations under the License.
 """
 
 import logging
-from importlib import resources
 
 import numpy
 
+from bluepyemodel.ecode.noise_data import load_noise_data
 from bluepyemodel.ecode.stimulus import BPEM_stimulus
 
 logger = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class SubWhiteNoise(BPEM_stimulus):
                 that multiplies the noise from the data file
             holding_current (float): amplitude of the holding current (nA)
             data_filepath (str): path to the noise .txt data file
-                If not given, will use the default one at bluepyemodel/ecodes/data/SubWhiteNoise.txt
+                If not given, loads bundled bluepyemodel/ecode/data/SubWhiteNoise.npz.
         """
 
         self.amp = kwargs.get("amp", None)
@@ -62,9 +62,7 @@ class SubWhiteNoise(BPEM_stimulus):
         if data_filepath is not None:
             series = numpy.loadtxt(data_filepath)
         else:
-            resource = resources.files("bluepyemodel") / "ecode" / "data" / "SubWhiteNoise.txt"
-            with open(resource, "r") as f:
-                series = numpy.loadtxt(f)
+            series = load_noise_data(self.name)
 
         self.current_series = series[:, 1]
         self.time_series = series[:, 0]
