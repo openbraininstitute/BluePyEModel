@@ -74,16 +74,6 @@ def _set_morphology_dependent_locations(recording, cell):
     return new_recs
 
 
-def destroy_temporary_cell(cell, simulator):
-    """Destroy a cell instantiated without parameters/mechanisms, if it was instantiated."""
-    if getattr(cell, "icell", None) is None:
-        return
-    # CellModel.destroy iterates over params and mechanisms, set to None for the temporary cell
-    cell.params = {}
-    cell.mechanisms = []
-    cell.destroy(sim=simulator)
-
-
 class FitnessCalculatorConfiguration:
     """The goal of this class is to store the results of an efeature extraction (efeatures
     and protocols) or to contain the results of a previous extraction retrieved from an access
@@ -588,13 +578,15 @@ class FitnessCalculatorConfiguration:
         """
 
         cell = deepcopy(_cell)
-        cell.params = None
-        cell.mechanisms = None
+        # Empty (not None) so that only the morphology is built and ``destroy`` can iterate.
+        cell.params = {}
+        cell.mechanisms = []
         try:
             cell.instantiate(sim=simulator)
             self._configure_locations_on_cell(cell, simulator)
         finally:
-            destroy_temporary_cell(cell, simulator)
+            if cell.icell is not None:
+                cell.destroy(sim=simulator)
 
     def _configure_locations_on_cell(self, cell, simulator):
         """Set the morphology-dependent recordings using an instantiated cell."""
