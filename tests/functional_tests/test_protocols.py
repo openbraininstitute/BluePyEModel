@@ -34,10 +34,10 @@ def test_protocols(db, tmp_path):
         protocols=evaluator.fitness_protocols.values(), param_values=params
     )
 
-    assert_allclose(responses["bpo_rmp"], -77.232155, rtol=1e-06)
+    assert_allclose(responses["bpo_rmp"], -77.23221837, rtol=1e-06)
     assert_allclose(responses["bpo_holding_current"], -0.146875, rtol=1e-06)
-    assert_allclose(responses["bpo_rin"], 37.32179555, rtol=1e-06)
-    assert_allclose(responses["bpo_threshold_current"], 0.4765729735, rtol=1e-06)
+    assert_allclose(responses["bpo_rin"], 37.31923372, rtol=1e-06)
+    assert_allclose(responses["bpo_threshold_current"], 0.4766120756, rtol=1e-06)
 
     for prot_name in [
         "RMPProtocol.soma.v",

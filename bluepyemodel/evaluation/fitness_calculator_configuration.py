@@ -571,13 +571,25 @@ class FitnessCalculatorConfiguration:
         self.protocols = [p for i, p in enumerate(self.protocols) if i not in to_remove]
 
     def configure_morphology_dependent_locations(self, _cell, simulator):
-        """"""
+        """Resolve morphology-dependent recording locations on a temporary cell.
+
+        The temporary cell is destroyed afterwards: left in NEURON, its sections would be
+        integrated by CVode in every later simulation of this process and its forks.
+        """
 
         cell = deepcopy(_cell)
-        cell.params = None
-        cell.mechanisms = None
-        cell.instantiate(sim=simulator)
+        # Empty (not None) so that only the morphology is built and ``destroy`` can iterate.
+        cell.params = {}
+        cell.mechanisms = []
+        try:
+            cell.instantiate(sim=simulator)
+            self._configure_locations_on_cell(cell, simulator)
+        finally:
+            if cell.icell is not None:
+                cell.destroy(sim=simulator)
 
+    def _configure_locations_on_cell(self, cell, simulator):
+        """Set the morphology-dependent recordings using an instantiated cell."""
         # TODO: THE SAME FOR STIMULI
 
         skipped_recordings = []
