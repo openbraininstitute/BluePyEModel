@@ -17,9 +17,7 @@ limitations under the License.
 import pytest
 
 from bluepyemodel.evaluation.evaluator import get_simulator
-from bluepyemodel.evaluation.fitness_calculator_configuration import (
-    FitnessCalculatorConfiguration,
-)
+from bluepyemodel.evaluation.fitness_calculator_configuration import FitnessCalculatorConfiguration
 from bluepyemodel.model import model
 
 
@@ -363,3 +361,15 @@ def test_configure_morphology_dependent_locations_cleans_up_on_error(
     with pytest.raises(RuntimeError, match="location configuration failed"):
         config.configure_morphology_dependent_locations(cell_model, simulator)
     assert len(list(simulator.neuron.h.allsec())) == 0
+
+
+def test_empty_configuration_and_stochasticity_modes():
+    configuration = FitnessCalculatorConfiguration(stochasticity=["Step_150"])
+
+    assert configuration.protocols == []
+    assert configuration.efeatures == []
+    assert configuration.check_stochasticity("Step_150") is True
+    assert configuration.check_stochasticity("Step_250") is False
+
+    boolean_configuration = FitnessCalculatorConfiguration(stochasticity=True)
+    assert boolean_configuration.check_stochasticity("any_protocol") is True
