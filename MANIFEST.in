@@ -1,2 +1,4 @@
 include bluepyemodel/export_emodel/templates/cell_template_neurodamus.jinja2
+recursive-include bluepyemodel/ecode/data *.npz
+include scripts/convert_noise_data.py
 recursive-exclude tests *
