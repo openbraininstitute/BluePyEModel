@@ -31,6 +31,7 @@ from bluepyopt.ephys.simulators import NrnSimulator
 
 from ..ecode import eCodes
 from ..ecode import fixed_timestep_eCodes
+from ..ecode.recordedcurrent import RecordedCurrent
 from ..tools.multiprotocols_efeatures_utils import get_protocol_list_from_protocol_name
 from ..tools.utils import are_same_protocol
 from .efel_feature_bpem import DendFitFeature
@@ -182,9 +183,12 @@ def define_protocol(
     location = define_location(location_dict)
     # cannot use pop here because stim["location"] is used later
     filtered_stim = {k: v for k, v in stim.items() if k != "location"}
+    physical_replay = filtered_stim.get("waveform_includes_holding") is True
     for k, ecode in eCodes.items():
         if k in protocol_configuration.name.lower():
-            stimulus = ecode(location=location, **filtered_stim)
+            stimulus = (RecordedCurrent if physical_replay else ecode)(
+                location=location, **filtered_stim
+            )
             if k in fixed_timestep_eCodes:
                 cvode_active = False
             break
@@ -198,6 +202,15 @@ def define_protocol(
     stoch = stochasticity and protocol_configuration.stochasticity
     if stoch:
         cvode_active = False
+
+    if physical_replay:
+        return BPEMProtocol(
+            name=protocol_configuration.name,
+            stimulus=stimulus,
+            recordings=recordings,
+            cvode_active=cvode_active,
+            stochasticity=stoch,
+        )
 
     kwargs = {}
     if protocol_configuration.protocol_type == "LocalThresholdBasedProtocol":

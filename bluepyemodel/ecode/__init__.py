@@ -33,6 +33,7 @@ from .poscheops import PosCheops
 from .probampanmda_ems import ProbAMPANMDA_EMS
 from .ramp import Ramp
 from .random_square_inputs import MultipleRandomStepInputs
+from .recordedcurrent import RecordedCurrent
 from .sahp import sAHP
 from .sinespec import SineSpec
 from .spikerec import SpikeRecMultiSpikes
@@ -81,6 +82,7 @@ eCodes = {
     "dendritic": DendriticStep,
     "randomsteps": MultipleRandomStepInputs,
     "custom": CustomFromFile,
+    "recordedcurrent": RecordedCurrent,
     "startnohold": IDrest,
     "thresholdaddition": ThresholdAddition,
     "probampanmda_ems": ProbAMPANMDA_EMS,
