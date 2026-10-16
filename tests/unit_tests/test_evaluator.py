@@ -26,6 +26,7 @@ from bluepyemodel.evaluation.evaluator import (
     define_efeature,
     define_location,
     define_protocol,
+    define_recording,
 )
 from bluepyemodel.evaluation.protocol_configuration import ProtocolConfiguration
 from bluepyemodel.evaluation.protocols import ThresholdBasedProtocol
@@ -116,3 +117,37 @@ def test_start_from_emodel(db, db_restart):
     assert eva.cell_model.params["constant.distribution_decay"].frozen is True
     assert eva.cell_model.params["constant.distribution_decay"].bounds is None
     assert eva.cell_model.params["constant.distribution_decay"]._value == -0.00453252486076784
+
+
+def test_define_location_supported_distance_and_error_paths():
+    assert define_location(None) is not None
+    assert define_location({"type": "CompRecording", "location": "ais"}) is not None
+    distance = define_location(
+        {
+            "type": "somadistance",
+            "name": "dendrite",
+            "somadistance": 100,
+            "seclist_name": "apical",
+        }
+    )
+    assert distance.soma_distance == 100
+
+    with pytest.raises(ValueError, match="Only soma and ais"):
+        define_location({"type": "CompRecording", "location": "basal", "name": "bad"})
+    with pytest.raises(ValueError, match="Unknown location type"):
+        define_location({"type": "unknown"})
+
+
+def test_define_recording_supports_fixed_dt_and_stimulus_variants():
+    fixed = define_recording(
+        {"type": "CompRecording", "name": "step.soma.v", "location": "soma", "var": "v"},
+        use_fixed_dt_recordings=True,
+    )
+    stimulus = define_recording(
+        {"type": "LooseDtRecordingStimulus", "name": "step.iclamp.i", "var": "i"},
+    )
+
+    assert fixed.__class__.__name__ == "FixedDtRecordingCustom"
+    assert fixed.variable == "v"
+    assert stimulus.__class__.__name__ == "LooseDtRecordingStimulus"
+    assert stimulus.variable == "i"

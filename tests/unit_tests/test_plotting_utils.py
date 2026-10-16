@@ -17,17 +17,24 @@ limitations under the License.
 """
 
 import copy
+from types import SimpleNamespace
+
 import numpy
+from bluepyopt.ephys.objectives import SingletonWeightObjective
+from bluepyopt.ephys.responses import TimeVoltageResponse
 
 from bluepyemodel.ecode.iv import IV
 from bluepyemodel.emodel_pipeline.plotting_utils import (
     binning,
     fill_in_IV_curve_evaluator,
+    get_experimental_FI_curve_for_plotting,
     get_ordered_currentscape_keys,
+    get_original_protocol_name,
     get_recording_names,
+    get_simulated_FI_curve_for_plotting,
     get_title,
-    get_traces_ylabel,
     get_traces_names_and_float_responses,
+    get_traces_ylabel,
     rel_to_abs_amplitude,
 )
 from bluepyemodel.evaluation.efel_feature_bpem import eFELFeatureBPEM
@@ -38,8 +45,6 @@ from bluepyemodel.evaluation.evaluator import (
 )
 from bluepyemodel.evaluation.protocols import ThresholdBasedProtocol
 from bluepyemodel.evaluation.recordings import LooseDtRecordingCustom
-from bluepyopt.ephys.objectives import SingletonWeightObjective
-from bluepyopt.ephys.responses import TimeVoltageResponse
 
 
 def test_get_traces_ylabel():
@@ -275,3 +280,60 @@ def test_get_ordered_currentscape_keys():
     }
     ordered_keys = get_ordered_currentscape_keys(keys)
     assert ordered_keys == expected_keys
+
+
+def test_get_original_protocol_name():
+    evaluator = SimpleNamespace(
+        fitness_protocols={
+            "main_protocol": SimpleNamespace(protocols={"Step_150": object()})
+        }
+    )
+
+    assert get_original_protocol_name("step", evaluator) == "Step_150"
+    assert get_original_protocol_name("RMP", evaluator) == "RMP"
+
+
+def test_get_experimental_fi_curve_for_plotting():
+    cells = [
+        SimpleNamespace(
+            recordings=[
+                SimpleNamespace(
+                    protocol_name="Step",
+                    efeatures={"mean_frequency": 10.0},
+                    amp="0.1",
+                    amp_rel="50",
+                ),
+                SimpleNamespace(
+                    protocol_name="Other",
+                    efeatures={"mean_frequency": 99.0},
+                    amp="0.2",
+                    amp_rel="100",
+                ),
+            ]
+        )
+    ]
+
+    result = get_experimental_FI_curve_for_plotting(cells, "step", n_bin=5)
+
+    assert result == ([50.0], [10.0], [0.0], [0.1], [10.0], [0.0])
+
+
+def test_get_simulated_fi_curve_for_plotting():
+    evaluator = SimpleNamespace(
+        fitness_calculator=SimpleNamespace(
+            calculate_values=lambda responses: {
+                "Step_100.soma.v.mean_frequency": [5.0],
+                "Step_200.soma.v.mean_frequency": None,
+                "Other_300.soma.v.mean_frequency": [99.0],
+            }
+        )
+    )
+    responses = {"bpo_threshold_current": 0.5, "bpo_holding_current": -0.2}
+
+    amp_rel, amp, frequency = get_simulated_FI_curve_for_plotting(
+        evaluator, responses, "step"
+    )
+
+    assert amp_rel == [100.0, 200.0]
+    numpy.testing.assert_allclose(amp, [0.3, 0.8])
+    numpy.testing.assert_allclose(frequency, [5.0, numpy.nan], equal_nan=True)

@@ -17,9 +17,7 @@ limitations under the License.
 import pytest
 
 from bluepyemodel.evaluation.evaluator import get_simulator
-from bluepyemodel.evaluation.fitness_calculator_configuration import (
-    FitnessCalculatorConfiguration,
-)
+from bluepyemodel.evaluation.fitness_calculator_configuration import FitnessCalculatorConfiguration
 from bluepyemodel.model import model
 
 
@@ -337,3 +335,41 @@ def test_configure_morphology_dependent_locations(config_dict_bad_recordings, db
     for feat in config.efeatures:
         # this efeature should have been removed
         assert feat.recording_name != "dend10000.v"
+
+    # the temporary cell used to resolve locations must not stay in NEURON
+    assert len(list(simulator.neuron.h.allsec())) == 0
+    config.configure_morphology_dependent_locations(cell_model, simulator)
+    assert len(list(simulator.neuron.h.allsec())) == 0
+
+
+def test_configure_morphology_dependent_locations_cleans_up_on_error(
+    config_dict_bad_recordings, db, monkeypatch
+):
+    """The temporary cell is destroyed even if configuring the locations fails."""
+    config = FitnessCalculatorConfiguration(**config_dict_bad_recordings)
+    cell_model = model.create_cell_model(
+        name=db.emodel_metadata.emodel,
+        model_configuration=db.get_model_configuration(),
+        morph_modifiers=None,
+    )
+    simulator = get_simulator(stochasticity=False, cell_model=cell_model)
+
+    def fail(*_args, **_kwargs):
+        raise RuntimeError("location configuration failed")
+
+    monkeypatch.setattr(config, "_configure_locations_on_cell", fail)
+    with pytest.raises(RuntimeError, match="location configuration failed"):
+        config.configure_morphology_dependent_locations(cell_model, simulator)
+    assert len(list(simulator.neuron.h.allsec())) == 0
+
+
+def test_empty_configuration_and_stochasticity_modes():
+    configuration = FitnessCalculatorConfiguration(stochasticity=["Step_150"])
+
+    assert configuration.protocols == []
+    assert configuration.efeatures == []
+    assert configuration.check_stochasticity("Step_150") is True
+    assert configuration.check_stochasticity("Step_250") is False
+
+    boolean_configuration = FitnessCalculatorConfiguration(stochasticity=True)
+    assert boolean_configuration.check_stochasticity("any_protocol") is True
