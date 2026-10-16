@@ -54,6 +54,7 @@ def get_parser():
     parser.add_argument("--iteration_tag", type=str, default="test")
     parser.add_argument("--use_ipyparallel", action="store_true", default=True)
     parser.add_argument("--use_multiprocessing", action="store_true", default=False)
+    parser.add_argument("--use_mpi", action="store_true", default=False)
     parser.add_argument("-v", "--verbose", action="count", dest="verbosity", default=1)
     parser.add_argument("--seed", type=int, required=False, default=1)
 
@@ -170,6 +171,7 @@ if __name__ == "__main__":
         nexus_endpoint=nexus_endpoint,
         use_ipyparallel=args.use_ipyparallel,
         use_multiprocessing=args.use_multiprocessing,
+        use_mpi=args.use_mpi,
         mtype=args.mtype,
         etype=args.etype,
         data_access_point="nexus",

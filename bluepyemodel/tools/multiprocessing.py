@@ -86,6 +86,55 @@ class NestedPool(pool.Pool):  # pylint: disable=abstract-method
     Process = NoDaemonProcess
 
 
+def mpi_map_function():
+    """Get the map function linked to MPI via mpi4py.
+
+    Returns:
+        A map-like function that uses MPI COMM_WORLD to distribute work.
+        Only the root process (rank 0) returns results; other processes
+        participate in computation but return None.
+    """
+    from mpi4py import MPI  # pylint: disable=no-name-in-module
+
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+
+    def mapper(func, it):
+        start_time = datetime.datetime.now()
+
+        # Convert iterator to list for indexing
+        items = list(it)
+        n_items = len(items)
+
+        if rank == 0:
+            # Divide work among processes
+            chunk_sizes = [n_items // size + (1 if i < n_items % size else 0) for i in range(size)]
+            offsets = [sum(chunk_sizes[:i]) for i in range(size)]
+            chunks = [items[offsets[i] : offsets[i] + chunk_sizes[i]] for i in range(size)]
+        else:
+            chunks = None
+
+        # Scatter work to all processes
+        local_chunk = comm.scatter(chunks, root=0)
+
+        # Each process applies function to its local chunk
+        local_results = [func(item) for item in local_chunk]
+
+        # Gather results back to root
+        results = comm.gather(local_results, root=0)
+
+        logger.debug("Took %s", datetime.datetime.now() - start_time)
+
+        # Only root returns the flattened results
+        if rank == 0:
+            # Flatten the list of results
+            return [item for sublist in results for item in sublist]
+        return None
+
+    return mapper
+
+
 def get_mapper(backend, ipyparallel_profile=None):
     """Get a mapper for parallel computations."""
     if backend == "ipyparallel":
@@ -94,6 +143,9 @@ def get_mapper(backend, ipyparallel_profile=None):
     if backend == "multiprocessing":
         nested_pool = NestedPool()
         return nested_pool.map
+
+    if backend == "mpi":
+        return mpi_map_function()
 
     # For any other backend, default to the built-in map function
     return map
