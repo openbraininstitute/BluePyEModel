@@ -22,7 +22,6 @@ import pathlib
 import warnings
 
 from bluepyemodel.access_point import get_access_point
-from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
 from bluepyemodel.efeatures_extraction.efeatures_extraction import extract_save_features_protocols
 from bluepyemodel.emodel_pipeline import plotting
 from bluepyemodel.export_emodel.export_emodel import export_emodels_sonata
@@ -34,6 +33,8 @@ from bluepyemodel.tools.utils import get_checkpoint_path
 from bluepyemodel.validation.validation import validate
 
 logger = logging.getLogger()
+
+DEFAULT_NEXUS_ENDPOINT = "https://openbluebrain.com/api/nexus/v1"
 
 
 class EModel_pipeline:

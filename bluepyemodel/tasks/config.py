@@ -18,7 +18,7 @@ limitations under the License.
 
 import luigi
 
-from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
+DEFAULT_NEXUS_ENDPOINT = "https://openbluebrain.com/api/nexus/v1"
 
 
 class EmodelAPIConfig(luigi.Config):
