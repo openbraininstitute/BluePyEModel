@@ -1500,3 +1500,54 @@ class NexusAccessPoint(DataAccessPoint):
             return True
         except AccessPointException:
             return False
+
+    def store_simulatable_neuron(self, simulatable_neuron, is_analysis_suitable=False):
+        """Store a BPEM object on Nexus
+
+        Args:
+            simulatable_neuron (SimulatableNeuron)
+            is_analysis_suitable (bool): Should be True only when managing metatada for resources
+                of type EModel, for which all data are complete (has FCC, ETC, EMC, etc.).
+        """
+
+        metadata_dict = self.emodel_metadata_ontology.for_resource(
+            is_analysis_suitable=is_analysis_suitable
+        )
+
+        type_ = "SimulatableNeuron"
+
+        base_payload = simulatable_neuron.as_dict()
+        base_payload["type"] = ["Entity", type_]
+        if "subject" in metadata_dict:
+            base_payload["subject"] = metadata_dict["subject"]
+        if "brainLocation" in metadata_dict:
+            base_payload["brainLocation"] = metadata_dict["brainLocation"]
+        if "annotation" in metadata_dict:
+            base_payload["annotation"] = metadata_dict["annotation"]
+
+        self.access_point.register(
+            base_payload,
+            filters_existence=None,
+            legacy_filters_existence=None,
+            replace=False,
+            distributions=None,
+            images=None,
+            type_=type_,
+        )
+
+        # update EMW if any
+        workflow, workflow_id = self.get_emodel_workflow()
+
+        # wait for the object to be uploaded and fetchable
+        if workflow is not None and workflow_id is not None:
+            time.sleep(self.sleep_time)
+
+            # fetch just uploaded simulatable neuron resource to get its id
+            type_ = "SimulatableNeuron"
+            filters = {"type": type_, **simulatable_neuron.as_dict()}
+            resource = self.access_point.fetch_one(filters, strict=True)
+            simulatable_neuron_id = resource.id
+            workflow.add_simulatable_neuron_id(simulatable_neuron_id)
+
+            time.sleep(self.sleep_time)
+            self.store_or_update_emodel_workflow(workflow)
