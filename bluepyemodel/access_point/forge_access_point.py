@@ -1187,6 +1187,8 @@ def get_curated_morphology(resources):
 
 def filter_mechanisms_with_brain_region(forge, resources, brain_region_label, br_visited):
     """Filter mechanisms by brain region"""
+    if brain_region_label in br_visited:  # already explored, or a cycle in the hierarchy
+        return None, br_visited
     br_visited.add(brain_region_label)
     filtered_resources = [
         r
@@ -1235,10 +1237,10 @@ def filter_mechanisms_with_brain_region(forge, resources, brain_region_label, br
         # can have multiple brain regions
         for br in brs:
             new_brain_region_label = br.label
-            resources, br_visited = filter_mechanisms_with_brain_region(
+            filtered_resources, br_visited = filter_mechanisms_with_brain_region(
                 forge, resources, new_brain_region_label, br_visited
             )
-            if resources is not None:
-                return resources, br_visited
+            if filtered_resources is not None:
+                return filtered_resources, br_visited
 
     return None, br_visited

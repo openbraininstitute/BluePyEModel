@@ -1,10 +1,4 @@
-"""Tests of ``NexusAccessPoint`` against an in-memory Nexus. No network or credentials.
-
-Deliberately not asserted, because the current behaviour looks wrong and a test would lock it in:
-the annotations chosen by ``store_emodel``, ``nonspecific_currents`` in
-``get_available_mechanisms``, and the distribution kept by ``store_or_update_emodel``.
-``get_t_types`` is left uncovered for the same reason.
-"""
+"""Tests of ``NexusAccessPoint`` against an in-memory Nexus. No network or credentials."""
 
 import os
 import pathlib
@@ -1124,3 +1118,109 @@ def test_store_morphology_annotates_mtype(ap, forge, workspace):
     ap.store_morphology("cell", str(path), mtype="L5_TPC")
     annotation = to_json(forge.active("NeuronMorphology")[0])["annotation"]
     assert annotation[0]["hasBody"]["label"] == "L5_TPC"
+
+
+# Regressions
+
+
+REQUIRED_CONFIGURATIONS = (
+    "FitnessCalculatorConfiguration",
+    "EModelConfiguration",
+    "EModelPipelineSettings",
+    "ExtractionTargetsConfiguration",
+)
+
+
+def quality_labels(resource):
+    annotations = to_json(resource).get("annotation", [])
+    return [a["hasBody"]["label"] for a in annotations if "QualityAnnotation" in str(a)]
+
+
+def test_complete_emodel_is_tagged_analysis_suitable_and_curated(ap, forge):
+    add_workflow(ap, forge)
+    for type_ in REQUIRED_CONFIGURATIONS:
+        forge.add(type_, **identity(ap))
+    ap.store_emodel(make_emodel(ap))
+    assert quality_labels(forge.active("EModel")[0]) == ["Analysis Suitable", "Curated"]
+
+
+@pytest.mark.parametrize("missing", REQUIRED_CONFIGURATIONS)
+def test_incomplete_emodel_is_not_tagged(ap, forge, missing):
+    add_workflow(ap, forge)
+    for type_ in REQUIRED_CONFIGURATIONS:
+        if type_ != missing:
+            forge.add(type_, **identity(ap))
+    ap.store_emodel(make_emodel(ap))
+    assert quality_labels(forge.active("EModel")[0]) == []
+
+
+def test_store_emodel_finds_configurations_stored_with_legacy_metadata(ap, forge):
+    add_workflow(ap, forge)
+    legacy = ap.emodel_metadata_ontology.filters_for_resource_legacy()
+    for type_ in REQUIRED_CONFIGURATIONS:
+        forge.add(type_, **legacy)
+    ap.store_emodel(make_emodel(ap))
+    assert quality_labels(forge.active("EModel")[0]) == ["Analysis Suitable", "Curated"]
+
+
+def test_store_or_update_emodel_replaces_the_stored_json(ap, forge):
+    add_emodel(ap, forge, seed=5, fitness=2.0)
+    ap.store_or_update_emodel(make_emodel(ap, seed=5, fitness=9.0))
+    stored = forge.active("EModel")[0]
+    assert len(stored.distribution) == 1
+    assert forge.payload_of(stored)["fitness"] == 9.0
+
+
+@pytest.fixture
+def emodel_figures(monkeypatch):
+    monkeypatch.setattr(EModel, "build_pdf_dependencies", lambda self, seed: ["fig__traces.pdf"])
+
+
+def test_store_or_update_emodel_attaches_images(ap, forge, emodel_figures):
+    add_emodel(ap, forge, seed=5)
+    ap.store_or_update_emodel(make_emodel(ap, seed=5, fitness=9.0))
+    assert forge.active("EModel")[0].image.about == "traces"
+
+
+def test_update_emodel_images_replaces_images(ap, forge, emodel_figures):
+    resource = add_emodel(ap, forge, seed=1)
+    resource.image = "old.pdf"
+    ap.update_emodel_images(seed=1)
+    images = forge.active("EModel")[0].image
+    assert [image.about for image in images] == ["traces"]
+
+
+def test_update_emodel_images_can_keep_old_images(ap, forge, emodel_figures):
+    resource = add_emodel(ap, forge, seed=1)
+    resource.image = "old.pdf"
+    ap.update_emodel_images(seed=1, keep_old_images=True)
+    assert to_json(forge.active("EModel")[0])["image"][0] == "old.pdf"
+    assert forge.active("EModel")[0].image[1].about == "traces"
+
+
+def test_get_t_types_matches_normalised_me_type(ap, forge):
+    content = (
+        b"me-type,t-type,modality,value\n"
+        b"L5_TPC,t1,rna,3\n"
+        b"L5-TPC,t2,rna,1\n"
+        b"L5_TPC,t1,atac,2\n"
+        b"other,t3,rna,1\n"
+    )
+    forge.add("RNASequencing", name="table", files={"table.csv": content})
+    assert ap.get_t_types("table") == ["t1", "t2"]
+
+
+def test_get_available_mechanisms_keeps_nonspecific_currents(ap, forge):
+    forge.add(
+        "SubCellularModelScript",
+        name="Ih",
+        exposesParameter={"type": "CurrentDensity", "name": "ihcn", "ionName": "non-specific"},
+    )
+    assert ap.get_available_mechanisms()[0].nonspecific_currents == ["ihcn"]
+
+
+def test_missing_trace_error_names_the_etype(ap, forge):
+    payload = targets_payload([])
+    forge.add("ExtractionTargetsConfiguration", payload=payload, **identity(ap))
+    with pytest.raises(AccessPointException, match="with etype cAC"):
+        ap.get_targets_configuration()

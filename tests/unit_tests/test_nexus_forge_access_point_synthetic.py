@@ -803,3 +803,21 @@ def test_filter_mechanisms_no_match(forge):
         None,
         {"CA1"},
     )
+
+
+def test_filter_mechanisms_tries_every_layer_parent(forge):
+    match = located("Second")
+    forge.sparql_answers = [
+        (('"Layer 5"', "isLayerPartOf"), [Resource(label="First"), Resource(label="Second")])
+    ]
+    resources, visited = fap.filter_mechanisms_with_brain_region(forge, [match], "Layer 5", set())
+    assert resources == [match]
+    assert visited == {"Layer 5", "First", "Second"}
+
+
+def test_filter_mechanisms_stops_on_hierarchy_cycle(forge):
+    forge.sparql_answers = [
+        (('"A"', "isPartOf"), [Resource(label="B")]),
+        (('"B"', "isPartOf"), [Resource(label="A")]),
+    ]
+    assert fap.filter_mechanisms_with_brain_region(forge, [], "A", set()) == (None, {"A", "B"})
