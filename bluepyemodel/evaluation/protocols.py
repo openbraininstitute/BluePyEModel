@@ -1004,7 +1004,7 @@ class ProtocolRunner(ephys.protocols.Protocol):
                     protocol_name,
                     self.threshold_data[prot_output_key],
                 )
-                new_responses = {prot_output_key, self.threshold_data[prot_output_key]}
+                new_responses = {prot_output_key: self.threshold_data[prot_output_key]}
             else:
                 logger.debug("Computing protocol %s", protocol_name)
                 new_responses = self.protocols[protocol_name].run(

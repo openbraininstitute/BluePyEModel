@@ -196,7 +196,7 @@ def config_dict_from_bpe2():
                 {"feature": "AP_amplitude", "val": [69.9585, 7.4575]},
             ]
         },
-        "IV_-40": {
+        "IV_0": {
             "soma.v": [
                 {
                     "feature": "ohmic_input_resistance_vb_ssse",
@@ -205,7 +205,7 @@ def config_dict_from_bpe2():
                 {"feature": "voltage_base", "val": [-82.9501, 0.8908]},
             ]
         },
-        "IV_0": {
+        "IV_-40": {
             "soma.v": [
                 {"feature": "voltage_base", "val": [-77.1196, 3.6608]},
             ]
