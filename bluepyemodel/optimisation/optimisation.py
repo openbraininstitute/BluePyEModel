@@ -160,19 +160,12 @@ def setup_and_run_optimisation(
     )
 
 
-def store_best_model(
+def find_best_model(
     access_point,
     seed=None,
     checkpoint_path=None,
 ):
-    """Store the best model from an optimisation. Reads a checkpoint file generated
-        by BluePyOpt and store the best individual of the hall of fame.
-
-    Args:
-        access_point (DataAccessPoint): data access point.
-        checkpoint_path (str): path to the checkpoint file. If None, checkpoint_dir will be used.
-    """
-
+    """Find the best model from an optimisation."""
     cell_evaluator = get_evaluator_from_access_point(
         access_point=access_point,
         include_validation_protocols=False,
@@ -212,4 +205,20 @@ def store_best_model(
         emodel_metadata=access_point.emodel_metadata,
     )
 
+    return emodel
+
+
+def store_best_model(
+    access_point,
+    seed=None,
+    checkpoint_path=None,
+):
+    """Store the best model from an optimisation. Reads a checkpoint file generated
+        by BluePyOpt and store the best individual of the hall of fame.
+
+    Args:
+        access_point (DataAccessPoint): data access point.
+        checkpoint_path (str): path to the checkpoint file. If None, checkpoint_dir will be used.
+    """
+    emodel = find_best_model(access_point, seed, checkpoint_path)
     access_point.store_emodel(emodel)
