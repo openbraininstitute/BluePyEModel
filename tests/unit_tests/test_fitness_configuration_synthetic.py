@@ -1,5 +1,7 @@
 """Deterministic tests for FitnessCalculatorConfiguration initialisation paths."""
 
+from types import SimpleNamespace
+
 import pytest
 
 from bluepyemodel.evaluation.fitness_calculator_configuration import (
@@ -106,18 +108,52 @@ def test_init_from_bluepyefe_requires_rmp_and_rin_stimuli():
         )
 
 
-def test_protocol_exist_is_always_truthy():
-    """Documents current behaviour: protocol_exist wraps a generator, so it never returns False.
+def test_protocol_exist_only_finds_registered_protocols():
+    configuration = FitnessCalculatorConfiguration()
+    configuration.protocols = [SimpleNamespace(name="Step_100")]
 
-    As a consequence the "protocol does not exist" guards in _add_bluepyefe_efeature and
-    _add_legacy_efeature are unreachable.
-    """
+    assert configuration.protocol_exist("Step_100") is True
+    assert configuration.protocol_exist("never_registered") is False
+
+
+@pytest.mark.parametrize("add", ["_add_bluepyefe_efeature", "_add_legacy_efeature"])
+def test_efeature_requires_a_registered_protocol(add):
     configuration = FitnessCalculatorConfiguration()
 
-    assert configuration.protocol_exist("never_registered") is True
+    with pytest.raises(ValueError, match="Unknown_100"):
+        getattr(configuration, add)(feature(), "Unknown_100", "soma", None)
 
-    configuration._add_bluepyefe_efeature(feature(), "Unknown_100", "soma", None)
-    assert configuration.efeatures[0].protocol_name == "Unknown_100"
+    assert configuration.efeatures == []
+
+
+def test_bluepyefe_efeature_remapped_to_pre_protocol_needs_no_registered_protocol():
+    configuration = FitnessCalculatorConfiguration(name_rmp_protocol="IV_0")
+
+    configuration._add_bluepyefe_efeature(feature("voltage_base"), "IV_0", "soma", None)
+
+    assert configuration.efeatures[0].protocol_name == "RMPProtocol"
+
+
+@pytest.mark.parametrize(
+    "protocol_name, efel_name, stored_as",
+    [
+        ("Rin", "ohmic_input_resistance_vb_ssse", "RinProtocol"),
+        ("Rin", "voltage_base", "SearchHoldingCurrent"),
+        ("RMP", "voltage_base", "RMPProtocol"),
+        ("RinHoldCurrent", "bpo_holding_current", "SearchHoldingCurrent"),
+        ("Threshold", "bpo_threshold_current", "SearchThresholdCurrent"),
+        ("RinHoldcurrent", "bpo_holding_current", "RinHoldcurrent"),
+        ("Main", "mean_frequency", "Main"),
+    ],
+)
+def test_legacy_efeature_on_pre_protocol_needs_no_registered_protocol(
+    protocol_name, efel_name, stored_as
+):
+    configuration = FitnessCalculatorConfiguration()
+
+    configuration._add_legacy_efeature(feature(efel_name), protocol_name, "soma", None)
+
+    assert configuration.efeatures[0].protocol_name == stored_as
 
 
 def test_bluepyefe_efeature_uses_optional_metadata():

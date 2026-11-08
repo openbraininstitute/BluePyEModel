@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 import os
+import platform
 import shutil
 
 import pytest
@@ -52,7 +53,8 @@ def emodel_dir(workspace, nrnivmodl):
         shutil.copytree(DATA / name, dst / name)
     for name in files:
         shutil.copyfile(DATA / name, dst / name)
-    shutil.copytree(nrnivmodl / "x86_64", workspace / "x86_64")
+    arch = platform.machine()
+    shutil.copytree(nrnivmodl / arch, workspace / arch)
     yield dst
 
 
