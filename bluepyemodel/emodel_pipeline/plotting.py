@@ -2267,7 +2267,7 @@ def currentscape(
                         voltage,
                         currents,
                         updated_config,
-                        ions_data=ionic_concentrations,
+                        ions_data=(ionic_concentrations if len(ionic_concentrations) > 0 else None),
                         time=time,
                     )
                     plt.close(fig)
