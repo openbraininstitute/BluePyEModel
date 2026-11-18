@@ -332,3 +332,54 @@ def test_currentscape_passes_ordered_response_data_to_optional_package(
     assert calls["config"]["output"]["savefig"] is True
     assert calls["config"]["output"]["fname"] == "L5PC__1__currentscape.Step_100.soma"
     assert config == {}
+
+
+def test_currentscape_passes_none_ions_data_when_no_ion_recordings(tmp_path, monkeypatch):
+    calls = {}
+    currentscape_package = ModuleType("currentscape")
+    currentscape_module = ModuleType("currentscape.currentscape")
+
+    def fake_plot(voltage, currents, config, ions_data, time):
+        calls.update(
+            voltage=voltage,
+            currents=currents,
+            config=config,
+            ions_data=ions_data,
+            time=time,
+        )
+        return matplotlib.pyplot.figure()
+
+    currentscape_module.plot_currentscape = fake_plot
+    monkeypatch.setitem(sys.modules, "currentscape", currentscape_package)
+    monkeypatch.setitem(sys.modules, "currentscape.currentscape", currentscape_module)
+    monkeypatch.setattr(
+        plotting_module,
+        "get_ordered_currentscape_keys",
+        lambda keys: {
+            "Step_100": {
+                "soma": {
+                    "voltage_key": "Step_100.soma.v",
+                    "current_keys": ["Step_100.soma.ina"],
+                    "current_names": ["ina"],
+                    "ion_conc_keys": [],
+                    "ion_conc_names": [],
+                }
+            }
+        },
+    )
+    responses = {
+        "Step_100.soma.v": {"time": [0.0, 1.0], "voltage": [-80.0, -70.0]},
+        "Step_100.soma.ina": {"time": [0.0, 1.0], "voltage": [0.1, 0.2]},
+    }
+
+    plotting_module.currentscape(
+        responses=responses,
+        config={},
+        metadata_str="L5PC__1",
+        figures_dir=tmp_path,
+        emodel="L5PC",
+    )
+
+    # an empty ionic concentration list must be turned into None,
+    # because currentscape treats [] as a dataset of 0 elements
+    assert calls["ions_data"] is None
