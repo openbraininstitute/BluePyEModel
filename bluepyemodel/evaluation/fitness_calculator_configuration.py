@@ -239,7 +239,7 @@ class FitnessCalculatorConfiguration:
         return configured_efeatures
 
     def protocol_exist(self, protocol_name):
-        return bool(p for p in self.protocols if p.name == protocol_name)
+        return any(p.name == protocol_name for p in self.protocols)
 
     def check_stochasticity(self, protocol_name):
         """Check if stochasticity should be active for a given protocol"""
@@ -319,7 +319,10 @@ class FitnessCalculatorConfiguration:
         ):
             tmp_feature.protocol_name = "RinProtocol"
 
-        if protocol_name not in PRE_PROTOCOLS and not self.protocol_exist(protocol_name):
+        # Use the name after remapping: features moved to a pre-protocol need no stored protocol.
+        if tmp_feature.protocol_name not in PRE_PROTOCOLS and not self.protocol_exist(
+            tmp_feature.protocol_name
+        ):
             raise ValueError(
                 f"Trying to register efeatures for protocol {protocol_name},"
                 " but this protocol does not exist"
@@ -484,7 +487,10 @@ class FitnessCalculatorConfiguration:
         if protocol_name == "Threshold":
             tmp_feature.protocol_name = "SearchThresholdCurrent"
 
-        if protocol_name not in PRE_PROTOCOLS and not self.protocol_exist(protocol_name):
+        # init_from_legacy_dict does not store the legacy pre-protocols, so they are never found.
+        if tmp_feature.protocol_name not in (
+            PRE_PROTOCOLS + LEGACY_PRE_PROTOCOLS
+        ) and not self.protocol_exist(tmp_feature.protocol_name):
             raise ValueError(
                 f"Trying to register efeatures for protocol {protocol_name},"
                 " but this protocol does not exist"

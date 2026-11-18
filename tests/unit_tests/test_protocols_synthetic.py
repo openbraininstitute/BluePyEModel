@@ -303,13 +303,7 @@ def test_protocol_runner_transitive_dependency_order():
     assert runner.execution_order == ["first", "second", "third"]
 
 
-def test_protocol_runner_saved_threshold_data_builds_set_instead_of_dict():
-    """Documents a production defect in ProtocolRunner.run.
-
-    When a protocol's ``output_key`` is already present in ``threshold_data``, the skip branch
-    assigns ``new_responses = {key, value}`` (a set literal) instead of a dict. The subsequent
-    ``responses.update(new_responses)`` then fails while unpacking the set members.
-    """
+def test_protocol_runner_reuses_saved_threshold_data():
     cached = FakeProtocol(
         "cached", {"bpo_holding_current": 5}, output_key="bpo_holding_current"
     )
@@ -317,9 +311,7 @@ def test_protocol_runner_saved_threshold_data_builds_set_instead_of_dict():
     runner.threshold_data = {"bpo_holding_current": -0.05}
     cell_model = SimpleNamespace(freeze=lambda values: None, unfreeze=lambda keys: None)
 
-    with pytest.raises((TypeError, ValueError)):
-        runner.run(cell_model, {})
-
+    assert runner.run(cell_model, {}) == {"bpo_holding_current": -0.05}
     assert cached.calls == []
 
 

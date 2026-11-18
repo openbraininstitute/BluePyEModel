@@ -110,6 +110,7 @@ class TargetsConfigurator:
         protocols_rheobase = self.access_point.pipeline_settings.protocols_rheobase
         protocols_mapping = self.access_point.pipeline_settings.protocols_mapping
 
+        auto_targets = None
         if not targets:
             auto_targets = self.access_point.pipeline_settings.auto_targets
             auto_targets_presets = self.access_point.pipeline_settings.auto_targets_presets

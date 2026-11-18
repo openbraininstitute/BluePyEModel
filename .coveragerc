@@ -1,4 +1,7 @@
 [run]
+# pytest-forked children leave through os._exit(), which skips coverage's
+# normal save. Without this, tests run with --forked record nothing.
+patch = _exit
 source = bluepyemodel
 omit =
     # Luigi workflow orchestration depends on the internal, non-public

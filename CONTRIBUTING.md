@@ -134,3 +134,18 @@ Run the following command to run the Python unit-tests: `tox`
 The code coverage of the Python unit-tests may not decrease over time.
 It means that every change must go with their corresponding Python unit-tests to
 validate the library behavior as well as to demonstrate the API usage.
+
+# Release
+
+Merging a pull request into `main` does not make a release. Releases are made manually.
+
+1. In the GitHub repository, open **Actions** and select the **Release** workflow.
+2. Click **Run workflow**, keep the branch on `main` and choose which part of the version to
+   increase: `patch` (default), `minor` or `major`.
+3. The workflow runs the test suite, creates the version tag, makes a GitHub release and
+   publishes the package on PyPI.
+
+A `#major`, `#minor` or `#patch` token in a commit message since the last release takes priority
+over the chosen part.
+
+Pushing a version tag such as `1.2.3` also makes a release for that version.
