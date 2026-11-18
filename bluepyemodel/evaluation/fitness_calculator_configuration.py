@@ -267,7 +267,11 @@ class FitnessCalculatorConfiguration:
         stochasticity = self.check_stochasticity(protocol_name)
 
         protocol_type = "Protocol"
-        if self.name_rmp_protocol and self.name_rin_protocol:
+        if (
+            self.name_rmp_protocol
+            and self.name_rin_protocol
+            and stimulus.get("waveform_includes_holding") is not True
+        ):
             protocol_type = "ThresholdBasedProtocol"
 
         tmp_protocol = ProtocolConfiguration(
