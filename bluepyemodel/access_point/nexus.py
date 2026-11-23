@@ -26,6 +26,7 @@ from itertools import chain
 
 import pandas
 from kgforge.core import Resource
+from kgforge.specializations.resources import Dataset
 
 from bluepyemodel.access_point.access_point import DataAccessPoint
 from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
@@ -339,7 +340,7 @@ class NexusAccessPoint(DataAccessPoint):
             ]
             if not filtered_traces:
                 raise AccessPointException(
-                    "Could not find any trace with etype {self.emodel_metadata.etype}. "
+                    f"Could not find any trace with etype {self.emodel_metadata.etype}. "
                     "Please specify files in your ExtractionTargetsConfiguration."
                 )
             configuration.files = filtered_traces
@@ -741,7 +742,8 @@ class NexusAccessPoint(DataAccessPoint):
         resources = self.access_point.fetch_legacy_compatible(filters, filters_legacy)
         if resources is None:
             return
-        em_r = resources[0]
+        # search returns plain Resources, and only Datasets can have images attached
+        em_r = Dataset.from_resource(self.access_point.forge, resources[0], store_metadata=True)
         if not keep_old_images:
             em_r.image = []  # remove any previous images
 
@@ -791,17 +793,29 @@ class NexusAccessPoint(DataAccessPoint):
             self.store_emodel(emodel)
             return
 
-        em_r = resources[0]
         emodel_dict = emodel.as_dict()
 
+        # update_distribution returns a Dataset, which is required to attach images
+        em_r = self.access_point.update_distribution(
+            resources[0], self.emodel_metadata.as_string(), emodel
+        )
         em_r = self.access_point.add_images_to_resource(
             emodel_dict["nexus_images"], em_r, filters_existence=None
         )
-        self.access_point.update_distribution(em_r, self.emodel_metadata.as_string(), emodel)
         em_r.score = emodel.fitness
 
         schema_id = self.access_point.forge._model.schema_id("EModel")
         self.access_point.forge.update(em_r, schema_id=schema_id)
+
+    def _has_resource(self, type_):
+        """Return True if a resource of the given type exists for the current emodel.
+
+        Unlike the ``has_*`` methods, this does not download or compile the configuration."""
+        filters = {"type": type_}
+        filters.update(self.emodel_metadata_ontology.filters_for_resource())
+        filters_legacy = {"type": type_}
+        filters_legacy.update(self.emodel_metadata_ontology.filters_for_resource_legacy())
+        return self.access_point.fetch_legacy_compatible(filters, filters_legacy) is not None
 
     def store_emodel(self, emodel, description=None):
         """Store an EModel on Nexus"""
@@ -815,11 +829,14 @@ class NexusAccessPoint(DataAccessPoint):
 
         emodel.workflow_id = nexus_id
         # make it analysis suitable AND curated if this is True
-        is_analysis_suitable = (
-            self.has_fitness_calculator_configuration
-            and self.has_model_configuration
-            and self.has_pipeline_settings
-            and self.has_targets_configuration
+        is_analysis_suitable = all(
+            self._has_resource(type_)
+            for type_ in (
+                "FitnessCalculatorConfiguration",
+                "EModelConfiguration",
+                "EModelPipelineSettings",
+                "ExtractionTargetsConfiguration",
+            )
         )
         self.store_object(
             emodel,
@@ -1152,11 +1169,10 @@ class NexusAccessPoint(DataAccessPoint):
         """Get the list of t-types available for the present emodel"""
 
         df, _ = self.load_channel_gene_expression(table_name)
-        # replace non-alphanumeric characters with underscores in t-types from RNASeq data
-        df["me-type"] = df["me-type"].str.replace(r"\W", "_")
-        return (
-            df.loc[self.emodel_metadata.emodel].index.get_level_values("t-type").unique().tolist()
-        )
+        df = df.reset_index()
+        # replace non-alphanumeric characters with underscores in me-types from RNASeq data
+        me_types = df["me-type"].str.replace(r"\W", "_", regex=True)
+        return df.loc[me_types == self.emodel_metadata.emodel, "t-type"].unique().tolist()
 
     def get_available_morphologies(self):
         """Get the list of names of the available morphologies"""
@@ -1237,6 +1253,7 @@ class NexusAccessPoint(DataAccessPoint):
                 ljp_corrected=ljp_corrected,
                 parameters=parameters,
                 ion_currents=ion_currents,
+                nonspecific_currents=non_specific_currents,
                 ionic_concentrations=ionic_concentrations,
                 id=r.id,
             )

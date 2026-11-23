@@ -1,14 +1,26 @@
 name: Release
 
+# Releases are made manually: run this workflow from the Actions tab on main,
+# or push a version tag. Merging to main no longer releases.
 on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Part of the version to increase
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
   push:
-    branches:
-      - main
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   call-test-workflow:
+    # a manual release can only be made from main
+    if: ${{ github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main' }}
     permissions:
       contents: read
       id-token: write
@@ -31,22 +43,31 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Fetch the tag, if any. If not tagged, create a patch tag
+      - name: Stop if this commit is already released
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          git fetch --tags --quiet
+          released=$(git tag --points-at HEAD)
+          if [ -n "$released" ]; then
+            echo "::error::This commit is already released as $released. Merge new changes before releasing."
+            exit 1
+          fi
+
+      - name: Create a new version tag
         uses: anothrNick/github-tag-action@1.64.0
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         id: tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           WITH_V: false
-          DEFAULT_BUMP: patch
-
+          DEFAULT_BUMP: ${{ inputs.bump }}
 
       - name: Build a source tarball and wheel
         run: |
             pip install build
             python -m build
 
-      - name: Get and store tag from 'Bump version and push tag' step
+      - name: Get and store tag from 'Create a new version tag' step
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         run: echo "TAG_NAME=${{ steps.tag.outputs.new_tag }}" >> $GITHUB_ENV
       - name: Get and store tag from triggered tag push
@@ -54,7 +75,7 @@ jobs:
         run: echo "TAG_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ env.TAG_NAME }}
           name: ${{ env.TAG_NAME }}

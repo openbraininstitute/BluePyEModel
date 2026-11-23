@@ -2,6 +2,10 @@ name: CI Testing
 
 on:
     pull_request:
+    # test main after every merge, as merging no longer releases
+    push:
+      branches:
+        - main
     # allows this workflow to be reusable (e.g. by the build workflow)
     workflow_call:
 

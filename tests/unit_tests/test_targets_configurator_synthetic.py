@@ -89,6 +89,26 @@ def test_create_configuration_uses_auto_targets(monkeypatch):
     configurator.save_configuration.assert_called_once_with()
 
 
+def test_create_configuration_uses_explicit_targets():
+    access_point = MagicMock()
+    access_point.has_targets_configuration.return_value = False
+    settings = access_point.pipeline_settings
+    settings.files_for_extraction = ["file"]
+    settings.targets = [{"efeature": "Spikecount"}]
+    settings.protocols_rheobase = ["Rin"]
+    settings.protocols_mapping = None
+    configurator = TargetsConfigurator(access_point)
+    configurator.new_configuration = MagicMock()
+    configurator.save_configuration = MagicMock()
+
+    configurator.create_and_save_configuration_from_access_point()
+
+    configurator.new_configuration.assert_called_once_with(
+        ["file"], [{"efeature": "Spikecount"}], ["Rin"], None, None
+    )
+    configurator.save_configuration.assert_called_once_with()
+
+
 def test_create_configuration_uses_preset_auto_targets(monkeypatch):
     access_point = MagicMock()
     access_point.has_targets_configuration.return_value = False
