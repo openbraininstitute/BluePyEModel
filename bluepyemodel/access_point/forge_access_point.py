@@ -31,6 +31,7 @@ from kgforge.core import Resource
 from kgforge.core.commons.strategies import ResolvingStrategy
 from kgforge.specializations.resources import Dataset
 
+from bluepyemodel.access_point.nexus_endpoints import DEFAULT_NEXUS_ENDPOINT
 from bluepyemodel.efeatures_extraction.targets_configuration import TargetsConfiguration
 from bluepyemodel.emodel_pipeline.emodel import EModel
 from bluepyemodel.emodel_pipeline.emodel_script import EModelScript
@@ -46,8 +47,6 @@ logger = logging.getLogger("__main__")
 
 
 # pylint: disable=bare-except,consider-iterating-dictionary
-
-DEFAULT_NEXUS_ENDPOINT = "https://openbluebrain.com/api/nexus/v1"
 
 CLASS_TO_NEXUS_TYPE = {
     "TargetsConfiguration": "ExtractionTargetsConfiguration",
