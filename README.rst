@@ -49,25 +49,7 @@ Additionally, to cite software used for different steps of the pipeline, please 
 Requirements
 ------------
 
-* `Python 3.11+ <https://www.python.org/downloads/release/python-311/>`_
-* numpy
-* scipy >= 1.16.1
-* pandas
-* ipyparallel >= 6.3
-* tqdm
-* pyyaml
-* gitpython
-* bluepyopt >= 1.14.10
-* bluepyefe >= 2.3.48
-* neurom >= 3.0
-* efel >= 5.5.5
-* configparser
-* neuron >= 8.0
-* morph_tool >= 2.8
-* morphio
-* fasteners >= 0.16
-* jinja2 >= 3.0.3
-* currentscape >= 0.0.11
+Python 3.11 or later, on Linux or macOS (on Windows, use WSL). ``pip`` installs the other dependencies, including the `NEURON <https://www.neuron.yale.edu/neuron/>`__ simulator; see ``pyproject.toml`` for the full list.
 
 Installation
 ------------
@@ -83,30 +65,37 @@ The optional dependencies ``test`` and ``docs`` install what is needed to run th
 The Nexus access point and the Luigi workflow were removed in BluePyEModel 2.0. They remain available in BluePyEModel 1.x.
 
 
-To get started with the E-Model building pipeline
--------------------------------------------------
+Getting started
+---------------
 
 .. image:: https://raw.githubusercontent.com/openbraininstitute/BluePyEModel/main/doc/images/pipeline.png
    :alt: E-Model building pipeline
 
-This section presents a general picture of the pipeline. For a detailed picture and how to use it, please refer to the `L5PC example <https://github.com/openbraininstitute/BluePyEModel/tree/main/examples/L5PC/>`_ and its `README <https://github.com/openbraininstitute/BluePyEModel/tree/main/examples/L5PC/README.rst>`_.
+The pipeline has six steps, run in this order:
 
-The pipeline is divided in 6 steps:
+* ``extract``: extracts e-features from the recordings and averages them over the sweeps at each target amplitude.
+* ``optimise``: builds a NEURON cell model and optimises its parameters against the extracted e-features.
+* ``store``: reads the results of the optimisation and stores the best model of each seed in a local json file, ``final.json``.
+* ``validate``: runs the stored models on validation protocols, which were not used for optimisation, and decides whether each model is good enough.
+* ``plot``: plots the traces, e-feature scores, parameters and optimisation progress of the stored models.
+* ``export``: exports the stored models as hoc templates for NEURON, or in SONATA format for circuit simulations.
 
-* ``extraction``: extracts e-features from ephys recordings and averages the results e-feature values along the requested targets.
-* ``optimisation``: builds a NEURON cell model and optimises its parameters using as targets the efeatures computed during e-feature extraction.
-* ``storage of the model``: reads the results of the extraction and stores the models (best set of parameters) in a local json file.
-* ``validation``: reads the models and runs the optimisation protocols and/or validation protocols on them. The e-feature scores obtained on these protocols are then passed to a validation function that decides if the model is good enough.
-* ``plotting``: reads the models and runs the optimisation protocols and/or validation protocols on them. Then, plots the resulting traces along the e-feature scores and parameter distributions.
-* ``exporting``: read the parameter of the best models and export them in files that can be used either in NEURON or for circuit building.
+Each step is a command of the ``bluepyemodel`` command line, and ``run`` runs them all. With the `simplecell example <https://github.com/openbraininstitute/BluePyEModel/tree/main/examples/simplecell>`_:
 
-These six steps are to be run in order as for example validation cannot be run if no models have been stored. Steps ``validation``, ``plotting`` and ``exporting`` are optional. Step ``extraction`` can also be optional in the case where the file containing the protocols and optimisation targets is created by hand or if it is obtained from an older project.
+.. code-block:: console
 
-Schematics of BluePyEModel classes
------------------------------------
+    cd examples/simplecell
+    sh download_ephys_data.sh
+    bluepyemodel run --emodel simplecell --recipes-path config/recipes.json \
+        --etype cADpyr --species rat --brain-region SSCX --seed 1 --force-extraction
+
+The steps are also available from Python, with the ``EModel_pipeline`` class. The `documentation <https://bluepyemodel.readthedocs.io/>`_ describes the configuration files and every command, and the `L5PC example <https://github.com/openbraininstitute/BluePyEModel/tree/main/examples/L5PC/>`_ builds a detailed pyramidal cell model on a laptop or a Slurm cluster.
+
+Main classes
+------------
 
 .. image:: https://raw.githubusercontent.com/openbraininstitute/BluePyEModel/main/doc/images/classes_schema.png
-   :alt: Schematics of BluePyEModel classes
+   :alt: Main classes of BluePyEModel and how data flows between them
 
 
 Acknowledgment

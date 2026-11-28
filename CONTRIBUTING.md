@@ -105,29 +105,34 @@ the main (upstream) repository:
     git pull --ff upstream main
     ```
 
-[github]: https://github.com/BlueBrain/BluePyEModel
+[github]: https://github.com/openbraininstitute/BluePyEModel
 
 # Development Environment
 
-Please make sure to install the project requirements,
-see the [dependencies](./setup.py#dependencies)
-
 ## Setup
 
-It is recommended to use `virtualenv` to develop in a sandbox environment:
+Create a virtual environment and install the package in editable mode, with the test
+dependencies:
 
-```
-virtualenv venv
+```shell
+python -m venv venv
 . venv/bin/activate
+pip install -e ".[test]"
 ```
 
-## Build
-
-Run the following command to build incrementally the project: `pip install -e .`
+The dependencies are listed in [pyproject.toml](./pyproject.toml).
 
 ## Test
 
-Run the following command to run the Python unit-tests: `tox`
+Run the tests, the linters and the documentation build with [tox](https://tox.wiki):
+
+```shell
+tox -e lint,py3,docs
+```
+
+`tox -e format` formats the code with black and isort. The tests that run NEURON simulations
+are run in separate processes (`--forked`), and compile the test mechanisms with `nrnivmodl`,
+which needs a C compiler.
 
 ## Coding conventions
 

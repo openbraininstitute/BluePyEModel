@@ -6,6 +6,12 @@
    :maxdepth: 3
 
    Home <self>
+   installation
+   quickstart
+   concepts
+   configuration
+   cli
+   gene_data
    api_ref.rst
    changelog
 

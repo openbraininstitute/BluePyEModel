@@ -87,6 +87,8 @@ autodoc_typehints = "signature"
 autodoc_default_options = {
     "members": True,
     "show-inheritance": True,
+    # document objects in the module that defines them, not again where __all__ re-exports them
+    "ignore-module-all": True,
 }
 autoclass_content = "both"
 

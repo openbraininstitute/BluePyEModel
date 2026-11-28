@@ -13,6 +13,7 @@ BluePyEModel
    :recursive:
 
    access_point
+   cli
    ecode
    efeatures_extraction
    emodel_pipeline
@@ -21,5 +22,7 @@ BluePyEModel
    icselector
    model
    optimisation
+   preprocessing
    tools
+   utils
    validation
