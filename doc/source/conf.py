@@ -52,7 +52,6 @@ suppress_warnings = ["docutils", "autodoc.mocked_object"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_autosummary/bluepyemodel.icselector.met_type_ic_profile_generator.rst"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -97,6 +96,3 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
 }
 
-autodoc_mock_imports = [
-    "bluepyemodel.icselector.met_type_ic_profile_generator",
-]

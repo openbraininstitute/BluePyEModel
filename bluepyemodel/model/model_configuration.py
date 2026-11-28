@@ -35,13 +35,15 @@ def configure_model(
     Args:
         access_point (DataAccessPoint): access point to the emodel data
         morphology_name (str): name of the morphology on which to build the neuron model. This
-            morphology has to be available in the directory "./morphology" if using the local
-            access point or on Nexus if using the Nexus access point.
+            morphology has to be available in the morphology directory of the e-model.
         morphology_path (str): path to the morphology file
         morphology_format (str): format of the morphology, can be 'asc' or 'swc'. Optional if
             morphology_path was provided.
-        use_gene_data (bool): should the configuration be initialized using gene data. If False,
-            the configuration will be empty.
+        use_gene_data (bool): should the configuration be initialized using gene data, with the
+            ion channel selector. If False, the configuration will be empty.
+
+    The configuration is saved with the access point, which for the local access point writes
+    it over the recipe's ``params`` file.
     """
 
     configurator = ModelConfigurator(access_point=access_point)

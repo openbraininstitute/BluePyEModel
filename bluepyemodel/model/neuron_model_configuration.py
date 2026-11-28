@@ -555,8 +555,9 @@ class NeuronModelConfiguration:
 
         if morphology_name not in self.available_morphologies:
             raise ValueError(
-                "The morphology you want to use is not available in Nexus or in your "
-                "morphology directory"
+                f"Morphology {morphology_name} is not available in the morphology directory. "
+                "Available morphologies (file names without extension): "
+                f"{sorted(self.available_morphologies)}"
             )
 
         self.morphology = MorphologyConfiguration(

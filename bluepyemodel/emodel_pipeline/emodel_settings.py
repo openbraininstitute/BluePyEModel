@@ -108,6 +108,7 @@ class EModelPipelineSettings:
         protocols_rheobase=None,
         auto_targets=None,
         auto_targets_presets=None,
+        path_ic_map=None,
     ):
         """Creator of the EModelPipelineSettings class.
 
@@ -238,8 +239,10 @@ class EModelPipelineSettings:
                 used by the Luigi workflow.
             max_n_batch (int): maximum number of optimisation batches. Only used by the Luigi
                 workflow.
-            name_gene_map (str): name of the gene mapping csv file. Only required when using the
-                Nexus access_point and the IC-selector.
+            name_gene_map (str): path to the gene expression csv file used by the ion channel
+                selector, relative to the e-model directory. Only required when configuring the
+                model from gene data (``configure_model(use_gene_data=True)``). The file has the
+                columns "me-type", "t-type" and "modality", followed by one column per gene.
             n_model (int): minimum number of models to pass validation to consider the e-model
                 building task done. Only used by the Luigi workflow.
             use_ProbAMPANMDA_EMS (bool): True to link ProbAMPANMDA_EMS in EMC on nexus,
@@ -358,6 +361,10 @@ class EModelPipelineSettings:
             protocols_rheobase (list): temporary
             auto_targets (list): temporary
             auto_targets_presets (list): temporary
+            path_ic_map (str): path to the ion channel map json file used by the ion channel
+                selector, relative to the e-model directory. It maps genes to mechanisms,
+                parameters and distributions. Only required when configuring the model from gene
+                data.
         """
 
         # Settings related to E-features extraction
@@ -440,6 +447,7 @@ class EModelPipelineSettings:
         self.optimisation_batch_size = optimisation_batch_size
         self.max_n_batch = max_n_batch
         self.name_gene_map = name_gene_map
+        self.path_ic_map = path_ic_map
 
         # Settings specific to the analysis (figure plotting)
         self.plot_optimisation_progress = plot_optimisation_progress

@@ -177,7 +177,26 @@ class EModel_pipeline:
         morphology_format=None,
         use_gene_data=False,
     ):
-        """To be deprecated"""
+        """Create a model configuration and save it to the recipe's ``params`` file.
+
+        With ``use_gene_data=True``, the mechanisms, parameters and distributions are selected
+        by the ion channel selector from gene expression data. This needs the pipeline settings
+        ``name_gene_map`` (gene expression csv) and ``path_ic_map`` (ion channel map json),
+        and the e-model's ``ttype``, ``mtype`` and ``etype``. Otherwise the configuration only
+        contains the selected morphology.
+
+        Warning: the configuration is written over the file given by ``params`` in the recipe.
+
+        Args:
+            morphology_name (str): name of the morphology on which to build the model.
+            morphology_path (str): path to the morphology file.
+            morphology_format (str): format of the morphology, "asc" or "swc". Optional if
+                morphology_path is given.
+            use_gene_data (bool): select the ion channels from gene data.
+
+        Returns:
+            NeuronModelConfiguration
+        """
 
         return configure_model(
             self.access_point,

@@ -82,8 +82,8 @@ class ModelConfigurator:
             self.configuration = None
 
     def get_gene_based_parameters(self):
-        """Get the gene mapping from Nexus and retrieve the matching parameters and mechanisms
-        from the ion channel selector"""
+        """Read the gene expression table and the ion channel map, and get the matching
+        parameters, mechanisms and distributions from the ion channel selector."""
 
         from bluepyemodel.icselector import icselector
 
@@ -101,8 +101,9 @@ class ModelConfigurator:
         ic_map_path = self.access_point.load_ic_map()
 
         selector = icselector.ICSelector(ic_map_path, gene_map_path)
-        me_type = f"{self.access_point.emodel_metadata.mtype}_ \
-                    {self.access_point.emodel_metadata.etype}"
+        me_type = (
+            f"{self.access_point.emodel_metadata.mtype}_{self.access_point.emodel_metadata.etype}"
+        )
         parameters, mechanisms, distributions, nexus_keys = selector.get_cell_config_from_ttype(
             [self.access_point.emodel_metadata.ttype, me_type]
         )

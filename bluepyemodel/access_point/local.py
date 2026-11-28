@@ -24,6 +24,7 @@ from itertools import chain
 from pathlib import Path
 
 import fasteners
+import pandas
 from bluepyefe.tools import NumpyEncoder
 
 from bluepyemodel.access_point.access_point import DataAccessPoint
@@ -455,6 +456,60 @@ class LocalAccessPoint(DataAccessPoint):
 
         patterns = ["*" + ext for ext in SUPPORTED_MORPHOLOGY_EXTENSIONS]
         return {morph_file.stem for pattern in patterns for morph_file in morph_dir.glob(pattern)}
+
+    def _resolve_ion_channel_selector_file(self, path, setting):
+        """Return the absolute path of an ion channel selector input file."""
+        if not path:
+            raise ValueError(
+                f"The pipeline setting '{setting}' is required to configure the model from gene "
+                "data."
+            )
+        path = Path(path)
+        if not path.is_absolute():
+            path = self.emodel_dir / path
+        if not path.is_file():
+            raise FileNotFoundError(
+                f"File given by the pipeline setting '{setting}' not found: {path}"
+            )
+        return path
+
+    def load_channel_gene_expression(self, name):
+        """Read the gene expression table used by the ion channel selector.
+
+        Args:
+            name (str): path to the csv file, relative to the e-model directory. It is usually
+                the pipeline setting ``name_gene_map``.
+
+        Returns:
+            tuple: the table as a pandas.DataFrame indexed by "me-type", "t-type" and "modality",
+            and the absolute path to the file.
+        """
+        path = self._resolve_ion_channel_selector_file(name, "name_gene_map")
+        df = pandas.read_csv(path, index_col=["me-type", "t-type", "modality"])
+        return df, path
+
+    def load_ic_map(self):
+        """Return the path to the ion channel map used by the ion channel selector.
+
+        The path comes from the pipeline setting ``path_ic_map``, relative to the e-model
+        directory.
+        """
+        return self._resolve_ion_channel_selector_file(
+            self.pipeline_settings.path_ic_map, "path_ic_map"
+        )
+
+    def get_t_types(self, table_name):
+        """Get the t-types available for the present e-model in a gene expression table.
+
+        Args:
+            table_name (str): path to the gene expression csv file, relative to the e-model
+                directory.
+        """
+        df, _ = self.load_channel_gene_expression(table_name)
+        df = df.reset_index()
+        # replace non-alphanumeric characters with underscores in the me-types
+        me_types = df["me-type"].str.replace(r"\W", "_", regex=True)
+        return df.loc[me_types == self.emodel_metadata.emodel, "t-type"].unique().tolist()
 
     def get_model_configuration(self, skip_get_available_morph=False):
         """Get the configuration of the model, including parameters, mechanisms and distributions
