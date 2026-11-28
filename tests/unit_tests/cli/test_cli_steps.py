@@ -16,6 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import logging
 from unittest.mock import MagicMock
 
 import pytest
@@ -218,3 +219,8 @@ def test_summarize(pipeline):
     pipeline.access_point.__str__ = MagicMock(return_value="summary of L5PC")
     result = invoke("summarize", *BASE)
     assert "summary of L5PC" in result.output
+
+
+def test_fonttools_logs_are_quiet(pipeline):
+    invoke("--log-level", "DEBUG", "validate", *BASE)
+    assert logging.getLogger("fontTools").level == logging.WARNING

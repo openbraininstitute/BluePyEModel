@@ -43,6 +43,8 @@ def main(log_level):
         handlers=[logging.StreamHandler()],
         force=True,
     )
+    # fontTools logs every font it subsets when matplotlib saves figures
+    logging.getLogger("fontTools").setLevel(max(LOG_LEVELS[log_level], logging.WARNING))
 
 
 main.add_command(extract)
