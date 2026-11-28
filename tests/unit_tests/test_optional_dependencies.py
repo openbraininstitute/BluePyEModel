@@ -68,3 +68,13 @@ def test_forge_access_point_reexports_default_endpoint():
     from bluepyemodel.access_point import nexus_endpoints
 
     assert forge_access_point.DEFAULT_NEXUS_ENDPOINT == nexus_endpoints.DEFAULT_NEXUS_ENDPOINT
+
+
+def test_luigi_config_uses_default_endpoint():
+    """The Luigi configuration reads the endpoint from the dependency-free module."""
+    pytest.importorskip("luigi")
+    from bluepyemodel.access_point import nexus_endpoints
+    from bluepyemodel.tasks.config import EmodelAPIConfig
+
+    config = EmodelAPIConfig(recipes_path="recipes.json")
+    assert config.nexus_endpoint == nexus_endpoints.DEFAULT_NEXUS_ENDPOINT
