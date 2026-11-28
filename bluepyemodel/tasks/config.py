@@ -18,7 +18,7 @@ limitations under the License.
 
 import luigi
 
-from bluepyemodel.access_point.forge_access_point import DEFAULT_NEXUS_ENDPOINT
+from bluepyemodel.access_point.nexus_endpoints import DEFAULT_NEXUS_ENDPOINT
 
 
 class EmodelAPIConfig(luigi.Config):
