@@ -53,32 +53,16 @@ classifiers=[
 ]
 
 [project.optional-dependencies]
-luigi = [
-    "luigi>=3.7.2",
-    "luigi-tools>=0.0.12",
-]
 docs = [
     "graphviz",
     "sphinx>=8.2,<10",
     "obi-sphinx-theme>=2.0.0",
-    "luigi>=3.7.2",
-    "luigi-tools>=0.0.12",
 ]
 test = [
     "pytest>=6.2",
     "dictdiffer>=0.8",
 ]
-nexus = [
-    "nexusforge>=0.8.2",
-    "entity_management>=1.2",
-    "pyJWT>=2.1.0",
-]
 all = [
-    "luigi>=3.7.2",
-    "luigi-tools>=0.0.12",
-    "nexusforge>=0.8.2",
-    "entity_management>=1.2",
-    "pyJWT>=2.1.0",
     "pytest>=6.2",
     "dictdiffer>=0.8",
 ]

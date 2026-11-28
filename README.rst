@@ -74,15 +74,13 @@ Installation
 
 BluePyEModel can be pip installed with the following command:
 
-.. code-block:: python
+.. code-block:: console
 
-    pip install bluepyemodel[all]
+    pip install bluepyemodel
 
-If you do not wish to install all dependencies, specific dependencies can be selected by indicating which ones to install between brackets in place of 'all' (If you want multiple dependencies, they have to be separated by commas). The available dependencies are:
+The optional dependencies ``test`` and ``docs`` install what is needed to run the tests and to build the documentation, for example ``pip install bluepyemodel[test]``.
 
-* luigi
-* nexus
-* all
+The Nexus access point and the Luigi workflow were removed in BluePyEModel 2.0. They remain available in BluePyEModel 1.x.
 
 
 To get started with the E-Model building pipeline
@@ -103,8 +101,6 @@ The pipeline is divided in 6 steps:
 * ``exporting``: read the parameter of the best models and export them in files that can be used either in NEURON or for circuit building.
 
 These six steps are to be run in order as for example validation cannot be run if no models have been stored. Steps ``validation``, ``plotting`` and ``exporting`` are optional. Step ``extraction`` can also be optional in the case where the file containing the protocols and optimisation targets is created by hand or if it is obtained from an older project.
-
-For an example of how to run the pipeline with the Nexus access point, see the `Nexus example <https://github.com/openbraininstitute/BluePyEModel/tree/main/examples/nexus/>`_
 
 Schematics of BluePyEModel classes
 -----------------------------------

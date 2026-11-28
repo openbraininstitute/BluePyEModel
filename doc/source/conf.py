@@ -95,13 +95,8 @@ add_module_names = False
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "luigi": ("https://luigi.readthedocs.io/en/stable", None),
 }
 
 autodoc_mock_imports = [
-    "bluepyemodel.tasks.luigi_tools",
     "bluepyemodel.icselector.met_type_ic_profile_generator",
-    "entity_management",
-    "jwt",
-    "kgforge",
 ]

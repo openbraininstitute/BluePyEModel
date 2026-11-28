@@ -290,15 +290,16 @@ def test_compile_mechs_in_emodel_dir_logs_exception_and_restores_cwd(tmp_path, c
     assert "Cannot compile the mechanisms" in caplog.text
 
 
-def test_copy_and_compile_mechanisms_noop_for_local_access_point():
-    class FakeLocalAccessPoint:
-        """Minimal stand-in with the class name LocalAccessPoint."""
+def test_copy_and_compile_mechanisms_is_a_noop(monkeypatch):
+    """It only served the removed Nexus access point."""
+    calls = []
+    monkeypatch.setattr(
+        "bluepyemodel.tools.mechanisms.compile_mechs", lambda *args: calls.append(args)
+    )
 
-    access_point = FakeLocalAccessPoint()
+    copy_and_compile_mechanisms(object())
 
-    # Should not raise, and should not attempt to compile anything since
-    # the class name is not NexusAccessPoint.
-    copy_and_compile_mechanisms(access_point)
+    assert not calls
 
 
 def test_get_mechanism_name_suffix():

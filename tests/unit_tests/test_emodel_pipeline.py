@@ -17,8 +17,9 @@ limitations under the License.
 import pytest
 
 from bluepyemodel.access_point.local import LocalAccessPoint
-from bluepyemodel.access_point.nexus import NexusAccessPoint
+from bluepyemodel.access_point import get_access_point
 from bluepyemodel.emodel_pipeline.emodel_pipeline import EModel_pipeline
+from bluepyemodel.emodel_pipeline.emodel_pipeline import EModel_pipeline_nexus
 from tests.utils import DATA
 from unittest.mock import patch
 
@@ -43,16 +44,32 @@ def test_init_local(pipeline):
     assert isinstance(pipeline.access_point, LocalAccessPoint)
 
 
-def test_init_nexus_missing_project():
-    with pytest.raises(
-        ValueError,
-        match="Nexus project name is required for Nexus access point.",
-    ):
-        _ = EModel_pipeline(
+def test_nexus_access_point_was_removed():
+    with pytest.raises(ValueError, match="removed in BluePyEModel 2.0"):
+        EModel_pipeline(
             emodel="cADpyr_L5TPC",
             recipes_path=DATA / "config/recipes.json",
-            ttype="test",
-            species="mouse",
-            brain_region="SSCX",
             data_access_point="nexus",
         )
+    with pytest.raises(ValueError, match="removed in BluePyEModel 2.0"):
+        get_access_point("nexus", emodel="cADpyr_L5TPC")
+    with pytest.raises(ValueError, match="removed in BluePyEModel 2.0"):
+        EModel_pipeline_nexus(emodel="cADpyr_L5TPC")
+
+
+def test_unknown_access_point():
+    with pytest.raises(ValueError, match="Unknown access point"):
+        EModel_pipeline(emodel="cADpyr_L5TPC", data_access_point="other")
+    with pytest.raises(ValueError, match="Unknown access point"):
+        get_access_point("other", emodel="cADpyr_L5TPC")
+
+
+def test_nexus_arguments_are_ignored_with_a_warning():
+    with pytest.warns(DeprecationWarning, match="nexus_project, access_token ignored"):
+        pipe = EModel_pipeline(
+            emodel="cADpyr_L5TPC",
+            recipes_path=DATA / "config/recipes.json",
+            nexus_project="project",
+            access_token="token",
+        )
+    assert isinstance(pipe.access_point, LocalAccessPoint)
