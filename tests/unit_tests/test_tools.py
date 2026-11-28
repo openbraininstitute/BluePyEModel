@@ -31,6 +31,7 @@ from bluepyemodel.tools.utils import format_protocol_name_to_list
 from bluepyemodel.tools.utils import get_curr_name
 from bluepyemodel.tools.utils import get_loc_name
 from bluepyemodel.tools.utils import get_protocol_name
+from bluepyemodel.tools.utils import load_function_from_file
 from bluepyemodel.tools.utils import select_rec_for_thumbnail
 from tests.utils import DATA
 
@@ -365,3 +366,22 @@ def test_discriminate_by_temp_returns_all_when_none_match_any_temperature():
     result = discriminate_by_temp(resources, [34, 37])
 
     assert result == resources
+
+
+def test_load_function_from_file(tmp_path):
+    module_path = tmp_path / "custom_functions.py"
+    module_path.write_text("def double(x):\n    return 2 * x\n")
+
+    assert load_function_from_file(module_path, "double")(21) == 42
+    assert load_function_from_file(str(module_path), "double")(1) == 2
+
+    with pytest.raises(AttributeError):
+        load_function_from_file(module_path, "missing")
+    with pytest.raises(FileNotFoundError):
+        load_function_from_file(tmp_path / "missing.py", "double")
+
+    # no loader exists for a file without a Python suffix
+    not_python = tmp_path / "custom_functions.txt"
+    not_python.write_text("def double(x):\n    return 2 * x\n")
+    with pytest.raises(ImportError, match="Cannot import"):
+        load_function_from_file(not_python, "double")

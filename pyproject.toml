@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools >= 64", "setuptools_scm"]
+requires = ["setuptools >= 77", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,7 +9,8 @@ authors = [
 ]
 description="Blue Brain Python Electrical Modeling Pipeline"
 readme = "README.rst"
-license = {file = "LICENSE.txt"}
+license = "Apache-2.0"
+license-files = ["LICENSE.txt", "COPYING", "AUTHORS.txt"]
 requires-python = ">= 3.11"
 dynamic = ["version"]
 dependencies = [
@@ -45,10 +46,14 @@ keywords=[
 classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: POSIX",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Utilities",
 ]
 

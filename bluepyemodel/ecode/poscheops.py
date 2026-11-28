@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 class PosCheops(BPEM_stimulus):
     # pylint: disable=line-too-long,anomalous-backslash-in-string
 
-    """PosCheops current stimulus
+    r"""PosCheops current stimulus
 
     .. code-block:: none
 

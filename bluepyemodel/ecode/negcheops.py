@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 class NegCheops(BPEM_stimulus):
     # pylint: disable=line-too-long,anomalous-backslash-in-string
 
-    """NegCheops current stimulus
+    r"""NegCheops current stimulus
 
     .. code-block:: none
 

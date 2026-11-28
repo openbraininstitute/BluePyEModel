@@ -17,8 +17,6 @@ limitations under the License.
 """
 
 import logging
-import pathlib
-from importlib.machinery import SourceFileLoader
 
 import numpy
 
@@ -26,6 +24,7 @@ from bluepyemodel.evaluation.evaluation import compute_responses
 from bluepyemodel.evaluation.evaluation import get_evaluator_from_access_point
 from bluepyemodel.tools.utils import are_same_protocol
 from bluepyemodel.tools.utils import get_protocol_name
+from bluepyemodel.tools.utils import load_function_from_file
 from bluepyemodel.validation import validation_functions
 
 logger = logging.getLogger(__name__)
@@ -50,11 +49,8 @@ def define_validation_function(access_point):
             raise ValueError("validation_function must be 'max_score' or 'mean_score'.")
 
     elif isinstance(validation_function, list) and len(validation_function) == 2:
-        # pylint: disable=deprecated-method,no-value-for-parameter
-        function_module = SourceFileLoader(
-            pathlib.Path(validation_function[0]).stem, validation_function[0]
-        ).load_module()
-        validation_function = getattr(function_module, validation_function[1])
+        file_path, function_name = validation_function
+        validation_function = load_function_from_file(file_path, function_name)
 
     if not callable(validation_function):
         raise TypeError("validation_function is not callable nor a list of two strings")

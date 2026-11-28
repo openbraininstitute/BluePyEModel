@@ -17,6 +17,7 @@ limitations under the License.
 """
 
 import glob
+import importlib.util
 import logging
 import pickle
 from pathlib import Path
@@ -28,6 +29,25 @@ from bluepyemodel.ecode import eCodes
 from bluepyemodel.tools.checkpoint_hdf5 import read_checkpoint_h5
 
 logger = logging.getLogger("__main__")
+
+
+def load_function_from_file(file_path, function_name):
+    """Import a Python file as a module and return one of its functions.
+
+    Args:
+        file_path (str or Path): path to the Python file.
+        function_name (str): name of the function in that file.
+
+    Returns:
+        The function.
+    """
+    file_path = Path(file_path)
+    spec = importlib.util.spec_from_file_location(file_path.stem, file_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot import {file_path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return getattr(module, function_name)
 
 
 def deduplicate_checkpoint_paths(checkpoint_paths):

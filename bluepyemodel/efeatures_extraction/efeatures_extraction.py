@@ -19,13 +19,13 @@ limitations under the License.
 import logging
 import pathlib
 import pickle
-from importlib.machinery import SourceFileLoader
 
 import bluepyefe.extract
 import numpy
 
 from bluepyemodel.evaluation.fitness_calculator_configuration import FitnessCalculatorConfiguration
 from bluepyemodel.tools.search_pdfs import search_figure_efeatures
+from bluepyemodel.tools.utils import load_function_from_file
 
 logger = logging.getLogger(__name__)
 
@@ -143,11 +143,8 @@ def define_extraction_reader_function(access_point):
         return None
 
     if isinstance(extraction_reader, list) and len(extraction_reader) == 2:
-        # pylint: disable=deprecated-method,no-value-for-parameter
-        function_module = SourceFileLoader(
-            pathlib.Path(extraction_reader[0]).stem, extraction_reader[0]
-        ).load_module()
-        extraction_reader = getattr(function_module, extraction_reader[1])
+        file_path, function_name = extraction_reader
+        extraction_reader = load_function_from_file(file_path, function_name)
 
     elif not callable(extraction_reader):
         raise TypeError("Extraction reader function is not callable nor a list of two strings")
