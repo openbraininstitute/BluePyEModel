@@ -570,7 +570,7 @@ class LocalAccessPoint(DataAccessPoint):
         configuration = TargetsConfiguration(
             files=config_dict["files"],
             targets=config_dict["targets"],
-            protocols_rheobase=config_dict["protocols_rheobase"],
+            protocols_rheobase=config_dict.get("protocols_rheobase", []),
             additional_fitness_efeatures=config_dict.get("additional_fitness_efeatures", None),
             additional_fitness_protocols=config_dict.get("additional_fitness_protocols", None),
             protocols_mapping=config_dict.get("protocols_mapping", None),

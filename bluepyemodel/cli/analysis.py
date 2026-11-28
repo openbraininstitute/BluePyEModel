@@ -6,6 +6,9 @@ from pathlib import Path
 
 import click
 
+from bluepyemodel.cli.common import given_metadata
+from bluepyemodel.cli.common import metadata_options
+
 
 def _resolve_checkpoint_path(access_point, seed, checkpoint_path, checkpoints_dir):
     if checkpoint_path is not None:
@@ -21,6 +24,7 @@ def _resolve_checkpoint_path(access_point, seed, checkpoint_path, checkpoints_di
 
 
 @click.command()
+@metadata_options
 @click.option("--seed", type=int, required=True, help="Random seed")
 @click.option("--emodel", required=True, help="EModel name")
 @click.option(
@@ -76,6 +80,7 @@ def analyse(
     output_figures_dir,
     output_nodes_dir,
     output_em_dir,
+    **metadata,
 ):
     """Analyse an optimisation checkpoint: store results, plot, export, and write EM JSON."""
 
@@ -92,6 +97,7 @@ def analyse(
     access_point = LocalAccessPoint(
         emodel=emodel,
         recipes_path=recipes_path,
+        **given_metadata(**metadata),
     )
     resolved_checkpoint = _resolve_checkpoint_path(
         access_point,

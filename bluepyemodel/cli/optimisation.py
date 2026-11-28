@@ -5,10 +5,14 @@ from pathlib import Path
 
 import click
 
+from bluepyemodel.cli.common import given_metadata
+from bluepyemodel.cli.common import metadata_options
+
 L = logging.getLogger(__name__)
 
 
 @click.command()
+@metadata_options
 @click.option("--seed", type=int, required=True, help="Random seed")
 @click.option("--emodel", required=True, help="EModel name")
 @click.option(
@@ -32,7 +36,7 @@ L = logging.getLogger(__name__)
     default=False,
     help="Convert the optimisation checkpoint pickle to HDF5 after the run.",
 )
-def optimise(seed, emodel, workers, checkpoints_dir, recipes_path, convert_checkpoint):
+def optimise(seed, emodel, workers, checkpoints_dir, recipes_path, convert_checkpoint, **metadata):
     """Run EModel optimisation."""
     from bluepyemodel.access_point.local import LocalAccessPoint
     from bluepyemodel.optimisation import setup_and_run_optimisation
@@ -43,6 +47,7 @@ def optimise(seed, emodel, workers, checkpoints_dir, recipes_path, convert_check
     access_point = LocalAccessPoint(
         emodel=emodel,
         recipes_path=recipes_path,
+        **given_metadata(**metadata),
     )
     with NestedPool(processes=workers) as pool:
         setup_and_run_optimisation(
@@ -54,7 +59,7 @@ def optimise(seed, emodel, workers, checkpoints_dir, recipes_path, convert_check
         )
 
     if convert_checkpoint:
-        L.info("Convering pickle checkpoint to hdf5...")
+        L.info("Converting pickle checkpoint to hdf5...")
         checkpoint_path = Path(
             get_checkpoint_path(
                 access_point.emodel_metadata,

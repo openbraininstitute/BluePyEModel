@@ -215,9 +215,16 @@ def export_emodels_hoc(
     seeds=None,
     new_emodel_name=None,
     new_metadata=None,
+    output_dir=None,
 ):
     """Export a set of emodels to a set of folder named after them. Each folder will contain a hoc
-    version of the model."""
+    version of the model.
+
+    Args:
+        output_dir (str): directory to write the files to. If None, each model is written to its
+            own folder in ./export_emodels_hoc/. With several models, give None: an explicit
+            directory receives the files of every model under the same names.
+    """
 
     cell_evaluator = get_evaluator_from_access_point(
         access_point, include_validation_protocols=True
@@ -244,4 +251,4 @@ def export_emodels_hoc(
             mo.emodel_metadata = new_metadata
         if not cell_model.morphology.morph_modifiers:  # Turn [] into None
             cell_model.morphology.morph_modifiers = None
-        _export_emodel_hoc(cell_model, mo, output_dir=None, new_emodel_name=new_emodel_name)
+        _export_emodel_hoc(cell_model, mo, output_dir=output_dir, new_emodel_name=new_emodel_name)
