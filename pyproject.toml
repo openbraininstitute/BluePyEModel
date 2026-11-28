@@ -93,7 +93,9 @@ bluepyemodel = "bluepyemodel.__main__:main"
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["tests",]
+# Only ship the bluepyemodel package. Without this, setuptools also finds examples/, doc/
+# and scripts/ as namespace packages and installs them at the top of site-packages.
+include = ["bluepyemodel*"]
 
 [tool.setuptools_scm]
 version_scheme = "python-simplified-semver"
