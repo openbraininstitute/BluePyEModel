@@ -42,9 +42,10 @@ def configure_targets(access_point):
                             "filename": filename.split("/")[-1].split(".")[0],
                             "ecodes": {ecode: ecodes_metadata[ecode]},
                             "other_metadata": {
-                                "v_file": filename,
-                                # IMPORTANT: modify "ch1" with your number of channel in your ibw files
-                                "i_file": filename.replace("ch0", "ch1"),
+                                # In these recordings ch0 is the current and ch1 the voltage.
+                                # IMPORTANT: adapt the channel numbers to your own ibw files.
+                                "i_file": filename,
+                                "v_file": filename.replace("ch0", "ch1"),
                                 "i_unit": "A",
                                 "v_unit": "V",
                                 "t_unit": "s",
