@@ -21,6 +21,5 @@ BluePyEModel
    icselector
    model
    optimisation
-   tasks
    tools
    validation

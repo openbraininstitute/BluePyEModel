@@ -100,14 +100,13 @@ def compile_mechs_in_emodel_dir(mechanisms_directory):
         os.chdir(cwd)
 
 
-def copy_and_compile_mechanisms(access_point):
-    """Copy mechs if asked, and compile them."""
+def copy_and_compile_mechanisms(access_point):  # pylint: disable=unused-argument
+    """Does nothing.
 
-    if access_point.__class__.__name__ == "NexusAccessPoint":
-        # Mechanisms are automatically download by the Nexus API
-        # when calling this function
-        _ = access_point.get_model_configuration()
-        compile_mechs("./mechanisms")
+    It downloaded and compiled the mechanisms of the Nexus access point, which was removed in
+    BluePyEModel 2.0. Kept so that existing calls still work. With the local access point,
+    compile the mechanisms with compile_mechs or compile_mechs_in_emodel_dir.
+    """
 
 
 def get_mechanism_currents(mech_file):
